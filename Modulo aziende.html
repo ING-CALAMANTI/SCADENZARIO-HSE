@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aziende — Scadenzario Sicurezza</title>
+<link rel="stylesheet" href="fondamenta.css">
+<style>
+/* verde, verde-scuro, badge, rosso/arancio/ok arrivano da fondamenta.css.
+   Qui restano solo i token non presenti nelle fondamenta. */
+:root{--verde-chiaro:#e6f0ef;--grigio:#f5f6f6;--testo:#222;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;}
+body{background:var(--grigio);color:var(--testo);}
+header{background:var(--verde);color:#fff;padding:18px 28px;}
+header h1{font-size:20px;font-weight:600;}
+header p{font-size:13px;opacity:.85;margin-top:2px;}
+nav{background:var(--verde-scuro);display:flex;flex-wrap:wrap;}
+nav button{background:none;border:none;color:#cfe0df;padding:12px 22px;font-size:14px;cursor:pointer;}
+nav button.attivo{background:var(--grigio);color:var(--verde);font-weight:600;}
+main{padding:22px;max-width:1250px;margin:0 auto;}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:22px;}
+.card{background:#fff;border:1px solid var(--bordo);border-radius:6px;padding:16px;}
+.card .num{font-size:30px;font-weight:700;color:var(--verde);}
+.card .lbl{font-size:13px;color:#666;margin-top:4px;}
+.card[onclick]{cursor:pointer;transition:box-shadow .15s,border-color .15s;}
+.card[onclick]:hover{border-color:var(--verde);box-shadow:0 2px 8px rgba(15,94,90,.15);}
+.pannello{background:#fff;border:1px solid var(--bordo);border-radius:6px;padding:18px;margin-bottom:20px;}
+.pannello h2{font-size:16px;color:var(--verde);margin-bottom:12px;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:var(--verde-chiaro);color:var(--verde-scuro);text-align:left;padding:8px;border-bottom:2px solid var(--bordo);}
+td{padding:8px;border-bottom:1px solid var(--bordo);vertical-align:top;}
+tr:hover td{background:#fafbfb;}
+.badge{display:inline-block;padding:3px 9px;border-radius:10px;font-size:11px;font-weight:600;color:#fff;}
+.b-rosso{background:var(--rosso);} .b-arancio{background:var(--arancio);} .b-ok{background:var(--ok);} .b-verde{background:var(--verde);} .b-grigio{background:#999;}
+button.azione{background:var(--verde);color:#fff;border:none;border-radius:4px;padding:8px 16px;font-size:13px;cursor:pointer;}
+button.azione:hover{background:var(--verde-scuro);}
+button.secondario{background:#fff;color:var(--verde);border:1px solid var(--verde);border-radius:4px;padding:7px 14px;font-size:13px;cursor:pointer;}
+button.piccolo{padding:4px 10px;font-size:12px;}
+input,select,textarea{width:100%;padding:8px;border:1px solid var(--bordo);border-radius:4px;font-size:13px;margin-bottom:10px;}
+textarea{min-height:70px;resize:vertical;}
+label{font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:3px;}
+.riga{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.riga3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;}
+.riga4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:50;overflow:auto;}
+.modal{background:#fff;max-width:900px;margin:30px auto;border-radius:6px;padding:22px;}
+.modal h3{color:var(--verde);margin-bottom:6px;font-size:17px;}
+#m-contatto{z-index:70;background:rgba(0,0,0,.6);}
+#m-contatto .modal{max-width:640px;}
+.scheda{background:#fff;border:1px solid var(--bordo);border-left:4px solid var(--verde);border-radius:6px;padding:0;margin-bottom:12px;overflow:hidden;}
+.scheda.cessata{border-left-color:#999;opacity:.75;}
+.scheda-testa{display:flex;justify-content:space-between;align-items:center;cursor:pointer;flex-wrap:wrap;gap:8px;padding:14px 16px;}
+.scheda-testa:hover{background:#fafbfb;}
+.scheda-corpo{display:none;padding:0 16px 16px;border-top:1px solid var(--bordo);}
+.sezione{margin-top:14px;}
+.sezione h4{font-size:12px;font-weight:700;color:var(--verde);letter-spacing:.4px;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--verde-chiaro);}
+.dato{font-size:13px;margin-bottom:3px;}
+.dato span{color:#666;}
+.unita{border:1px solid var(--bordo);border-radius:5px;padding:12px;margin-bottom:10px;background:#fcfdfd;}
+.unita-testa{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px;}
+.unita-nome{font-size:13px;font-weight:700;color:var(--verde-scuro);}
+.contatto{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:4px;background:#fff;border:1px solid var(--bordo);margin-bottom:6px;font-size:12px;flex-wrap:wrap;gap:6px;}
+.contatto-ruolo{font-weight:700;color:var(--verde);min-width:150px;}
+.filtri{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+.filtri input,.filtri select{width:auto;min-width:190px;margin-bottom:0;}
+.avviso{background:#fff8e6;border:1px solid var(--arancio);border-radius:5px;padding:10px 12px;font-size:12px;margin-bottom:12px;}
+.vuoto{font-size:12px;color:#888;font-style:italic;padding:6px 0;}
+.contatore{font-size:12px;color:#666;}
+.barra-lic{height:6px;background:var(--bordo);border-radius:3px;overflow:hidden;margin-top:6px;}
+.barra-lic div{height:100%;background:var(--verde);}
+@media(max-width:800px){.riga,.riga3,.riga4{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<header>
+<h1>Aziende</h1>
+<p>Anagrafica, unità produttive e contatti — modulo base della piattaforma</p>
+</header>
+<nav>
+<button class="attivo" onclick="vaiTab('elenco',this)">Elenco aziende</button>
+<button onclick="vaiTab('contatti',this)">Rubrica contatti</button>
+<button onclick="vaiTab('notifiche',this)">Notifiche</button>
+</nav>
+<main>
+
+<!-- ELENCO -->
+<section id="tab-elenco">
+<div class="cards">
+<div class="card"><div class="num" id="c-aziende">0</div><div class="lbl">Aziende attive</div></div>
+<div class="card"><div class="num" id="c-unita">0</div><div class="lbl">Unità produttive</div></div>
+<div class="card"><div class="num" id="c-contatti">0</div><div class="lbl">Contatti registrati</div></div>
+<div class="card"><div class="num" id="c-abilitati" style="color:var(--ok)">0</div><div class="lbl">Abilitati alle notifiche</div></div>
+</div>
+<div class="pannello">
+<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+<h2 style="margin:0">Anagrafica aziende</h2>
+<div>
+<button class="azione" onclick="apriAzienda()">Nuova azienda</button>
+<button class="secondario" onclick="esporta()">Esporta JSON</button>
+<button class="secondario" onclick="document.getElementById('imp').click()">Importa JSON</button>
+<input type="file" id="imp" accept=".json" style="display:none" onchange="importa(this)">
+</div>
+</div>
+<div class="filtri" style="margin-top:12px">
+<input id="f-cerca" placeholder="Cerca per ragione sociale, sede, P.IVA" oninput="disegnaElenco()">
+<select id="f-stato" onchange="disegnaElenco()">
+<option value="Attiva">Solo attive</option>
+<option value="">Tutte</option>
+<option value="Cessata">Solo cessate</option>
+</select>
+</div>
+</div>
+<div id="lista"></div>
+</section>
+
+<!-- CONTATTI -->
+<section id="tab-contatti" style="display:none">
+<div class="pannello">
+<h2>Rubrica contatti</h2>
+<p style="font-size:12px;color:#666;margin-bottom:12px">Tutte le persone registrate nelle aziende, con i ruoli ricoperti. Da qui si verifica rapidamente chi riceve le notifiche.</p>
+<div class="filtri">
+<input id="f-c-cerca" placeholder="Cerca per nome, email, azienda" oninput="disegnaContatti()">
+<select id="f-c-ruolo" onchange="disegnaContatti()"><option value="">Tutti i ruoli</option></select>
+<select id="f-c-notifiche" onchange="disegnaContatti()">
+<option value="">Tutti</option>
+<option value="si">Solo abilitati alle notifiche</option>
+<option value="no">Solo non abilitati</option>
+</select>
+</div>
+<table><thead><tr><th>Nome</th><th>Ruoli</th><th>Azienda / Unità</th><th>Contatti</th><th>Notifiche</th></tr></thead>
+<tbody id="tbl-contatti"></tbody></table>
+<p id="c-conteggio" class="contatore" style="margin-top:8px"></p>
+</div>
+</section>
+
+<!-- NOTIFICHE -->
+<section id="tab-notifiche" style="display:none">
+<div class="pannello">
+<h2>Licenze notifica</h2>
+<p style="font-size:13px;margin-bottom:14px">Le notifiche automatiche di scadenza vengono inviate ai contatti abilitati. Ogni contatto abilitato occupa una licenza del pacchetto. Il consulente riceve sempre tutte le notifiche senza occupare licenze.</p>
+<div class="riga">
+<div>
+<label>Licenze del pacchetto</label>
+<input type="number" id="lic-tot" min="0" onchange="salvaLicenze()">
+</div>
+<div>
+<label>Licenze occupate</label>
+<p style="font-size:26px;font-weight:700;color:var(--verde)" id="lic-usate">0</p>
+<div class="barra-lic"><div id="lic-barra" style="width:0%"></div></div>
+<p class="contatore" id="lic-nota" style="margin-top:6px"></p>
+</div>
+</div>
+</div>
+<div class="pannello">
+<h2>Contatti abilitati</h2>
+<p style="font-size:12px;color:#666;margin-bottom:12px">Per ciascuno sono indicate le categorie di avviso che riceve. Un contatto in prova riceve le notifiche fino alla scadenza del periodo, poi va abilitato.</p>
+<table><thead><tr><th>Nome</th><th>Azienda / Unità</th><th>Email</th><th>Riceve avvisi su</th><th>Stato</th></tr></thead>
+<tbody id="tbl-notifiche"></tbody></table>
+</div>
+</section>
+</main>
+
+<!-- MODAL AZIENDA -->
+<div class="modal-bg" id="m-azienda"><div class="modal">
+<h3 id="az-titolo">Nuova azienda</h3>
+<p style="font-size:12px;color:#666;margin-bottom:14px">I dati inseriti qui alimentano tutti i moduli della piattaforma.</p>
+
+<h4 style="color:var(--verde);font-size:13px;margin:14px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--verde-chiaro)">IDENTIFICAZIONE</h4>
+<div class="riga">
+<div><label>Ragione sociale</label><input id="az-ragione" placeholder="Es. Valdama"></div>
+<div><label>Forma giuridica</label><input id="az-forma" placeholder="S.r.l., S.p.A., Ditta individuale"></div>
+</div>
+<div class="riga3">
+<div><label>Partita IVA</label><input id="az-piva"></div>
+<div><label>Codice fiscale</label><input id="az-cf"></div>
+<div><label>Codice ATECO</label><input id="az-ateco"></div>
+</div>
+<label>Attività svolta</label><input id="az-attivita" placeholder="Es. Produzione di articoli igienico sanitari in ceramica">
+
+<h4 style="color:var(--verde);font-size:13px;margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--verde-chiaro)">SEDE LEGALE</h4>
+<div class="riga3">
+<div><label>Indirizzo</label><input id="az-sl-via"></div>
+<div><label>CAP e comune</label><input id="az-sl-comune"></div>
+<div><label>Provincia</label><input id="az-sl-prov"></div>
+</div>
+
+<h4 style="color:var(--verde);font-size:13px;margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--verde-chiaro)">DATORE DI LAVORO</h4>
+<p style="font-size:12px;color:#666;margin-bottom:8px">Unica figura designata a livello societario. Tutte le altre si designano per unità produttiva.</p>
+<div class="riga3">
+<div><label>Nome e cognome</label><input id="az-ddl"></div>
+<div><label>Email</label><input id="az-ddl-email" type="email"></div>
+<div><label>Telefono</label><input id="az-ddl-tel"></div>
+</div>
+
+<h4 style="color:var(--verde);font-size:13px;margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--verde-chiaro)">UNITÀ PRODUTTIVE</h4>
+<p style="font-size:12px;color:#666;margin-bottom:8px">Ogni sopralluogo, scadenza o adempimento si riferisce a una specifica unità produttiva.</p>
+<div id="az-unita"></div>
+<button type="button" class="secondario piccolo" onclick="aggiungiUnita()">Aggiungi unità produttiva</button>
+<button type="button" class="secondario piccolo" onclick="aggiungiUnita(true)">Aggiungi copiando la sede legale</button>
+
+<h4 style="color:var(--verde);font-size:13px;margin:18px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--verde-chiaro)">ALTRO</h4>
+<div class="riga">
+<div><label>Stato</label><select id="az-stato"><option>Attiva</option><option>Cessata</option></select></div>
+<div><label>Referente amministrativo</label><input id="az-referente"></div>
+</div>
+<label>Note</label><textarea id="az-note"></textarea>
+
+<input type="hidden" id="az-id">
+<div style="text-align:right;margin-top:16px">
+<button class="secondario" onclick="chiudi('m-azienda')">Annulla</button>
+<button class="azione" onclick="salvaAzienda()">Salva azienda</button>
+</div>
+</div></div>
+
+<!-- MODAL CONTATTO -->
+<div class="modal-bg" id="m-contatto"><div class="modal">
+<h3>Contatto</h3>
+<p style="font-size:12px;color:#666;margin-bottom:14px" id="ct-dove"></p>
+<div class="riga">
+<div><label>Nome e cognome</label><input id="ct-nome"></div>
+<div><label>Ruolo</label><select id="ct-ruolo"></select></div>
+</div>
+<div class="riga">
+<div><label>Email</label><input id="ct-email" type="email"></div>
+<div><label>Telefono</label><input id="ct-tel"></div>
+</div>
+<h4 style="color:var(--verde);font-size:13px;margin:16px 0 8px;padding-bottom:4px;border-bottom:1px solid var(--verde-chiaro)">NOTIFICHE AUTOMATICHE</h4>
+<label style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;margin-bottom:10px">
+<input type="checkbox" id="ct-notifiche" style="width:auto;margin:0" onchange="mostraCategorie()"> Riceve le notifiche di scadenza
+</label>
+<div id="ct-blocco-cat" style="display:none">
+<p style="font-size:12px;color:#666;margin-bottom:8px">Selezionare le categorie di avviso che questo contatto deve ricevere.</p>
+<div class="riga3" id="ct-categorie"></div>
+<div class="avviso" id="ct-avviso-lic"></div>
+</div>
+<input type="hidden" id="ct-az"><input type="hidden" id="ct-un"><input type="hidden" id="ct-idx">
+<div style="text-align:right;margin-top:14px">
+<button class="secondario" onclick="chiudi('m-contatto')">Annulla</button>
+<button class="azione" onclick="salvaContatto()">Salva contatto</button>
+</div>
+</div></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="firebase-init.js"></script>
+<script src="auth-gate.js"></script>
+<script src="fondamenta.js"></script>
+<script>
+/* ============ DATI ============ */
+const RUOLI=['Datore di Lavoro','Dirigente delegato','RSPP','ASPP','Medico Competente','RLS',
+ 'Preposto','Addetto antincendio','Addetto primo soccorso','Referente amministrativo','Manutentore','Altro'];
+const CATEGORIE=['Antincendio','Formazione','Attrezzature','Recipienti in pressione','Adempimenti','Audit e sopralluoghi'];
+const GIORNI_PROVA=30;
+
+let licenzeTotali=5;
+
+let aziende=[
+ {id:1,ragione:"Valdama",forma:"S.r.l.",piva:"",cf:"",ateco:"23.42.00",
+  attivita:"Produzione di articoli igienico sanitari in ceramica",
+  slVia:"Via Galileo Galilei, 5",slComune:"01033 Civita Castellana",slProv:"VT",
+  ddl:"Daniele Vitali",ddlEmail:"",ddlTel:"",
+  stato:"Attiva",referente:"",note:"",
+  unita:[
+   {id:1,nome:"Stabilimento di Civita Castellana",via:"Via Galileo Galilei, 5",
+    comune:"01033 Civita Castellana",prov:"VT",addetti:"",superficie:"",turni:"",
+    attvvf:"",catvvf:"",scadvvf:"",rischioinc:"",
+    contatti:[
+     {nome:"Ing. Walter Calamanti",ruolo:"RSPP",email:"",tel:"",notifiche:true,categorie:CATEGORIE.slice(),inizioProva:null}
+    ]}
+  ]},
+ {id:2,ragione:"Galassia",forma:"S.r.l.",piva:"",cf:"",ateco:"23.42.00",
+  attivita:"Produzione di articoli igienico sanitari in ceramica",
+  slVia:"Zona Industriale località Pantalone, snc",slComune:"01030 Corchiano",slProv:"VT",
+  ddl:"Dimitri Mei",ddlEmail:"",ddlTel:"",
+  stato:"Attiva",referente:"",note:"",
+  unita:[
+   {id:1,nome:"Stabilimento di Corchiano",via:"Zona Industriale località Pantalone, snc",
+    comune:"01030 Corchiano",prov:"VT",addetti:"",superficie:"",turni:"",
+    attvvf:"",catvvf:"",scadvvf:"",rischioinc:"",
+    contatti:[
+     {nome:"Ing. Walter Calamanti",ruolo:"RSPP",email:"",tel:"",notifiche:false,categorie:[],inizioProva:null},
+     {nome:"Massimo Carpenti",ruolo:"Dirigente delegato",email:"",tel:"",notifiche:false,categorie:[],inizioProva:null}
+    ]}
+  ]}
+];
+let prossimoId=3;
+let unitaTemp=[];
+
+/* ============ UTILITÀ ============ */
+function chiudi(id){document.getElementById(id).style.display='none';}
+function dataIt(d){return d?Fond.fmtData(d):'';}
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+// nome completo con forma giuridica, senza duplicarla se già contenuta
+function nomeCompleto(z){
+ if(!z)return '';
+ const r=(z.ragione||'').trim(), f=(z.forma||'').trim();
+ if(!f)return r;
+ const n=s=>s.toLowerCase().replace(/[.\s]+/g,'');
+ return n(r).endsWith(n(f))?r:(r+' '+f);
+}
+function etichettaUnita(u){
+ if(!u)return '';
+ return u.nome||[u.via,u.comune].filter(x=>x).join(', ')||'Unità produttiva';
+}
+function tuttiContatti(){
+ const out=[];
+ aziende.forEach(z=>{
+  if(z.ddl)out.push({nome:z.ddl,ruolo:'Datore di Lavoro',email:z.ddlEmail||'',tel:z.ddlTel||'',
+   notifiche:false,categorie:[],azienda:z,unita:null,societario:true});
+  (z.unita||[]).forEach(u=>(u.contatti||[]).forEach((c,i)=>{
+   out.push(Object.assign({},c,{azienda:z,unita:u,idx:i}));
+  }));
+ });
+ return out;
+}
+function licenzeUsate(){
+ let n=0;
+ aziende.forEach(z=>(z.unita||[]).forEach(u=>(u.contatti||[]).forEach(c=>{if(c.notifiche&&!inProva(c))n++;})));
+ return n;
+}
+function inProva(c){
+ if(!c.inizioProva)return false;
+ const g=Math.floor((Date.now()-new Date(c.inizioProva).getTime())/86400000);
+ return g<GIORNI_PROVA;
+}
+function giorniProvaRimasti(c){
+ if(!c.inizioProva)return 0;
+ const g=Math.floor((Date.now()-new Date(c.inizioProva).getTime())/86400000);
+ return Math.max(0,GIORNI_PROVA-g);
+}
+
+/* ============ NAVIGAZIONE ============ */
+function vaiTab(t,btn){
+ document.querySelectorAll('main section').forEach(s=>s.style.display='none');
+ document.getElementById('tab-'+t).style.display='block';
+ document.querySelectorAll('nav button').forEach(b=>b.classList.remove('attivo'));
+ btn.classList.add('attivo');
+ if(t==='elenco')disegnaElenco();
+ if(t==='contatti')disegnaContatti();
+ if(t==='notifiche')disegnaNotifiche();
+}
+
+/* ============ ELENCO AZIENDE ============ */
+function disegnaElenco(){
+ const q=(document.getElementById('f-cerca').value||'').toLowerCase();
+ const fs=document.getElementById('f-stato').value;
+ let html='';
+ aziende.forEach(z=>{
+  if(fs&&z.stato!==fs)return;
+  if(q){
+   const testo=(nomeCompleto(z)+' '+(z.piva||'')+' '+(z.attivita||'')+' '+(z.slComune||'')
+    +' '+(z.unita||[]).map(u=>etichettaUnita(u)+' '+(u.comune||'')).join(' ')).toLowerCase();
+   if(!testo.includes(q))return;
+  }
+  const nU=(z.unita||[]).length;
+  const nC=(z.unita||[]).reduce((s,u)=>s+(u.contatti||[]).length,0)+(z.ddl?1:0);
+  html+='<div class="scheda'+(z.stato==='Cessata'?' cessata':'')+'">'
+   +'<div class="scheda-testa" onclick="apriChiudi(this)">'
+   +'<div><strong style="font-size:15px">'+esc(nomeCompleto(z))+'</strong>'
+   +(z.stato==='Cessata'?' <span class="badge b-grigio">cessata</span>':'')
+   +'<br><span style="font-size:12px;color:#666">'+esc(z.attivita||'')+'</span></div>'
+   +'<div><span class="badge b-verde">'+nU+(nU===1?' unità':' unità')+'</span> '
+   +'<span class="badge b-verde">'+nC+(nC===1?' contatto':' contatti')+'</span></div>'
+   +'</div><div class="scheda-corpo">'
+   // identificazione
+   +'<div class="riga"><div class="sezione"><h4>IDENTIFICAZIONE</h4>'
+   +(z.piva?'<p class="dato"><span>P.IVA:</span> '+esc(z.piva)+'</p>':'')
+   +(z.cf?'<p class="dato"><span>Codice fiscale:</span> '+esc(z.cf)+'</p>':'')
+   +(z.ateco?'<p class="dato"><span>ATECO:</span> '+esc(z.ateco)+'</p>':'')
+   +(z.slVia?'<p class="dato"><span>Sede legale:</span> '+esc(z.slVia)+', '+esc(z.slComune||'')+' '+(z.slProv?'('+esc(z.slProv)+')':'')+'</p>':'')
+   +'</div><div class="sezione"><h4>DATORE DI LAVORO</h4>'
+   +(z.ddl?'<p class="dato"><strong>'+esc(z.ddl)+'</strong></p>'
+     +(z.ddlEmail?'<p class="dato"><span>Email:</span> '+esc(z.ddlEmail)+'</p>':'')
+     +(z.ddlTel?'<p class="dato"><span>Telefono:</span> '+esc(z.ddlTel)+'</p>':'')
+     :'<p class="vuoto">Non indicato</p>')
+   +'</div></div>'
+   // unità produttive
+   +'<div class="sezione"><h4>UNITÀ PRODUTTIVE</h4>'
+   +(z.unita||[]).map((u,iu)=>schedaUnita(z,u,iu)).join('')
+   +'</div>'
+   +(z.note?'<div class="sezione"><h4>NOTE</h4><p class="dato">'+esc(z.note)+'</p></div>':'')
+   +'<div style="margin-top:14px">'
+   +'<button class="secondario piccolo" onclick="event.stopPropagation();apriAzienda('+z.id+')">Modifica azienda</button> '
+   +'<button class="secondario piccolo" onclick="event.stopPropagation();eliminaAzienda('+z.id+')">Elimina</button>'
+   +'</div></div></div>';
+ });
+ document.getElementById('lista').innerHTML=html||'<div class="pannello"><p class="vuoto">Nessuna azienda corrisponde ai filtri. Premere "Nuova azienda" per aggiungerne una.</p></div>';
+ aggiornaCards();
+}
+function schedaUnita(z,u,iu){
+ const c=u.contatti||[];
+ return '<div class="unita">'
+  +'<div class="unita-testa"><span class="unita-nome">'+esc(etichettaUnita(u))+'</span>'
+  +(u.attvvf?'<span class="badge b-verde">'+esc(u.attvvf)+(u.catvvf?' — cat. '+esc(u.catvvf):'')+'</span>':'')
+  +'</div>'
+  +(u.via?'<p class="dato">'+esc(u.via)+', '+esc(u.comune||'')+' '+(u.prov?'('+esc(u.prov)+')':'')+'</p>':'')
+  +((u.addetti||u.superficie||u.turni)?'<p class="dato"><span>'
+    +[u.addetti?u.addetti+' addetti':'',u.superficie?u.superficie+' m²':'',u.turni].filter(x=>x).join(' · ')
+    +'</span></p>':'')
+  +(u.scadvvf?'<p class="dato"><span>Scadenza SCIA antincendio:</span> '+dataIt(u.scadvvf)+'</p>':'')
+  +'<p style="font-size:11px;font-weight:700;color:var(--verde);margin:10px 0 6px">FIGURE E CONTATTI</p>'
+  +(c.length?c.map((x,i)=>rigaContatto(z,u,x,i)).join(''):'<p class="vuoto">Nessuna figura designata per questa unità.</p>')
+  +'<button class="secondario piccolo" style="margin-top:6px" onclick="event.stopPropagation();apriContatto('+z.id+','+u.id+')">Aggiungi contatto</button>'
+  +'</div>';
+}
+function rigaContatto(z,u,c,i){
+ let stato='';
+ if(c.notifiche){
+  if(inProva(c))stato='<span class="badge b-arancio">prova, '+giorniProvaRimasti(c)+' gg</span>';
+  else stato='<span class="badge b-ok">notifiche attive</span>';
+ }
+ return '<div class="contatto">'
+  +'<div><span class="contatto-ruolo">'+esc(c.ruolo)+'</span> '+esc(c.nome||'—')
+  +(c.email?' <span style="color:#888">· '+esc(c.email)+'</span>':'')+'</div>'
+  +'<div>'+stato+' <button class="secondario piccolo" onclick="event.stopPropagation();apriContatto('+z.id+','+u.id+','+i+')">Modifica</button>'
+  +' <button class="secondario piccolo" onclick="event.stopPropagation();eliminaContatto('+z.id+','+u.id+','+i+')">Elimina</button></div>'
+  +'</div>';
+}
+function apriChiudi(el){
+ const c=el.nextElementSibling;
+ c.style.display=c.style.display==='block'?'none':'block';
+}
+function aggiornaCards(){
+ const attive=aziende.filter(z=>z.stato!=='Cessata').length;
+ let nu=0,nc=0,na=0;
+ aziende.forEach(z=>{
+  nu+=(z.unita||[]).length;
+  if(z.ddl)nc++;
+  (z.unita||[]).forEach(u=>(u.contatti||[]).forEach(c=>{nc++;if(c.notifiche)na++;}));
+ });
+ document.getElementById('c-aziende').textContent=attive;
+ document.getElementById('c-unita').textContent=nu;
+ document.getElementById('c-contatti').textContent=nc;
+ document.getElementById('c-abilitati').textContent=na;
+}
+
+/* ============ MODULO AZIENDA ============ */
+const campi=['ragione','forma','piva','cf','ateco','attivita','slVia','slComune','slProv','ddl','ddlEmail','ddlTel','stato','referente','note'];
+const ids={ragione:'az-ragione',forma:'az-forma',piva:'az-piva',cf:'az-cf',ateco:'az-ateco',attivita:'az-attivita',
+ slVia:'az-sl-via',slComune:'az-sl-comune',slProv:'az-sl-prov',ddl:'az-ddl',ddlEmail:'az-ddl-email',ddlTel:'az-ddl-tel',
+ stato:'az-stato',referente:'az-referente',note:'az-note'};
+
+function apriAzienda(id){
+ document.getElementById('az-titolo').textContent=id?'Modifica azienda':'Nuova azienda';
+ const z=id?aziende.find(x=>x.id===id):null;
+ campi.forEach(k=>{const el=document.getElementById(ids[k]);if(el)el.value=z?(z[k]||''):'';});
+ if(!z)document.getElementById('az-stato').value='Attiva';
+ unitaTemp=z&&z.unita?JSON.parse(JSON.stringify(z.unita)):[nuovaUnita()];
+ disegnaUnitaModulo();
+ document.getElementById('az-id').value=id||'';
+ document.getElementById('m-azienda').style.display='block';
+}
+function nuovaUnita(){
+ return {id:Math.max(0,...unitaTemp.map(u=>u.id||0))+1,nome:'',via:'',comune:'',prov:'',
+  addetti:'',superficie:'',turni:'',attvvf:'',catvvf:'',scadvvf:'',rischioinc:'',contatti:[]};
+}
+function aggiungiUnita(daSedeLegale){
+ const u=nuovaUnita();
+ if(daSedeLegale){
+  u.via=document.getElementById('az-sl-via').value.trim();
+  u.comune=document.getElementById('az-sl-comune').value.trim();
+  u.prov=document.getElementById('az-sl-prov').value.trim();
+  if(!u.via&&!u.comune){alert('Compilare prima la sede legale.');return;}
+ }
+ unitaTemp.push(u);disegnaUnitaModulo();
+}
+function rimuoviUnita(i){
+ if(unitaTemp.length===1){alert('Deve restare almeno un\'unità produttiva.');return;}
+ const n=(unitaTemp[i].contatti||[]).length;
+ if(n&&!confirm('Questa unità ha '+n+' contatti associati, che verranno eliminati. Procedere?'))return;
+ unitaTemp.splice(i,1);disegnaUnitaModulo();
+}
+function setUnita(i,campo,val){unitaTemp[i][campo]=val;}
+function disegnaUnitaModulo(){
+ document.getElementById('az-unita').innerHTML=unitaTemp.map((u,i)=>
+  '<div class="unita">'
+  +'<div class="unita-testa"><span class="unita-nome">Unità '+(i+1)+'</span>'
+  +'<button type="button" class="secondario piccolo" onclick="rimuoviUnita('+i+')">Rimuovi</button></div>'
+  +'<label>Denominazione</label><input value="'+esc(u.nome)+'" onchange="setUnita('+i+',\'nome\',this.value)" placeholder="Es. Stabilimento di Corchiano">'
+  +'<div class="riga3">'
+  +'<div><label>Indirizzo</label><input value="'+esc(u.via)+'" onchange="setUnita('+i+',\'via\',this.value)"></div>'
+  +'<div><label>CAP e comune</label><input value="'+esc(u.comune)+'" onchange="setUnita('+i+',\'comune\',this.value)"></div>'
+  +'<div><label>Provincia</label><input value="'+esc(u.prov)+'" onchange="setUnita('+i+',\'prov\',this.value)"></div>'
+  +'</div><div class="riga3">'
+  +'<div><label>N. addetti</label><input type="number" min="0" value="'+esc(u.addetti)+'" onchange="setUnita('+i+',\'addetti\',this.value)"></div>'
+  +'<div><label>Superficie coperta (m²)</label><input type="number" min="0" value="'+esc(u.superficie)+'" onchange="setUnita('+i+',\'superficie\',this.value)"></div>'
+  +'<div><label>Turni</label><input value="'+esc(u.turni)+'" onchange="setUnita('+i+',\'turni\',this.value)" placeholder="Es. 2 turni"></div>'
+  +'</div><div class="riga4">'
+  +'<div><label>Attività D.P.R. 151/2011</label><input value="'+esc(u.attvvf)+'" onchange="setUnita('+i+',\'attvvf\',this.value)" placeholder="Es. 12.2.C"></div>'
+  +'<div><label>Categoria</label><select onchange="setUnita('+i+',\'catvvf\',this.value)">'
+   +['','A','B','C','Non soggetta'].map(o=>'<option'+(u.catvvf===o?' selected':'')+'>'+o+'</option>').join('')+'</select></div>'
+  +'<div><label>Scadenza SCIA</label><input type="date" value="'+esc(u.scadvvf)+'" onchange="setUnita('+i+',\'scadvvf\',this.value)"></div>'
+  +'<div><label>Rischio incendio</label><select onchange="setUnita('+i+',\'rischioinc\',this.value)">'
+   +['','Basso','Medio','Elevato'].map(o=>'<option'+(u.rischioinc===o?' selected':'')+'>'+o+'</option>').join('')+'</select></div>'
+  +'</div>'
+  +'<p style="font-size:11px;color:#666;margin-top:4px">Figure e contatti si aggiungono dalla scheda azienda dopo il salvataggio'
+  +((u.contatti||[]).length?' — attualmente '+u.contatti.length+':'
+    +'</p><p style="font-size:11px;color:#888">'+u.contatti.map(c=>esc(c.ruolo)+' ('+esc(c.nome||'—')+')').join(', ')+'</p>':'.</p>')
+  +'</div>').join('');
+}
+function salvaAzienda(){
+ const rag=document.getElementById('az-ragione').value.trim();
+ if(!rag){alert('La ragione sociale è obbligatoria.');return;}
+ if(!unitaTemp.length){alert('Inserire almeno un\'unità produttiva.');return;}
+ const dati={};campi.forEach(k=>{const el=document.getElementById(ids[k]);dati[k]=el?el.value.trim():'';});
+ dati.unita=JSON.parse(JSON.stringify(unitaTemp));
+ const id=document.getElementById('az-id').value;
+ if(id)Object.assign(aziende.find(x=>x.id===+id),dati);
+ else aziende.push(Object.assign({id:prossimoId++},dati));
+ salva();
+ chiudi('m-azienda');disegnaElenco();
+}
+function eliminaAzienda(id){
+ const z=aziende.find(x=>x.id===id);
+ if(!confirm('Eliminare l\'anagrafica di '+nomeCompleto(z)+' con tutte le unità e i contatti?\n\nSe l\'azienda ha dati in altri moduli, è preferibile impostarla su "Cessata".'))return;
+ aziende=aziende.filter(x=>x.id!==id);salva();disegnaElenco();
+}
+
+/* ============ CONTATTI ============ */
+function apriContatto(idAz,idUn,idx){
+ const z=aziende.find(x=>x.id===idAz);
+ const u=z.unita.find(x=>x.id===idUn);
+ const c=(idx!==undefined)?u.contatti[idx]:null;
+ document.getElementById('ct-dove').textContent=nomeCompleto(z)+' — '+etichettaUnita(u);
+ document.getElementById('ct-ruolo').innerHTML=RUOLI.filter(r=>r!=='Datore di Lavoro')
+  .map(r=>'<option'+(c&&c.ruolo===r?' selected':'')+'>'+r+'</option>').join('');
+ document.getElementById('ct-nome').value=c?c.nome||'':'';
+ document.getElementById('ct-email').value=c?c.email||'':'';
+ document.getElementById('ct-tel').value=c?c.tel||'':'';
+ document.getElementById('ct-notifiche').checked=c?!!c.notifiche:false;
+ document.getElementById('ct-categorie').innerHTML=CATEGORIE.map((k,i)=>
+  '<label style="display:flex;align-items:center;gap:6px;font-weight:400;font-size:13px">'
+  +'<input type="checkbox" style="width:auto;margin:0" id="cat'+i+'"'
+  +((c&&c.categorie&&c.categorie.includes(k))?' checked':'')+'> '+k+'</label>').join('');
+ document.getElementById('ct-az').value=idAz;
+ document.getElementById('ct-un').value=idUn;
+ document.getElementById('ct-idx').value=(idx!==undefined)?idx:'';
+ mostraCategorie();
+ document.getElementById('m-contatto').style.display='block';
+}
+function mostraCategorie(){
+ const on=document.getElementById('ct-notifiche').checked;
+ document.getElementById('ct-blocco-cat').style.display=on?'block':'none';
+ if(!on)return;
+ const usate=licenzeUsate(), idx=document.getElementById('ct-idx').value;
+ const az=+document.getElementById('ct-az').value, un=+document.getElementById('ct-un').value;
+ let giaAttivo=false;
+ if(idx!==''){
+  const c=aziende.find(x=>x.id===az).unita.find(x=>x.id===un).contatti[+idx];
+  giaAttivo=c.notifiche&&!inProva(c);
+ }
+ const box=document.getElementById('ct-avviso-lic');
+ if(giaAttivo){box.innerHTML='Questo contatto occupa già una licenza. Licenze in uso: '+usate+' su '+licenzeTotali+'.';}
+ else if(usate>=licenzeTotali){
+  box.innerHTML='<strong>Pacchetto licenze esaurito</strong> ('+usate+' su '+licenzeTotali+'). '
+   +'Il contatto verrà attivato in prova per '+GIORNI_PROVA+' giorni; per proseguire oltre occorre ampliare il pacchetto.';
+ }else{
+  box.innerHTML='Attivando le notifiche verrà occupata una licenza. Disponibili: '+(licenzeTotali-usate)+' su '+licenzeTotali+'.';
+ }
+}
+function salvaContatto(){
+ const nome=document.getElementById('ct-nome').value.trim();
+ if(!nome){alert('Inserire il nome del contatto.');return;}
+ const az=+document.getElementById('ct-az').value, un=+document.getElementById('ct-un').value;
+ const idx=document.getElementById('ct-idx').value;
+ const u=aziende.find(x=>x.id===az).unita.find(x=>x.id===un);
+ const notif=document.getElementById('ct-notifiche').checked;
+ const cat=CATEGORIE.filter((k,i)=>document.getElementById('cat'+i).checked);
+ if(notif&&!cat.length){alert('Selezionare almeno una categoria di avviso, oppure disattivare le notifiche.');return;}
+ const email=document.getElementById('ct-email').value.trim();
+ if(notif&&!email){alert('Per ricevere le notifiche serve un indirizzo email.');return;}
+ const prec=(idx!=='')?u.contatti[+idx]:null;
+ const dati={nome:nome,ruolo:document.getElementById('ct-ruolo').value,email:email,
+  tel:document.getElementById('ct-tel').value.trim(),notifiche:notif,categorie:cat,
+  inizioProva:prec?prec.inizioProva:null};
+ // se si attivano le notifiche senza licenze disponibili, parte il periodo di prova
+ if(notif&&!dati.inizioProva){
+  const eraAttivo=prec&&prec.notifiche&&!inProva(prec);
+  if(!eraAttivo&&licenzeUsate()>=licenzeTotali)dati.inizioProva=new Date().toISOString().slice(0,10);
+ }
+ if(!notif)dati.inizioProva=null;
+ if(idx!=='')u.contatti[+idx]=dati; else u.contatti.push(dati);
+ salva();
+ chiudi('m-contatto');disegnaElenco();
+}
+function eliminaContatto(idAz,idUn,idx){
+ const u=aziende.find(x=>x.id===idAz).unita.find(x=>x.id===idUn);
+ if(!confirm('Eliminare il contatto '+(u.contatti[idx].nome||'')+'?'))return;
+ u.contatti.splice(idx,1);salva();disegnaElenco();
+}
+
+/* ============ RUBRICA ============ */
+function disegnaContatti(){
+ const q=(document.getElementById('f-c-cerca').value||'').toLowerCase();
+ const fr=document.getElementById('f-c-ruolo'), fn=document.getElementById('f-c-notifiche').value;
+ const tutti=tuttiContatti();
+ const ruoli=[...new Set(tutti.map(c=>c.ruolo))].sort();
+ const sel=fr.value;
+ fr.innerHTML='<option value="">Tutti i ruoli</option>'+ruoli.map(r=>'<option'+(r===sel?' selected':'')+'>'+r+'</option>').join('');
+ // raggruppo per persona: la stessa persona può ricoprire ruoli su più unità
+ const perPersona={};
+ tutti.forEach(c=>{
+  const chiave=(c.nome||'').toLowerCase().trim()+'|'+(c.email||'').toLowerCase().trim();
+  if(!perPersona[chiave])perPersona[chiave]={nome:c.nome,email:c.email,tel:c.tel,righe:[]};
+  perPersona[chiave].righe.push(c);
+  if(!perPersona[chiave].email&&c.email)perPersona[chiave].email=c.email;
+ });
+ let html='',n=0;
+ Object.values(perPersona).forEach(p=>{
+  const righe=p.righe.filter(c=>{
+   if(fr.value&&c.ruolo!==fr.value)return false;
+   if(fn==='si'&&!c.notifiche)return false;
+   if(fn==='no'&&c.notifiche)return false;
+   if(q){
+    const t=(p.nome+' '+(p.email||'')+' '+nomeCompleto(c.azienda)+' '+c.ruolo).toLowerCase();
+    if(!t.includes(q))return false;
+   }
+   return true;
+  });
+  if(!righe.length)return;
+  n++;
+  const attive=righe.filter(c=>c.notifiche).length;
+  html+='<tr><td><strong>'+esc(p.nome||'—')+'</strong></td>'
+   +'<td>'+[...new Set(righe.map(c=>c.ruolo))].map(r=>'<span class="badge b-verde" style="margin:1px 2px 1px 0">'+esc(r)+'</span>').join('')+'</td>'
+   +'<td>'+righe.map(c=>esc(nomeCompleto(c.azienda))+(c.unita?'<br><span style="color:#888">'+esc(etichettaUnita(c.unita))+'</span>':' <span style="color:#888">(societario)</span>')).join('<hr style="border:none;border-top:1px solid var(--bordo);margin:5px 0">')+'</td>'
+   +'<td>'+(p.email?esc(p.email):'<span class="vuoto">senza email</span>')+(p.tel?'<br>'+esc(p.tel):'')+'</td>'
+   +'<td>'+(attive?'<span class="badge b-ok">'+attive+(attive===1?' attiva':' attive')+'</span>':'<span class="badge b-grigio">no</span>')+'</td></tr>';
+ });
+ document.getElementById('tbl-contatti').innerHTML=html||'<tr><td colspan="5"><p class="vuoto">Nessun contatto corrisponde ai filtri.</p></td></tr>';
+ document.getElementById('c-conteggio').textContent=n?n+(n===1?' persona':' persone'):'';
+}
+
+/* ============ NOTIFICHE ============ */
+function disegnaNotifiche(){
+ document.getElementById('lic-tot').value=licenzeTotali;
+ const usate=licenzeUsate();
+ document.getElementById('lic-usate').textContent=usate+' / '+licenzeTotali;
+ const perc=licenzeTotali?Math.min(100,Math.round(usate/licenzeTotali*100)):0;
+ document.getElementById('lic-barra').style.width=perc+'%';
+ document.getElementById('lic-barra').style.background=usate>licenzeTotali?'var(--rosso)':'var(--verde)';
+ document.getElementById('lic-nota').textContent=usate>licenzeTotali
+  ? 'Licenze superate: ampliare il pacchetto o disattivare alcuni contatti.'
+  : (licenzeTotali-usate)+' licenze ancora disponibili.';
+ let html='';
+ aziende.forEach(z=>(z.unita||[]).forEach(u=>(u.contatti||[]).forEach(c=>{
+  if(!c.notifiche)return;
+  const prova=inProva(c);
+  html+='<tr><td><strong>'+esc(c.nome||'—')+'</strong><br><span style="color:#888">'+esc(c.ruolo)+'</span></td>'
+   +'<td>'+esc(nomeCompleto(z))+'<br><span style="color:#888">'+esc(etichettaUnita(u))+'</span></td>'
+   +'<td>'+(c.email?esc(c.email):'<span class="vuoto">senza email</span>')+'</td>'
+   +'<td>'+(c.categorie||[]).map(k=>'<span class="badge b-verde" style="margin:1px 2px 1px 0">'+esc(k)+'</span>').join('')+'</td>'
+   +'<td>'+(prova?'<span class="badge b-arancio">in prova</span><br><span style="font-size:11px;color:#888">'+giorniProvaRimasti(c)+' giorni rimasti</span>'
+     :'<span class="badge b-ok">attive</span>')+'</td></tr>';
+ })));
+ document.getElementById('tbl-notifiche').innerHTML=html||'<tr><td colspan="5"><p class="vuoto">Nessun contatto abilitato alle notifiche.</p></td></tr>';
+}
+function salvaLicenze(){
+ licenzeTotali=Math.max(0,+document.getElementById('lic-tot').value||0);
+ salva();
+ disegnaNotifiche();aggiornaCards();
+}
+
+/* ============ IMPORT / EXPORT ============ */
+function esporta(){
+ const out={meta:{nome:"Anagrafica aziende",versione:"2.0",
+  data:new Date().toISOString().slice(0,10),
+  totale_aziende:aziende.length,
+  licenze_notifica:{acquistate:licenzeTotali,utilizzate:licenzeUsate()},
+  struttura:"azienda > unità produttive > contatti"},
+  aziende:aziende};
+ const blob=new Blob([JSON.stringify(out,null,2)],{type:'application/json'});
+ const a=document.createElement('a');
+ a.href=URL.createObjectURL(blob);
+ a.download='anagrafica_aziende_'+new Date().toISOString().slice(0,10)+'.json';
+ document.body.appendChild(a);a.click();
+ setTimeout(()=>{document.body.removeChild(a);URL.revokeObjectURL(a.href);},1000);
+}
+function importa(inp){
+ const f=inp.files[0];if(!f)return;
+ const rd=new FileReader();
+ rd.onload=e=>{
+  try{
+   const d=JSON.parse(e.target.result);
+   const arr=Array.isArray(d)?d:d.aziende;
+   if(!Array.isArray(arr))throw new Error('Formato non riconosciuto');
+   const validi=arr.filter(x=>x.ragione);
+   if(!validi.length)throw new Error('Nessuna azienda valida nel file');
+   if(!confirm('Importare '+validi.length+' aziende sostituendo l\'anagrafica attuale?'))return;
+   aziende=validi.map((x,i)=>{
+    const z=Object.assign({id:x.id||(i+1)},x);
+    // compatibilità con esportazioni a struttura piatta (sede operativa sull'azienda)
+    if(!z.unita||!z.unita.length){
+     z.unita=[{id:1,nome:'',via:z.soVia||z.slVia||'',comune:z.soComune||z.slComune||'',prov:z.soProv||z.slProv||'',
+      addetti:z.addetti||'',superficie:z.superficie||'',turni:z.turni||'',
+      attvvf:z.attvvf||'',catvvf:z.catvvf||'',scadvvf:z.scadvvf||'',rischioinc:z.rischioinc||'',contatti:[]}];
+     // le vecchie figure come stringhe diventano contatti senza email
+     [['rspp','RSPP'],['mc','Medico Competente'],['rls','RLS']].forEach(([k,ruolo])=>{
+      if(z[k])z.unita[0].contatti.push({nome:z[k],ruolo:ruolo,email:'',tel:'',notifiche:false,categorie:[],inizioProva:null});
+     });
+    }
+    (z.unita||[]).forEach(u=>{if(!u.contatti)u.contatti=[];});
+    return z;});
+   prossimoId=Math.max(...aziende.map(x=>x.id))+1;
+   if(d.meta&&d.meta.licenze_notifica)licenzeTotali=d.meta.licenze_notifica.acquistate||licenzeTotali;
+   salva();
+   disegnaElenco();
+  }catch(err){alert('Errore nell\'importazione: '+err.message);}
+ };
+ rd.readAsText(f);inp.value='';
+}
+
+/* ============ PERSISTENZA (localStorage; Firebase la sostituirà) ============ */
+/* Persiste l'anagrafica (aziende), prossimoId e le licenze notifica.
+   L'export/import JSON già presente resta il ponte per spostare i dati tra PC. */
+const LS_KEY="aziende_dati_v1";
+function salva(){
+ Store.save(LS_KEY, {aziende:aziende, prossimoId:prossimoId, licenzeTotali:licenzeTotali})
+  .catch(function(e){ console.warn("Salvataggio non riuscito:", e); });
+}
+/* carica() ora è ASINCRONA: Firebase (o localStorage in fallback) restituisce una Promise.
+   Ritorna Promise<boolean> — true se sono stati caricati dati. */
+function carica(){
+ return Store.load(LS_KEY).then(function(d){
+  if(d && Array.isArray(d.aziende) && d.aziende.length){
+   aziende=d.aziende;
+   if(d.prossimoId) prossimoId=d.prossimoId;
+   if(d.licenzeTotali) licenzeTotali=d.licenzeTotali;
+   return true;
+  }
+  return false;
+ }).catch(function(e){ console.warn("Caricamento non riuscito:", e); return false; });
+}
+
+/* ============ AVVIO E AUTODIAGNOSI ============ */
+function autodiagnosi(){
+ const html=document.documentElement.innerHTML;
+ const nomi=[...html.matchAll(/on(?:click|change|input)="([a-zA-Z_][a-zA-Z0-9_]*)\(/g)].map(m=>m[1]);
+ const ignora=['window','this','event','alert','confirm','document'];
+ const mancanti=[...new Set(nomi)].filter(f=>!ignora.includes(f)&&typeof window[f]!=='function');
+ if(mancanti.length){
+  console.error('Funzioni mancanti nel modulo:',mancanti.join(', '));
+  const a=document.createElement('div');
+  a.style.cssText='position:fixed;bottom:0;left:0;right:0;background:var(--rosso);color:#fff;padding:10px 16px;font-size:13px;z-index:200;';
+  a.innerHTML='<strong>Anomalia rilevata:</strong> alcune funzioni non sono disponibili ('+mancanti.join(', ')+'). '
+   +'<button onclick="this.parentNode.remove()" style="background:#fff;color:var(--rosso);border:none;padding:4px 12px;border-radius:4px;margin-left:10px;cursor:pointer">Chiudi</button>';
+  document.body.appendChild(a);
+ }
+}
+/* Avvio asincrono: prima arrivano i dati (Firebase o localStorage), poi si disegna. */
+carica().then(function(){
+ disegnaElenco();
+ autodiagnosi();
+});
+</script>
+</body>
+</html>

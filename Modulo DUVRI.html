@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modulo DUVRI - Scadenzario Sicurezza</title>
+<link rel="stylesheet" href="fondamenta.css">
+<style>
+  /* Variabili locali rimappate sui token condivisi (fondamenta.css).
+     I nomi interni del modulo restano invariati; i valori arrivano da un punto solo. */
+  :root{
+    --verde-ok:var(--ok);
+    --verde-ok-bg:var(--ok-bg);
+    --sfondo:var(--grigio);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:var(--sfondo);color:var(--testo);font-size:14px;line-height:1.5}
+  header.app{background:var(--verde);color:#fff;padding:18px 20px}
+  header.app h1{font-size:19px;font-weight:600}
+  header.app p{font-size:12.5px;opacity:.9;margin-top:3px}
+  /* TABS */
+  .tabs{background:#fff;border-bottom:1px solid var(--bordo);display:flex;flex-wrap:wrap;padding:0 12px}
+  .tab{padding:12px 16px;cursor:pointer;font-size:13.5px;color:#6b7280;border-bottom:3px solid transparent;user-select:none}
+  .tab:hover{color:var(--verde)}
+  .tab.att{color:var(--verde);border-bottom-color:var(--verde);font-weight:600}
+  .wrap{max-width:1180px;margin:0 auto;padding:20px}
+  .page{display:none}
+  .page.att{display:block}
+  /* DASHBOARD CARD */
+  .dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:22px}
+  .card{background:#fff;border:1px solid var(--bordo);border-radius:8px;padding:16px;cursor:pointer;transition:box-shadow .15s}
+  .card:hover{box-shadow:0 2px 10px rgba(0,0,0,.08)}
+  .card .n{font-size:28px;font-weight:700;line-height:1}
+  .card .l{font-size:12.5px;color:#6b7280;margin-top:6px}
+  .card.att-f{outline:2px solid var(--verde);outline-offset:-1px}
+  .card.rosso .n{color:var(--rosso)}
+  .card.arancio .n{color:var(--arancio)}
+  .card.verde .n{color:var(--verde-ok)}
+  /* SEZIONI */
+  .sez{background:#fff;border:1px solid var(--bordo);border-radius:8px;margin-bottom:20px;overflow:hidden}
+  .sez-h{background:var(--verde);color:#fff;padding:11px 16px;font-size:14px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+  .sez-b{padding:16px}
+  /* TABELLE */
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:var(--verde-scuro);color:#fff;text-align:left;padding:9px 10px;font-weight:600;font-size:12px}
+  td{padding:9px 10px;border-bottom:1px solid #eee;vertical-align:middle}
+  tr:hover td{background:#f9fafb}
+  /* .badge, .b-rosso, .b-arancio, .b-verde, .b-grigio arrivano da fondamenta.css */
+  /* FORM */
+  label{display:block;font-size:12.5px;font-weight:600;margin-bottom:4px;color:var(--grigio-neutro)}
+  input,select,textarea{width:100%;padding:8px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;background:#fff}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--verde);box-shadow:0 0 0 2px rgba(15,94,90,.12)}
+  textarea{resize:vertical;min-height:70px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+  .fg{margin-bottom:14px}
+  .hint{font-size:11.5px;color:#6b7280;font-weight:400;margin-top:3px}
+  /* BOTTONI */
+  .btn{background:var(--verde);color:#fff;border:none;padding:9px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+  .btn:hover{background:var(--verde-scuro)}
+  .btn.sec{background:#fff;color:var(--verde);border:1px solid var(--verde)}
+  .btn.sec:hover{background:#f0f7f6}
+  .btn.pic{background:#fff;color:var(--grigio-neutro);border:1px solid #d1d5db}
+  .btn.pic:hover{background:#f9fafb}
+  .btn.sm{padding:5px 11px;font-size:12px}
+  .btn.danger{background:#fff;color:var(--rosso);border:1px solid #fca5a5}
+  .btn.danger:hover{background:var(--rosso-bg)}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  /* TOGGLE */
+  .sw{position:relative;display:inline-block;width:42px;height:23px;flex:none}
+  .sw input{opacity:0;width:0;height:0}
+  .sl{position:absolute;inset:0;background:#cbd5e1;border-radius:23px;cursor:pointer;transition:.2s}
+  .sl:before{content:"";position:absolute;height:17px;width:17px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s}
+  .sw input:checked+.sl{background:var(--verde)}
+  .sw input:checked+.sl:before{transform:translateX(19px)}
+  .sw-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .sw-row label{margin:0}
+  /* MODAL */
+  .ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;padding:24px;overflow:auto}
+  .ov.att{display:flex;align-items:flex-start;justify-content:center}
+  .modal{background:#fff;border-radius:10px;max-width:760px;width:100%;margin:auto;overflow:hidden}
+  .modal-h{background:var(--verde);color:#fff;padding:14px 18px;font-size:15px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+  .modal-h .x{cursor:pointer;font-size:20px;line-height:1;background:none;border:none;color:#fff}
+  .modal-b{padding:18px;max-height:calc(100vh - 160px);overflow:auto}
+  .modal-f{padding:14px 18px;border-top:1px solid var(--bordo);display:flex;gap:8px;justify-content:flex-end}
+  /* MISC */
+  .sub-h{font-size:13px;font-weight:700;color:var(--verde);text-transform:uppercase;letter-spacing:.4px;margin:18px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--bordo)}
+  .sub-h:first-child{margin-top:0}
+  .empty{padding:30px;text-align:center;color:#9ca3af;font-size:13px}
+  .pill-flag{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:var(--grigio-neutro)}
+  .tag{display:inline-block;background:#f0f7f6;color:var(--verde);border:1px solid #cfe3e1;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:600;margin:2px 2px 2px 0}
+  .prev-box{background:#f9fafb;border:1px solid var(--bordo);border-radius:6px;padding:12px;font-size:12.5px;white-space:pre-wrap;line-height:1.6}
+  .prev-box .ph{color:var(--verde);font-weight:600}
+  .info-note{background:#fef8ec;border:1px solid #f0dca8;border-radius:6px;padding:10px 12px;font-size:12px;color:#7c5a10;margin-bottom:14px}
+  .file-row{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:6px 0;border-bottom:1px solid #f0f0f0}
+  .file-row a{color:var(--verde);font-weight:600;text-decoration:none}
+  @media(max-width:720px){.grid2,.grid3{grid-template-columns:1fr}.wrap{padding:14px}}
+</style>
+</head>
+<body>
+
+<header class="app" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
+  <div>
+    <h1>Modulo DUVRI</h1>
+    <p>Gestione appalti, richieste DURC e visura CCIAA, conferma annuale del DUVRI</p>
+  </div>
+  <div class="actions">
+    <select id="selAzi" onchange="cambiaAzi()" style="padding:8px 10px;border-radius:8px;border:1px solid var(--bordo,#d8dedd);font-size:13px;font-weight:600;min-width:170px"></select>
+    <button class="btn sec" onclick="esportaDati()" title="Scarica i dati in un file per portarli su un altro PC">Esporta dati</button>
+    <button class="btn sec" onclick="document.getElementById('impFile').click()" title="Carica un file di dati esportato">Importa dati</button>
+    <input type="file" id="impFile" accept=".json" style="display:none" onchange="importaDati(this)">
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab att" data-p="p0" onclick="showTab('p0')">Scadenzario</div>
+  <div class="tab" data-p="p1" onclick="showTab('p1')">Fornitori e contratti</div>
+  <div class="tab" data-p="p2" onclick="showTab('p2')">Email</div>
+</div>
+
+<div class="wrap">
+
+  <!-- ============ P0 SCADENZARIO ============ -->
+  <div id="p0" class="page att">
+    <div class="dash" id="dash"></div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px">
+      <div class="actions">
+        <label style="margin:0;display:flex;align-items:center;gap:8px;font-weight:600">Finestra di visualizzazione
+          <select id="finestra" style="width:auto" onchange="renderScad()">
+            <option value="30">30 giorni</option>
+            <option value="60">60 giorni</option>
+            <option value="90" selected>90 giorni</option>
+            <option value="180">180 giorni</option>
+            <option value="9999">Tutte</option>
+          </select>
+        </label>
+        <span class="hint" style="margin:0">Filtro visivo, non tocca le email</span>
+      </div>
+      <div class="actions">
+        <select id="fFornitore" style="width:auto" onchange="renderScad()"><option value="">Tutti i fornitori</option></select>
+        <select id="fTipo" style="width:auto" onchange="renderScad()">
+          <option value="">Tutti i tipi</option>
+          <option value="DURC">DURC</option>
+          <option value="CCIAA">Visura CCIAA</option>
+          <option value="CONFERMA">Conferma DUVRI</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sez">
+      <div class="sez-h">Prossime scadenze <span id="scadCount" style="font-weight:400;opacity:.85"></span></div>
+      <div class="sez-b" style="padding:0">
+        <table>
+          <thead><tr>
+            <th>Fornitore</th><th>Contratto / Appalto</th><th>Tipo richiesta</th>
+            <th>Scadenza validità</th><th>Stato</th><th style="width:1%">Azioni</th>
+          </tr></thead>
+          <tbody id="scadBody"></tbody>
+        </table>
+        <div class="empty" id="scadEmpty" style="display:none">Nessuna scadenza nella finestra selezionata.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ P1 FORNITORI E CONTRATTI ============ -->
+  <div id="p1" class="page">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-size:15px;font-weight:700;color:var(--verde)">Fornitori e contratti</div>
+      <button class="btn" onclick="apriFornitore()">+ Nuovo fornitore / contratto</button>
+    </div>
+    <div id="fornList"></div>
+  </div>
+
+  <!-- ============ P2 EMAIL ============ -->
+  <div id="p2" class="page">
+    <div class="info-note">
+      Configurazione globale per azienda. I testi usano <strong>segnaposto</strong> che vengono sostituiti al volo per ogni voce.
+      Sul singolo contratto puoi impostare un testo <strong>override</strong> per i casi particolari.
+    </div>
+
+    <div class="sez">
+      <div class="sez-h">Destinatari e recapiti</div>
+      <div class="sez-b">
+        <div class="grid3">
+          <div class="fg"><label>Email Amministratore / Consulente</label><input id="emAdmin" placeholder="tua-email@esempio.it"></div>
+          <div class="fg"><label>Email Fornitore</label><input id="emForn" placeholder="impostata sul singolo fornitore"><div class="hint">Preso dalla scheda fornitore; qui solo fallback</div></div>
+          <div class="fg"><label>Email Azienda committente</label><input id="emAzienda" placeholder="sicurezza@azienda.it"></div>
+        </div>
+        <div class="sw-row">
+          <label class="sw"><input type="checkbox" id="autoInvio" checked><span class="sl"></span></label>
+          <label>Invio automatico quando è il momento di richiedere il documento</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="sez">
+      <div class="sez-h">Validità documenti e margine di invio (giorni)</div>
+      <div class="sez-b">
+        <div class="info-note">La scadenza di ogni documento si calcola dalla data dell'ultimo documento ricevuto + la sua validità di legge. La richiesta va inviata con il margine indicato prima della scadenza.</div>
+        <div class="grid3">
+          <div class="fg"><label>Validità DURC (giorni)</label><input type="number" id="valDurc" value="120"><div class="hint">Validità di legge del DURC</div></div>
+          <div class="fg"><label>Validità visura CCIAA (giorni)</label><input type="number" id="valCciaa" value="180"></div>
+          <div class="fg"><label>Margine di invio (giorni)</label><input type="number" id="margine" value="10"><div class="hint">Quanti giorni prima della scadenza inviare la richiesta</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sez">
+      <div class="sez-h">Testi predefiniti (a segnaposto)</div>
+      <div class="sez-b">
+        <div style="margin-bottom:12px">
+          <span class="tag">{AZIENDA}</span><span class="tag">{FORNITORE}</span><span class="tag">{CONTRATTO}</span>
+          <span class="tag">{TIPO}</span><span class="tag">{SCADENZA}</span><span class="tag">{ANNO}</span>
+          <span class="tag">{ANNO_PROSSIMO}</span>
+        </div>
+
+        <div class="sub-h">Richiesta DURC — trimestrale</div>
+        <div class="grid2">
+          <div class="fg"><label>Testo al Fornitore</label><textarea id="txtDurcForn">Spett.le {FORNITORE},
+con riferimento al contratto "{CONTRATTO}" in essere con {AZIENDA}, si richiede la trasmissione del DURC in corso di validità entro il {SCADENZA}, ai sensi dell'art. 26 D.Lgs. 81/2008.
+Cordiali saluti.</textarea></div>
+          <div class="fg"><label>Testo ad Amministratore e Azienda (conoscenza)</label><textarea id="txtDurcInt">Promemoria: richiesta DURC inviata al fornitore {FORNITORE} per il contratto "{CONTRATTO}" ({AZIENDA}). Scadenza documento: {SCADENZA}.</textarea></div>
+        </div>
+
+        <div class="sub-h">Richiesta visura Camera di Commercio — trimestrale</div>
+        <div class="grid2">
+          <div class="fg"><label>Testo al Fornitore</label><textarea id="txtCciaaForn">Spett.le {FORNITORE},
+con riferimento al contratto "{CONTRATTO}" con {AZIENDA}, si richiede visura camerale aggiornata (CCIAA) entro il {SCADENZA}, per la verifica dei requisiti tecnico-professionali di cui all'art. 26 D.Lgs. 81/2008.
+Cordiali saluti.</textarea></div>
+          <div class="fg"><label>Testo ad Amministratore e Azienda (conoscenza)</label><textarea id="txtCciaaInt">Promemoria: richiesta visura CCIAA inviata a {FORNITORE} per il contratto "{CONTRATTO}" ({AZIENDA}). Scadenza: {SCADENZA}.</textarea></div>
+        </div>
+
+        <div class="sub-h">Conferma annuale DUVRI</div>
+        <div class="grid2">
+          <div class="fg"><label>Testo al Fornitore</label><textarea id="txtConfForn">Spett.le {FORNITORE},
+con riferimento al DUVRI relativo al contratto "{CONTRATTO}" ({AZIENDA}), si chiede di comunicare, entro il {SCADENZA}, eventuali variazioni intervenute nelle lavorazioni, nei rischi o nelle misure di coordinamento.
+In assenza di comunicazioni, il DUVRI si intenderà confermato senza modifiche per l'anno {ANNO_PROSSIMO}.
+Cordiali saluti.</textarea></div>
+          <div class="fg"><label>Testo ad Amministratore e Azienda (conoscenza)</label><textarea id="txtConfInt">Conferma annuale DUVRI in scadenza per il contratto "{CONTRATTO}" ({AZIENDA}). Richiesta variazioni al fornitore {FORNITORE} entro il {SCADENZA}. Se nessuna variazione, DUVRI confermato per il {ANNO_PROSSIMO}.</textarea></div>
+        </div>
+
+        <div class="actions" style="margin-top:6px">
+          <button class="btn" onclick="salvaEmailGlobale()">Salva configurazione</button>
+          <span id="emSaved" class="pill-flag" style="color:var(--verde-ok);display:none">Configurazione salvata</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL FORNITORE/CONTRATTO ============ -->
+<div id="ovForn" class="ov">
+  <div class="modal">
+    <div class="modal-h"><span id="ovFornTitolo">Nuovo fornitore / contratto</span><button class="x" onclick="chiudi('ovForn')">&times;</button></div>
+    <div class="modal-b">
+      <div class="sub-h">Anagrafica fornitore</div>
+      <div class="grid2">
+        <div class="fg"><label>Ragione sociale *</label><input id="fRag"></div>
+        <div class="fg"><label>P.IVA</label><input id="fPiva"></div>
+      </div>
+      <div class="grid2">
+        <div class="fg"><label>Email fornitore *</label><input id="fEmail"></div>
+        <div class="fg"><label>Referente</label><input id="fRef"></div>
+      </div>
+
+      <div class="sub-h">Contratto / Appalto</div>
+      <div class="fg"><label>Descrizione contratto *</label><input id="cDesc" placeholder="es. Servizio di manutenzione impianti"></div>
+      <div class="fg"><label>Azienda committente</label><input id="cAzienda" value="Azienda committente"></div>
+
+      <div class="sub-h">Modalità di gestione periodica</div>
+      <div class="fg">
+        <label>Ambito temporale della richiesta DURC + CCIAA</label>
+        <select id="cModo" onchange="toggleModo()">
+          <option value="contratto">Legata al contratto (con data inizio e fine)</option>
+          <option value="ricorrente">Ricorrente finché attivo (nessuna data fine)</option>
+        </select>
+      </div>
+      <div class="grid2">
+        <div class="fg"><label>Data inizio</label><input type="date" id="cInizio"></div>
+        <div class="fg" id="wrapFine"><label>Data fine appalto</label><input type="date" id="cFine"></div>
+      </div>
+
+      <div class="sub-h">Documenti da richiedere</div>
+      <div class="info-note">La scadenza si calcola dalla data dell'ultimo documento ricevuto + validità di legge (globale: DURC <span id="hintValDurc">120</span> gg, CCIAA <span id="hintValCciaa">180</span> gg). La richiesta va inviata <span id="hintMarg">10</span> gg prima della scadenza.</div>
+      <div class="sw-row">
+        <label class="sw"><input type="checkbox" id="cDurc" checked><span class="sl"></span></label>
+        <label>Richiesta DURC</label>
+      </div>
+      <div class="fg" style="max-width:320px;margin-left:52px">
+        <label>Data ultimo DURC ricevuto</label>
+        <input type="date" id="cDocDurc">
+        <div class="hint">Vuoto = mai ricevuto (da richiedere). Aggiornabile anche dallo scadenzario.</div>
+      </div>
+      <div class="sw-row">
+        <label class="sw"><input type="checkbox" id="cCciaa" checked><span class="sl"></span></label>
+        <label>Richiesta visura CCIAA</label>
+      </div>
+      <div class="fg" style="max-width:320px;margin-left:52px">
+        <label>Data ultima visura CCIAA ricevuta</label>
+        <input type="date" id="cDocCciaa">
+        <div class="hint">Vuoto = mai ricevuta (da richiedere).</div>
+      </div>
+
+      <div class="sub-h">Conferma annuale DUVRI</div>
+      <div class="sw-row">
+        <label class="sw"><input type="checkbox" id="cConf" checked onchange="toggleConf()"><span class="sl"></span></label>
+        <label>Invia conferma annuale del DUVRI</label>
+      </div>
+      <div class="grid2" id="wrapConf">
+        <div class="fg"><label>Prima conferma (data)</label><input type="date" id="cConfData"></div>
+        <div class="fg">
+          <label>Ripeti per</label>
+          <select id="cConfAnni">
+            <option value="1">1 anno</option>
+            <option value="2">2 anni</option>
+            <option value="3" selected>3 anni</option>
+            <option value="5">5 anni</option>
+            <option value="99">Senza limite</option>
+          </select>
+          <div class="hint">Il DUVRI non ha durata di legge (art. 26): il tetto è una scelta gestionale</div>
+        </div>
+      </div>
+
+      <div class="sub-h">Documento DUVRI allegato</div>
+      <div class="fg">
+        <input type="file" id="cFile" accept=".pdf,.doc,.docx" onchange="segnaFile()">
+        <div class="hint">Il documento lo compili a parte e lo alleghi qui</div>
+        <div id="fileCorrente" style="margin-top:8px"></div>
+      </div>
+
+      <div class="sub-h">Testo email override (facoltativo)</div>
+      <div class="fg">
+        <label>Se compilato, sostituisce il testo globale per questo contratto</label>
+        <textarea id="cOverride" placeholder="Lascia vuoto per usare i testi predefiniti a segnaposto"></textarea>
+      </div>
+    </div>
+    <div class="modal-f">
+      <button class="btn sec" onclick="chiudi('ovForn')">Annulla</button>
+      <button class="btn" onclick="salvaFornitore()">Salva</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL ANTEPRIMA EMAIL ============ -->
+<div id="ovMail" class="ov">
+  <div class="modal">
+    <div class="modal-h"><span>Anteprima email</span><button class="x" onclick="chiudi('ovMail')">&times;</button></div>
+    <div class="modal-b" id="ovMailBody"></div>
+    <div class="modal-f">
+      <button class="btn sec" onclick="chiudi('ovMail')">Chiudi</button>
+      <button class="btn" onclick="chiudi('ovMail')">Invia ora (simulato)</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="firebase-init.js"></script>
+<script src="auth-gate.js"></script>
+<script src="fondamenta.js"></script>
+<script>
+/* ============ STATO ============ */
+/* Multi-azienda: AZIENDE dall'anagrafica condivisa; FORNITORI_BY[aziId] = fornitori/appalti per azienda;
+   "FORNITORI" resta la VISTA dell'azienda selezionata. EMAILCFG resta config comune (default legali). */
+var AZIENDE = [], aziId = null, FORNITORI_BY = {};
+var FORNITORI = [];
+var EMAILCFG = {};
+var editId = null;
+var fileTmp = null;
+var MS = 24*60*60*1000;
+
+/* ============ SEED DIMOSTRATIVO ============ */
+function oggiPiu(g){var d=new Date();d.setDate(d.getDate()+g);return d.toISOString().slice(0,10);}
+function seed(){
+  return [
+    {id:1, rag:"Elettro Impianti Tuscia S.r.l.", piva:"01234567890", email:"info@elettrotuscia.it", ref:"Sig. Rossi",
+     desc:"Manutenzione impianti elettrici", azienda:"Danesi Caffè S.p.A.",
+     modo:"contratto", inizio:oggiPiu(-200), fine:oggiPiu(500),
+     durc:true, cciaa:true, conf:true, confData:oggiPiu(40), confAnni:3, confN:0,
+     docDurc:oggiPiu(-20), docCciaa:oggiPiu(-90), override:"", file:"DUVRI_ElettroTuscia_2026.pdf"},
+    {id:2, rag:"Pulizie Industriali Sabina S.n.c.", piva:"09876543210", email:"amministrazione@pulisabina.it", ref:"Sig.ra Bianchi",
+     desc:"Servizio pulizie stabilimento", azienda:"Danesi Caffè S.p.A.",
+     modo:"ricorrente", inizio:oggiPiu(-400), fine:"",
+     durc:true, cciaa:false, conf:true, confData:oggiPiu(15), confAnni:99, confN:1,
+     docDurc:oggiPiu(-115), docCciaa:null, override:"", file:""}
+  ];
+}
+/* ============ PERSISTENZA (localStorage; Firebase la sostituirà) ============ */
+/* --- Selettore azienda / vista per-azienda --- */
+function nomeAzi(){ for(var i=0;i<AZIENDE.length;i++){ if(AZIENDE[i].id===aziId) return AZIENDE[i].nome; } return ""; }
+function initSelAzi(){ var s=document.getElementById("selAzi"); if(!s) return; s.innerHTML=""; for(var i=0;i<AZIENDE.length;i++){ var o=document.createElement("option"); o.value=AZIENDE[i].id; o.textContent=AZIENDE[i].nome; if(AZIENDE[i].id===aziId)o.selected=true; s.appendChild(o); } }
+function cambiaAzi(){ aziId=Number(document.getElementById("selAzi").value); if(!FORNITORI_BY[aziId]) FORNITORI_BY[aziId]=[]; FORNITORI=FORNITORI_BY[aziId]; renderScad(); renderForn(); }
+function mostraNessunAzienda(){ var d=document.createElement("div"); d.style.cssText="margin:20px;padding:16px 18px;background:#fdf3e3;border:1px solid #e6c98a;border-radius:10px;color:#7a5b1e;font-size:14px"; d.innerHTML="<b>Nessuna azienda in anagrafica.</b><br>Apri il modulo <b>Aziende</b>, inserisci almeno un'azienda, poi ricarica questa pagina."; document.body.insertBefore(d, document.body.firstChild); }
+
+var LS_KEY = "duvri_dati_v1";
+function salva(){
+  /* NON si salva più una lista piatta: si salva la mappa per-azienda. */
+  Store.save(LS_KEY, {FORNITORI_BY:FORNITORI_BY, EMAILCFG:EMAILCFG, aziId:aziId})
+    .catch(function(e){ console.warn("Salvataggio non riuscito:", e); });
+}
+/* carica() ASINCRONA: anagrafica condivisa + fornitori per-azienda (con migrazione dal formato piatto). */
+function carica(){
+  return Promise.all([ Store.aziende(), Store.load(LS_KEY) ]).then(function(res){
+    AZIENDE = res[0] || [];
+    var d = res[1];
+    var firstId = AZIENDE.length ? AZIENDE[0].id : null;
+    EMAILCFG = (d && d.EMAILCFG) || {};
+    if(d && d.FORNITORI_BY){ FORNITORI_BY = d.FORNITORI_BY; }
+    else if(d && Array.isArray(d.FORNITORI)){ FORNITORI_BY={}; if(firstId!==null) FORNITORI_BY[firstId]=d.FORNITORI; }  /* vecchio formato piatto → prima azienda */
+    else { FORNITORI_BY={}; if(firstId!==null) FORNITORI_BY[firstId]=seed(); }                                        /* primo avvio: demo alla prima azienda */
+    if(d && d.aziId) aziId = d.aziId;
+    if(AZIENDE.length){ var ok=false; for(var i=0;i<AZIENDE.length;i++){ if(AZIENDE[i].id===aziId){ok=true;break;} } if(!ok) aziId=firstId; }
+    else aziId=null;
+    if(aziId!==null){ if(!FORNITORI_BY[aziId]) FORNITORI_BY[aziId]=[]; FORNITORI=FORNITORI_BY[aziId]; } else FORNITORI=[];
+    return AZIENDE.length > 0;
+  }).catch(function(e){ console.warn("Caricamento non riuscito:", e); return false; });
+}
+/* Export/import JSON: ponte per lavorare tra più PC finché non c'è Firebase */
+function esportaDati(){
+  var blob = new Blob([JSON.stringify({FORNITORI_BY:FORNITORI_BY, EMAILCFG:EMAILCFG}, null, 2)], {type:"application/json"});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement("a");
+  a.href = url; a.download = "duvri_dati_"+Fond.oggiIT().replace(/\//g,"-")+".json";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function importaDati(input){
+  var file = input.files && input.files[0];
+  if(!file) return;
+  var r = new FileReader();
+  r.onload = function(){
+    try{
+      var d = JSON.parse(r.result);
+      if(!d || (!d.FORNITORI && !d.FORNITORI_BY)){ alert("File non valido."); return; }
+      if(!confirm("Importare i dati dal file? I fornitori e la config email verranno sostituiti (le aziende restano quelle dell'anagrafica).")) return;
+      EMAILCFG = d.EMAILCFG || {};
+      if(d.FORNITORI_BY){ FORNITORI_BY = d.FORNITORI_BY; }
+      else if(Array.isArray(d.FORNITORI)){ FORNITORI_BY={}; var fid=AZIENDE.length?AZIENDE[0].id:null; if(fid!==null) FORNITORI_BY[fid]=d.FORNITORI; }
+      if(aziId!==null){ if(!FORNITORI_BY[aziId]) FORNITORI_BY[aziId]=[]; FORNITORI=FORNITORI_BY[aziId]; }
+      salva(); caricaCfgUI(); renderScad(); renderForn();
+      alert("Dati importati.");
+    }catch(e){ alert("File non leggibile: "+e.message); }
+    input.value = "";
+  };
+  r.readAsText(file);
+}
+
+/* Avvio: carica dati salvati, altrimenti seed dimostrativo */
+/* avvio spostato in fondo (asincrono con Firebase): vedi blocco AVVIO */
+
+/* ============ TAB ============ */
+function showTab(p){
+  var tabs=document.querySelectorAll('.tab');for(var i=0;i<tabs.length;i++){tabs[i].classList.toggle('att',tabs[i].getAttribute('data-p')===p);}
+  var pages=document.querySelectorAll('.page');for(var j=0;j<pages.length;j++){pages[j].classList.toggle('att',pages[j].id===p);}
+  if(p==='p0')renderScad();
+  if(p==='p1')renderForn();
+}
+
+/* ============ PARAMETRI VALIDITÀ / INVIO ============ */
+/* Validità di legge del documento (giorni) e margine con cui inviare la richiesta prima
+   della scadenza. Modificabili dalla tab Email; qui i valori di riferimento. */
+var VALIDITA_DEF = {DURC:120, CCIAA:180};
+var MARGINE_DEF  = 10;
+function validitaTipo(tipo){
+  var c=EMAILCFG['default'];
+  if(c && c.validita && c.validita[tipo]>0) return c.validita[tipo];
+  return VALIDITA_DEF[tipo];
+}
+function margineInvio(){
+  var c=EMAILCFG['default'];
+  if(c && c.margine>0) return c.margine;
+  return MARGINE_DEF;
+}
+function docTipo(f, tipo){ return tipo==='DURC' ? f.docDurc : f.docCciaa; }
+
+/* ============ CALCOLO SCADENZE ============ */
+/* Una riga per documento attivo: scadenza = data documento + validità; invio = scadenza − margine.
+   La "conferma DUVRI" resta annuale da confData. */
+function occorrenze(f, orizzonteGiorni){
+  var out=[];
+  var oggi=new Date();oggi.setHours(0,0,0,0);
+  var limite=new Date(oggi.getTime()+orizzonteGiorni*MS);
+  var fine = (f.modo==='contratto' && f.fine)? new Date(f.fine): null;
+
+  function documento(tipo, attivo){
+    if(!attivo) return;
+    var doc = docTipo(f, tipo);            // data documento ricevuto (o vuoto)
+    var val = validitaTipo(tipo);
+    if(!doc){
+      /* mai ricevuto: da richiedere subito, nessuna scadenza calcolabile */
+      out.push({tipo:tipo, scad:null, mai:true, doc:null, invio:null});
+      return;
+    }
+    var scad = Fond.addGiorni(doc, val);   // scadenza validità
+    if(fine && scad>fine) return;          // oltre fine contratto: non pertinente
+    var invio = Fond.addGiorni(scad, -margineInvio());
+    /* mostra sempre l'ultimo documento; il filtro finestra agisce sulla scadenza */
+    if(scad<=limite || Fond.giorniA(scad)<0){
+      out.push({tipo:tipo, scad:scad, doc:new Date(doc), invio:invio, mai:false});
+    }
+  }
+  documento('DURC', f.durc);
+  documento('CCIAA', f.cciaa);
+
+  /* Conferma annuale DUVRI: mostra solo la PROSSIMA occorrenza utile (la prima da oggi in poi),
+     entro il numero di anni previsto e la fine contratto. Una sola riga per contratto. */
+  if(f.conf && f.confData){
+    var c=new Date(f.confData);
+    var maxN = (f.confAnni>=99)? 999 : f.confAnni;
+    var n=f.confN||0, g3=0;
+    while(n<maxN && g3<200){
+      if(c>=oggi){
+        if((!fine||c<=fine) && c<=limite) out.push({tipo:'CONFERMA', scad:new Date(c), annoConf:n+1, maxConf:maxN});
+        break; /* solo la prossima */
+      }
+      c=new Date(c.getTime()+365*MS);n++;g3++;
+    }
+  }
+  return out;
+}
+
+/* Stato di una occorrenza. Per DURC/CCIAA usa data invio + scadenza validità;
+   per CONFERMA usa la sola data scadenza con margine di invio. */
+function statoOcc(occ){
+  if(occ.mai) return {cls:'b-rosso', txt:'Documento mai acquisito', ord:-99999};
+  var oggi=new Date();oggi.setHours(0,0,0,0);
+  var ggScad=Fond.giorniA(occ.scad);
+  if(occ.tipo==='CONFERMA'){
+    var ggInvioC = ggScad - margineInvio();
+    if(ggScad<0) return {cls:'b-rosso', txt:'Scaduta da '+(-ggScad)+' gg', ord:ggScad};
+    if(ggInvioC<=0) return {cls:'b-arancio', txt:'Da inviare (scade '+Fond.fmtData(occ.scad)+')', ord:ggScad};
+    return {cls:'b-verde', txt:'Regolare (scade '+Fond.fmtData(occ.scad)+')', ord:ggScad};
+  }
+  var ggInvio=Fond.giorniA(occ.invio);
+  if(ggScad<0)  return {cls:'b-rosso',  txt:'Scaduto il '+Fond.fmtData(occ.scad), ord:ggScad};
+  if(ggInvio<=0)return {cls:'b-arancio',txt:'Da richiedere (scade '+Fond.fmtData(occ.scad)+')', ord:ggScad};
+  return {cls:'b-verde', txt:'Regolare fino al '+Fond.fmtData(occ.invio), ord:ggScad};
+}
+function nomeTipo(t){return t==='DURC'?'DURC':t==='CCIAA'?'Visura CCIAA':'Conferma DUVRI';}
+
+/* ============ DASHBOARD ============ */
+function tutteScad(orizz){
+  var res=[];
+  for(var i=0;i<FORNITORI.length;i++){
+    var f=FORNITORI[i];
+    var occ=occorrenze(f,orizz);
+    for(var k=0;k<occ.length;k++){
+      var st=statoOcc(occ[k]);
+      res.push({f:f, tipo:occ[k].tipo, scad:occ[k].scad, st:st, extra:occ[k]});
+    }
+  }
+  res.sort(function(a,b){return a.st.ord-b.st.ord;});
+  return res;
+}
+
+function renderDash(){
+  var all=tutteScad(9999);
+  var scaduti=0,inScad=0,regolari=0;
+  for(var i=0;i<all.length;i++){
+    if(all[i].st.cls==='b-rosso')scaduti++;
+    else if(all[i].st.cls==='b-arancio')inScad++;
+    else regolari++;
+  }
+  var d=document.getElementById('dash');
+  d.innerHTML=
+    card('rosso','filtRosso',scaduti,'Scadute')+
+    card('arancio','filtArancio',inScad,'Da richiedere')+
+    card('verde','filtVerde',regolari,'Regolari')+
+    card('','filtForn',FORNITORI.length,'Fornitori attivi');
+}
+function card(cls,fn,n,l){
+  return '<div class="card '+cls+'" onclick="'+fn+'()"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>';
+}
+var filtroStato='';
+function filtRosso(){filtroStato=filtroStato==='b-rosso'?'':'b-rosso';renderScad();markCard();}
+function filtArancio(){filtroStato=filtroStato==='b-arancio'?'':'b-arancio';renderScad();markCard();}
+function filtVerde(){filtroStato=filtroStato==='b-verde'?'':'b-verde';renderScad();markCard();}
+function filtForn(){showTab('p1');}
+function markCard(){
+  var cards=document.querySelectorAll('#dash .card');
+  cards[0].classList.toggle('att-f',filtroStato==='b-rosso');
+  cards[1].classList.toggle('att-f',filtroStato==='b-arancio');
+  cards[2].classList.toggle('att-f',filtroStato==='b-verde');
+}
+
+/* ============ SCADENZARIO ============ */
+function popolaFiltri(){
+  var s=document.getElementById('fFornitore');
+  var cur=s.value;
+  s.innerHTML='<option value="">Tutti i fornitori</option>';
+  for(var i=0;i<FORNITORI.length;i++){
+    s.innerHTML+='<option value="'+FORNITORI[i].id+'">'+esc(FORNITORI[i].rag)+'</option>';
+  }
+  s.value=cur;
+}
+function renderScad(){
+  renderDash();
+  popolaFiltri();
+  var finSel=parseInt(document.getElementById('finestra').value,10);
+  /* Se si clicca un contatore del cruscotto (filtroStato attivo), mostra TUTTE le voci
+     di quella categoria, non solo quelle nella finestra: così il numero cliccato corrisponde. */
+  var orizz = filtroStato ? 9999 : finSel;
+  var ff=document.getElementById('fFornitore').value;
+  var ft=document.getElementById('fTipo').value;
+  var all=tutteScad(orizz);
+  var body=document.getElementById('scadBody');
+  var rows='';var cnt=0;
+  for(var i=0;i<all.length;i++){
+    var r=all[i];
+    if(filtroStato && r.st.cls!==filtroStato)continue;
+    if(ff && String(r.f.id)!==ff)continue;
+    if(ft && r.tipo!==ft)continue;
+    cnt++;
+    var extra = r.tipo==='CONFERMA' && r.extra.maxConf<999 ? ' <span class="b-grigio badge">anno '+r.extra.annoConf+'/'+r.extra.maxConf+'</span>':'';
+    var scadTxt = r.scad ? fmtData(r.scad) : '—';
+    var scadISO = r.scad ? r.scad.toISOString().slice(0,10) : '';
+    var azioni = '<button class="btn sm sec" onclick="event.stopPropagation();anteprima('+r.f.id+',\''+r.tipo+'\',\''+scadISO+'\')">Email</button>';
+    if(r.tipo!=='CONFERMA') azioni += ' <button class="btn sm pic" onclick="event.stopPropagation();registraDoc('+r.f.id+',\''+r.tipo+'\')" title="Registra la data del documento ricevuto">Doc. ricevuto</button>';
+    rows+='<tr class="riga-scad" style="cursor:pointer" onclick="apriFornitore('+r.f.id+')" title="Apri scheda fornitore">'+
+      '<td>'+esc(r.f.rag)+'</td>'+
+      '<td>'+esc(r.f.desc)+'</td>'+
+      '<td>'+nomeTipo(r.tipo)+extra+'</td>'+
+      '<td>'+scadTxt+'</td>'+
+      '<td><span class="badge '+r.st.cls+'">'+r.st.txt+'</span></td>'+
+      '<td><div class="actions">'+azioni+'</div></td>'+
+    '</tr>';
+  }
+  body.innerHTML=rows;
+  document.getElementById('scadEmpty').style.display=cnt?'none':'block';
+  document.getElementById('scadCount').textContent='· '+cnt+' voci';
+}
+
+/* Registra la data del documento (DURC/CCIAA) ricevuto: ricalcola scadenza e prossimo invio */
+function registraDoc(id, tipo){
+  var f=getF(id);
+  var attuale = docTipo(f,tipo);
+  var oggi = new Date().toISOString().slice(0,10);
+  var val = prompt('Data del '+nomeTipo(tipo)+' ricevuto (AAAA-MM-GG):', attuale||oggi);
+  if(val===null) return;
+  val=val.trim();
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(val) || isNaN(new Date(val))){ alert('Data non valida. Usa il formato AAAA-MM-GG.'); return; }
+  if(tipo==='DURC') f.docDurc=val; else f.docCciaa=val;
+  salva(); renderScad();
+}
+
+/* ============ FORNITORI ============ */
+function renderForn(){
+  var c=document.getElementById('fornList');
+  if(!FORNITORI.length){c.innerHTML='<div class="sez"><div class="empty">Nessun fornitore. Aggiungi il primo contratto.</div></div>';return;}
+  var h='';
+  for(var i=0;i<FORNITORI.length;i++){
+    var f=FORNITORI[i];
+    var modoTxt = f.modo==='contratto'? ('Contratto: '+fmtStr(f.inizio)+' → '+(f.fine?fmtStr(f.fine):'—')) : 'Ricorrente (attivo)';
+    var flags='';
+    if(f.durc)flags+='<span class="tag">DURC (valido '+validitaTipo('DURC')+' gg)</span>';
+    if(f.cciaa)flags+='<span class="tag">CCIAA (valida '+validitaTipo('CCIAA')+' gg)</span>';
+    if(f.conf)flags+='<span class="tag">Conferma DUVRI '+(f.confAnni>=99?'illimitata':f.confAnni+' anni')+'</span>';
+    var fileTxt = f.file? '<span class="pill-flag">DUVRI allegato: <a href="#" onclick="return false" style="color:var(--verde)">'+esc(f.file)+'</a></span>':'<span class="pill-flag" style="color:#9ca3af">Nessun DUVRI allegato</span>';
+    h+='<div class="sez">'+
+      '<div class="sez-h">'+esc(f.rag)+
+        '<div class="actions"><button class="btn sm sec" onclick="apriFornitore('+f.id+')">Modifica</button>'+
+        '<button class="btn sm danger" onclick="elimina('+f.id+')">Elimina</button></div>'+
+      '</div>'+
+      '<div class="sez-b">'+
+        '<div class="grid3" style="margin-bottom:12px">'+
+          '<div><label>Contratto</label><div>'+esc(f.desc)+'</div></div>'+
+          '<div><label>Email fornitore</label><div>'+esc(f.email)+'</div></div>'+
+          '<div><label>Committente</label><div>'+esc(f.azienda)+'</div></div>'+
+        '</div>'+
+        '<div style="margin-bottom:10px">'+flags+'</div>'+
+        '<div class="pill-flag" style="margin-bottom:8px">'+modoTxt+'</div>'+
+        '<div>'+fileTxt+'</div>'+
+      '</div>'+
+    '</div>';
+  }
+  c.innerHTML=h;
+}
+
+function apriFornitore(id){
+  editId = id||null;
+  fileTmp=null;
+  document.getElementById('ovFornTitolo').textContent = id? 'Modifica fornitore / contratto':'Nuovo fornitore / contratto';
+  var f = id? getF(id) : {rag:'',piva:'',email:'',ref:'',desc:'',azienda:'Azienda committente',modo:'contratto',inizio:'',fine:'',durc:true,cciaa:true,conf:true,confData:'',confAnni:3,override:'',file:'',docDurc:'',docCciaa:''};
+  set('fRag',f.rag);set('fPiva',f.piva);set('fEmail',f.email);set('fRef',f.ref);
+  set('cDesc',f.desc);set('cAzienda',f.azienda);
+  set('cModo',f.modo);set('cInizio',f.inizio);set('cFine',f.fine||'');
+  document.getElementById('cDurc').checked=f.durc;
+  document.getElementById('cCciaa').checked=f.cciaa;
+  set('cDocDurc', f.docDurc||'');
+  set('cDocCciaa', f.docCciaa||'');
+  document.getElementById('cConf').checked=f.conf;
+  set('cConfData',f.confData||'');set('cConfAnni',f.confAnni||3);set('cOverride',f.override||'');
+  document.getElementById('fileCorrente').innerHTML = f.file? '<div class="file-row"><a href="#" onclick="return false">'+esc(f.file)+'</a></div>':'';
+  fileTmp = f.file||null;
+  /* aggiorna gli hint di validità/margine nella modale */
+  document.getElementById('hintValDurc').textContent=validitaTipo('DURC');
+  document.getElementById('hintValCciaa').textContent=validitaTipo('CCIAA');
+  document.getElementById('hintMarg').textContent=margineInvio();
+  toggleModo();toggleConf();
+  document.getElementById('ovForn').classList.add('att');
+}
+function toggleModo(){
+  var modo=document.getElementById('cModo').value;
+  document.getElementById('wrapFine').style.display = modo==='contratto'?'block':'none';
+}
+function toggleConf(){
+  document.getElementById('wrapConf').style.display = document.getElementById('cConf').checked?'grid':'none';
+}
+function segnaFile(){
+  var inp=document.getElementById('cFile');
+  if(inp.files&&inp.files[0]){fileTmp=inp.files[0].name;
+    document.getElementById('fileCorrente').innerHTML='<div class="file-row"><a href="#" onclick="return false">'+esc(fileTmp)+'</a> <span class="pill-flag" style="color:var(--verde-ok)">nuovo</span></div>';}
+}
+function salvaFornitore(){
+  var rag=val('fRag'),email=val('fEmail'),desc=val('cDesc');
+  if(!rag||!email||!desc){alert('Compila ragione sociale, email fornitore e descrizione contratto.');return;}
+  var obj={
+    id: editId||(Date.now()),
+    rag:rag, piva:val('fPiva'), email:email, ref:val('fRef'),
+    desc:desc, azienda:val('cAzienda'),
+    modo:val('cModo'), inizio:val('cInizio'), fine:val('cFine'),
+    durc:document.getElementById('cDurc').checked,
+    cciaa:document.getElementById('cCciaa').checked,
+    conf:document.getElementById('cConf').checked,
+    confData:val('cConfData'), confAnni:parseInt(val('cConfAnni'),10), confN:0,
+    docDurc:val('cDocDurc')||'', docCciaa:val('cDocCciaa')||'',
+    override:val('cOverride'), file:fileTmp||''
+  };
+  if(editId){var old=getF(editId);obj.confN=old.confN;
+    for(var i=0;i<FORNITORI.length;i++){if(FORNITORI[i].id===editId)FORNITORI[i]=obj;}}
+  else FORNITORI.push(obj);
+  salva();
+  chiudi('ovForn');renderForn();renderScad();
+}
+function elimina(id){
+  if(!confirm('Eliminare questo fornitore e le sue scadenze?'))return;
+  FORNITORI=FORNITORI_BY[aziId]=FORNITORI.filter(function(f){return f.id!==id;});
+  salva();
+  renderForn();renderScad();
+}
+
+/* ============ EMAIL ============ */
+function cfg(){
+  return {
+    emAdmin:val('emAdmin'), emForn:val('emForn'), emAzienda:val('emAzienda'),
+    auto:document.getElementById('autoInvio').checked,
+    validita:{DURC:parseInt(val('valDurc'),10)||120, CCIAA:parseInt(val('valCciaa'),10)||180},
+    margine:parseInt(val('margine'),10)||10,
+    durcForn:val('txtDurcForn'), durcInt:val('txtDurcInt'),
+    cciaaForn:val('txtCciaaForn'), cciaaInt:val('txtCciaaInt'),
+    confForn:val('txtConfForn'), confInt:val('txtConfInt')
+  };
+}
+function caricaCfgUI(){
+  var c=EMAILCFG['default'];
+  if(!c) return;
+  set('emAdmin',c.emAdmin||''); set('emForn',c.emForn||''); set('emAzienda',c.emAzienda||'');
+  if(c.auto!==undefined) document.getElementById('autoInvio').checked=c.auto;
+  if(c.validita){ set('valDurc',c.validita.DURC||120); set('valCciaa',c.validita.CCIAA||180); }
+  set('margine',c.margine||10);
+  set('txtDurcForn',c.durcForn||''); set('txtDurcInt',c.durcInt||'');
+  set('txtCciaaForn',c.cciaaForn||''); set('txtCciaaInt',c.cciaaInt||'');
+  set('txtConfForn',c.confForn||''); set('txtConfInt',c.confInt||'');
+}
+function salvaEmailGlobale(){
+  EMAILCFG['default']=cfg();
+  salva();
+  var s=document.getElementById('emSaved');s.style.display='inline-flex';
+  setTimeout(function(){s.style.display='none';},2200);
+}
+function applicaSegnaposto(txt,f,scadStr){
+  var anno=new Date(scadStr).getFullYear();
+  return Fond.applicaSegnaposto(txt, {
+    AZIENDA:f.azienda||'', FORNITORE:f.rag||'', CONTRATTO:f.desc||'',
+    TIPO:'', SCADENZA:fmtStr(scadStr), ANNO_PROSSIMO:(anno+1), ANNO:anno
+  });
+}
+function anteprima(id,tipo,scadStr){
+  var f=getF(id);
+  var c=EMAILCFG['default']||cfg();
+  var testoForn, testoInt, tit;
+  if(tipo==='DURC'){testoForn=c.durcForn;testoInt=c.durcInt;tit='Richiesta DURC';}
+  else if(tipo==='CCIAA'){testoForn=c.cciaaForn;testoInt=c.cciaaInt;tit='Richiesta visura CCIAA';}
+  else {testoForn=c.confForn;testoInt=c.confInt;tit='Conferma annuale DUVRI';}
+  var override = f.override && f.override.trim();
+  var corpoForn = override? f.override : testoForn;
+  var b='<div class="sub-h">'+tit+' — '+esc(f.rag)+'</div>';
+  if(override)b+='<div class="pill-flag" style="color:var(--verde-ok);margin-bottom:8px">• testo personalizzato (override)</div>';
+  b+='<div class="fg"><label>Al Fornitore &lt;'+esc(f.email||c.emForn)+'&gt;</label><div class="prev-box">'+esc(applicaSegnaposto(corpoForn,f,scadStr))+'</div></div>';
+  b+='<div class="fg"><label>Ad Amministratore &lt;'+esc(c.emAdmin)+'&gt; e Azienda &lt;'+esc(c.emAzienda)+'&gt; (conoscenza)</label><div class="prev-box">'+esc(applicaSegnaposto(testoInt,f,scadStr))+'</div></div>';
+  document.getElementById('ovMailBody').innerHTML=b;
+  document.getElementById('ovMail').classList.add('att');
+}
+
+/* ============ UTILITY ============ */
+function getF(id){for(var i=0;i<FORNITORI.length;i++){if(FORNITORI[i].id===id)return FORNITORI[i];}return null;}
+function set(id,v){document.getElementById(id).value=v;}
+function val(id){return document.getElementById(id).value;}
+function esc(s){s=s==null?'':String(s);return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmtData(d){return Fond.fmtData(d);}
+function fmtStr(s){return Fond.fmtData(s);}
+function chiudi(id){document.getElementById(id).classList.remove('att');}
+
+/* ============ AUTODIAGNOSI ============ */
+(function(){
+  if(typeof Fond==='undefined'){console.error('Autodiagnosi DUVRI: fondamenta.js non caricato — controlla che il file sia nella stessa cartella.');return;}
+  var richieste=['showTab','renderScad','renderForn','renderDash','apriFornitore','salvaFornitore','anteprima','salvaEmailGlobale','occorrenze','applicaSegnaposto','salva','carica','esportaDati','importaDati'];
+  var mancanti=[];
+  for(var i=0;i<richieste.length;i++){if(typeof window[richieste[i]]!=='function')mancanti.push(richieste[i]);}
+  if(mancanti.length)console.warn('Funzioni mancanti:',mancanti.join(', '));
+  else console.log('Autodiagnosi DUVRI: fondamenta OK, tutte le funzioni presenti.');
+})();
+
+/* ============ AVVIO (asincrono con Firebase) ============ */
+carica().then(function(){
+  if(!AZIENDE.length){ mostraNessunAzienda(); return; }
+  initSelAzi();
+  caricaCfgUI();
+  renderScad();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Registro Presidi Antincendio — Rev.2</title>
+<link rel="stylesheet" href="fondamenta.css">
+<style>
+/* I colori identitari (verde petrolio) sono rimappati sui token condivisi di fondamenta.css.
+   I letterali #0f5e5a/#0a4340 nel resto dello style restano ma coincidono con i token. */
+:root{--verde-chiaro:#e6f0ef;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;font-size:14px;background:#f4f4f2;color:#0f5e5a}
+input,select,textarea,button{font-family:inherit;font-size:13px}
+input,select,textarea{border:1px solid #ccc;border-radius:6px;padding:6px 10px;background:#fff}
+input[type=checkbox]{width:auto;margin:0;cursor:pointer}
+button{border:1px solid #ccc;border-radius:6px;padding:6px 12px;background:#fff;cursor:pointer}
+button:hover{background:#eee}
+.bp{background:#0f5e5a;color:#fff;border-color:#0f5e5a}.bp:hover{background:#0a4340}
+.br{background:#c0392b;color:#fff;border-color:#c0392b}.br:hover{background:#a93226}
+.bg{background:#27ae60;color:#fff;border-color:#27ae60}.bg:hover{background:#219150}
+.hdr{background:#0f5e5a;color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.hdr h1{font-size:15px;font-weight:600}
+.hdr select{background:#0a4340;color:#fff;border-color:#555;width:auto}
+.nav{background:#fff;border-bottom:1px solid #ddd;display:flex;padding:0 20px;overflow-x:auto}
+.ntab{padding:11px 18px;font-size:13px;cursor:pointer;border-bottom:3px solid transparent;color:#666;white-space:nowrap;font-weight:500}
+.ntab.on{border-bottom-color:#0f5e5a;color:#0f5e5a}
+.pg{padding:20px;max-width:1200px;margin:0 auto;display:none}.pg.on{display:block}
+.info-box{background:#e8f4fd;border:1px solid #b3d7f5;border-radius:8px;padding:12px;font-size:13px;color:#1a5276;margin-bottom:16px}
+.tb{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.badge{font-size:11px;padding:2px 7px;border-radius:4px;white-space:nowrap;display:inline-block;font-weight:500}
+.bs{background:#fdf0f0;color:#c0392b}.bi{background:#fdf5e6;color:#e67e22}.bo{background:#edf7ed;color:#27ae60}.bn{background:#f0f0ee;color:#888}
+.tipo-group{margin-bottom:20px}
+.tipo-group-hdr{display:flex;align-items:center;justify-content:space-between;background:#0a4340;color:#fff;padding:10px 14px;border-radius:8px 8px 0 0;flex-wrap:wrap;gap:8px}
+.tg-title{font-size:14px;font-weight:600}
+.tg-ditta{font-size:11px;opacity:.85;margin-left:8px;font-weight:400}
+.presidio{background:#fff;border:1px solid #ddd;border-top:none;overflow:hidden}
+.presidio-hdr{padding:10px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;gap:8px;flex-wrap:wrap}
+.presidio-hdr:hover{background:#fafaf8}
+.presidio-body{padding:14px;display:none;border-top:1px solid #eee;background:#fafaf8}
+.presidio-body.open{display:block}
+.storico-item{border:1px solid #eee;border-radius:6px;padding:10px 12px;margin-bottom:8px;background:#fff;font-size:12px}
+.si-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.si-data{font-weight:600;color:#374151}
+.mbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:center;justify-content:center}
+.mbg.on{display:flex}
+.mdl{background:#fff;border-radius:12px;padding:22px;width:94%;max-width:560px;max-height:85vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+.mdl h3{font-size:15px;font-weight:600;margin-bottom:14px}
+.fld{margin-bottom:10px}
+.fld label{display:block;font-size:12px;color:#666;margin-bottom:3px;font-weight:500}
+.fld input,.fld select,.fld textarea{width:100%}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cat-item{background:#fff;border:1px solid #ddd;border-radius:8px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.ditta-card{background:#fff;border:1px solid #ddd;border-radius:8px;padding:14px;margin-bottom:10px}
+.ditta-card h4{font-size:14px;margin-bottom:6px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>Registro Presidi Antincendio</h1>
+  <div style="display:flex;gap:8px;align-items:center">
+    <select id="selAzi" onchange="cambiaAzi()" style="min-width:170px"></select>
+    <button class="bp" onclick="openNuovaAzi()">+ Azienda</button>
+    <button class="bp" onclick="esportaDati()" title="Scarica i dati in un file per portarli su un altro PC">Esporta</button>
+    <button class="bp" onclick="document.getElementById('impFile').click()" title="Carica un file di dati esportato">Importa</button>
+    <input type="file" id="impFile" accept=".json" style="display:none" onchange="importaDati(this)">
+  </div>
+</div>
+
+<div class="nav">
+  <div class="ntab on" onclick="showTab(0)">Registro</div>
+  <div class="ntab" onclick="showTab(1)">Catalogo presidi</div>
+  <div class="ntab" onclick="showTab(2)">Ditte manutenzione</div>
+</div>
+
+<!-- REGISTRO -->
+<div class="pg on" id="p0">
+  <div class="info-box">
+    <strong>Registro dei controlli antincendio</strong> (DM 01/09/2021). Firma principale del Datore di Lavoro. Gli interventi tecnici sono documentati dai rapportini della ditta, i cui estremi sono annotati nel registro.
+  </div>
+  <div class="tb">
+    <select id="filtroTipo" onchange="renderPresidi()" style="min-width:200px"><option value="__tutti__">Tutti i presidi</option></select>
+    <button class="bg" onclick="openManutMassiva()">Manutenzione massiva</button>
+    <button class="br" onclick="esportaPDF()">&#8595; Esporta PDF registro</button>
+  </div>
+  <div id="presidiList"></div>
+</div>
+
+<!-- CATALOGO PRESIDI -->
+<div class="pg" id="p1">
+  <div class="info-box">Seleziona i tipi di presidio presenti in <strong id="catNome"></strong>. Solo quelli attivati compariranno nel registro. Puoi poi aggiungere le singole unita.</div>
+  <div class="tb">
+    <button onclick="selTuttiCat(true)">Seleziona tutti</button>
+    <button onclick="selTuttiCat(false)">Deseleziona tutti</button>
+    <button class="bp" onclick="salvaCatalogo()">Salva selezione</button>
+  </div>
+  <div id="catList"></div>
+  <div style="margin-top:16px;padding:14px;background:#fff;border:1px dashed #ccc;border-radius:8px">
+    <p style="font-size:12px;color:#666;margin-bottom:8px;font-weight:600">Aggiungi tipo personalizzato</p>
+    <div style="display:flex;gap:8px"><input type="text" id="nuovoTipoCat" placeholder="Es: Coperta antifiamma" style="flex:1"><button class="bp" onclick="aggiungiTipoCat()">Aggiungi</button></div>
+  </div>
+</div>
+
+<!-- DITTE -->
+<div class="pg" id="p2">
+  <div class="info-box">Definisci le ditte di manutenzione. Ogni presidio avra una ditta di riferimento, assegnabile anche per tipo (es. tutti gli estintori a una ditta).</div>
+  <div class="tb"><button class="bp" onclick="openFormDitta(null)">+ Nuova ditta</button></div>
+  <div id="ditteList"></div>
+  <div style="margin-top:16px;background:#fff;border:1px solid #ddd;border-radius:8px;padding:14px">
+    <h4 style="font-size:14px;margin-bottom:10px">Assegna ditta per tipo di presidio</h4>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:end">
+      <div class="fld" style="margin:0"><label>Tipo presidio</label><select id="assTipo" style="min-width:180px"></select></div>
+      <div class="fld" style="margin:0"><label>Ditta</label><select id="assDitta" style="min-width:180px"></select></div>
+      <button class="bg" onclick="assegnaPerTipo()">Assegna a tutti</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PRESIDIO -->
+<div class="mbg" id="mPres">
+  <div class="mdl">
+    <h3 id="mPresTit">Nuovo presidio</h3>
+    <div class="g2">
+      <div class="fld"><label>Tipo presidio</label><select id="pTipo"></select></div>
+      <div class="fld"><label>Matricola / Identificativo</label><input type="text" id="pMatr" placeholder="Es: EST-01"></div>
+    </div>
+    <div class="g2">
+      <div class="fld"><label>Ubicazione</label><input type="text" id="pUbic" placeholder="Es: Piano terra"></div>
+      <div class="fld"><label>Anno installazione</label><input type="text" id="pAnno" placeholder="Es: 2020"></div>
+    </div>
+    <div class="g2">
+      <div class="fld"><label>Frequenza verifica (giorni)</label><input type="number" id="pFreq" value="180"></div>
+      <div class="fld"><label>Ditta di riferimento</label><select id="pDitta"></select></div>
+    </div>
+    <div class="fld"><label>Note</label><input type="text" id="pNote" placeholder="Es: Polvere ABC 6kg"></div>
+    <div style="display:flex;gap:8px;margin-top:6px">
+      <button class="bp" onclick="salvaPresidio()">Salva</button>
+      <button onclick="chiudiModal('mPres')">Annulla</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL INTERVENTO -->
+<div class="mbg" id="mInterv">
+  <div class="mdl">
+    <h3>Registra intervento</h3>
+    <p style="font-size:12px;color:#888;margin-bottom:14px" id="mIntervSub"></p>
+    <div class="g2">
+      <div class="fld"><label>Data intervento</label><input type="date" id="iData"></div>
+      <div class="fld"><label>Tipo intervento</label><select id="iTipo"><option>Verifica periodica</option><option>Manutenzione ordinaria</option><option>Manutenzione straordinaria</option><option>Sostituzione</option><option>Collaudo</option><option>Ricarica</option></select></div>
+    </div>
+    <div class="g2">
+      <div class="fld"><label>Ditta manutentrice</label><select id="iMan"></select></div>
+      <div class="fld"><label>Esito</label><select id="iEsito"><option>Conforme</option><option>Non conforme</option><option>Conforme con riserva</option></select></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:8px 10px;background:#f5f5f3;border-radius:6px">
+      <input type="checkbox" id="iHasTec" onchange="toggleTecInterv()">
+      <label for="iHasTec" style="margin:0;font-size:13px;font-weight:500;cursor:pointer">Aggiungi tecnico esecutore</label>
+    </div>
+    <div class="fld" id="iTecWrap" style="display:none"><label>Tecnico esecutore</label><input type="text" id="iTec" placeholder="Nome e cognome"></div>
+    <div class="g2">
+      <div class="fld"><label>Prossima verifica</label><input type="date" id="iPross"></div>
+      <div class="fld"></div>
+    </div>
+    <div class="g2">
+      <div class="fld"><label>N. rapportino ditta</label><input type="text" id="iRapp" placeholder="Es: Rapp. 2026/153"></div>
+      <div class="fld"><label>Data rapportino</label><input type="date" id="iRappData"></div>
+    </div>
+    <div class="fld"><label>Note intervento</label><textarea id="iNote" rows="2"></textarea></div>
+    <div style="display:flex;gap:8px;margin-top:6px">
+      <button class="bp" onclick="salvaIntervento()">Registra</button>
+      <button onclick="chiudiModal('mInterv')">Annulla</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MASSIVA -->
+<div class="mbg" id="mMassiva">
+  <div class="mdl">
+    <h3>Manutenzione massiva</h3>
+    <p style="font-size:12px;color:#888;margin-bottom:14px">Registra lo stesso intervento su piu presidi insieme.</p>
+    <div class="fld"><label>Applica a</label><select id="mmTipo" onchange="updateMassivaCount()"></select></div>
+    <div class="g2">
+      <div class="fld"><label>Data intervento</label><input type="date" id="mmData" onchange="calcProssimaMassiva()"></div>
+      <div class="fld"><label>Tipo intervento</label><select id="mmTipoInt"><option>Verifica periodica</option><option>Manutenzione ordinaria</option><option>Collaudo</option></select></div>
+    </div>
+    <div class="g2">
+      <div class="fld"><label>Ditta manutentrice</label><select id="mmMan"></select></div>
+      <div class="fld"><label>Giorni alla prossima verifica</label><input type="number" id="mmGiorni" value="180" onchange="calcProssimaMassiva()"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:8px 10px;background:#f5f5f3;border-radius:6px">
+      <input type="checkbox" id="mmHasTec" onchange="toggleTecMassiva()">
+      <label for="mmHasTec" style="margin:0;font-size:13px;font-weight:500;cursor:pointer">Aggiungi tecnico esecutore</label>
+    </div>
+    <div class="fld" id="mmTecWrap" style="display:none"><label>Tecnico esecutore</label><input type="text" id="mmTec"></div>
+    <div class="g2">
+      <div class="fld"><label>Esito (per tutti)</label><select id="mmEsito"><option>Conforme</option><option>Conforme con riserva</option></select></div>
+      <div class="fld"><label>Prossima verifica (calcolata)</label><input type="date" id="mmPross"></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:8px 10px;background:#f5f5f3;border-radius:6px">
+      <input type="checkbox" id="mmHasRapp" onchange="toggleRappMassiva()">
+      <label for="mmHasRapp" style="margin:0;font-size:13px;font-weight:500;cursor:pointer">Includi estremi rapportino ditta</label>
+    </div>
+    <div class="g2" id="mmRappWrap" style="display:none">
+      <div class="fld"><label>N. rapportino</label><input type="text" id="mmRapp"></div>
+      <div class="fld"><label>Data rapportino</label><input type="date" id="mmRappData"></div>
+    </div>
+    <div style="background:#fff8e6;border:1px solid #f5d78b;border-radius:6px;padding:10px;font-size:12px;color:#8a6d0b;margin-bottom:14px">&#9888; Verranno aggiornati <strong id="mmCount">0</strong> presidi.</div>
+    <div style="display:flex;gap:8px">
+      <button class="bg" onclick="applicaMassiva()">Applica</button>
+      <button onclick="chiudiModal('mMassiva')">Annulla</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DITTA -->
+<div class="mbg" id="mDitta">
+  <div class="mdl">
+    <h3 id="mDittaTit">Nuova ditta</h3>
+    <div class="fld"><label>Nome ditta</label><input type="text" id="dNome" placeholder="Es: Rossi Antincendio Srl"></div>
+    <div class="g2">
+      <div class="fld"><label>Referente</label><input type="text" id="dRef"></div>
+      <div class="fld"><label>Telefono</label><input type="text" id="dTel"></div>
+    </div>
+    <div class="fld"><label>Email</label><input type="email" id="dEmail"></div>
+    <div style="display:flex;gap:8px;margin-top:6px">
+      <button class="bp" onclick="salvaDitta()">Salva</button>
+      <button onclick="chiudiModal('mDitta')">Annulla</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AZIENDA -->
+<div class="mbg" id="mAzi">
+  <div class="mdl">
+    <h3>Nuova azienda</h3>
+    <div class="fld" style="margin-top:10px"><label>Nome azienda</label><input type="text" id="nomeAzi"></div>
+    <div class="fld"><label>Datore di lavoro (per firma)</label><input type="text" id="dlAzi"></div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="bp" onclick="creaAzienda()">Crea</button>
+      <button onclick="chiudiModal('mAzi')">Annulla</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="firebase-init.js"></script>
+<script src="auth-gate.js"></script>
+<script src="fondamenta.js"></script>
+<script>
+var oggi=new Date();oggi.setHours(0,0,0,0);
+
+var TIPI_BASE=["Estintore","Idrante","Naspo","Gruppo di pompaggio","Riserva idrica","Rivelatore di fumo","Rivelatore di gas","Centrale rivelazione incendi","Maniglione antipanico","Porta REI","Illuminazione di emergenza","Evacuatore fumo e calore (EFC)","Segnaletica di sicurezza","Impianto di allarme","Impianto sprinkler","Serranda tagliafuoco"];
+
+/* Lista aziende dall'ANAGRAFICA CONDIVISA (Modulo Aziende): popolata in carica().
+   La config specifica del modulo (tipi di presidio attivi) sta in CONFIG[aziId];
+   il datore di lavoro arriva dall'anagrafica (campo ddl). */
+var AZIENDE=[];
+var CONFIG={};
+
+var DITTE={};
+DITTE[1]=[
+  {id:1,nome:"Rossi Antincendio Srl",referente:"Mario Rossi",tel:"0761-111222",email:"info@rossiantincendio.it"},
+  {id:2,nome:"Elettrica Bianchi",referente:"Luca Bianchi",tel:"0761-333444",email:"bianchi@elettrica.it"}
+];
+DITTE[2]=[];
+
+var PRESIDI={};
+PRESIDI[1]=[
+  {id:201,tipo:"Estintore",matricola:"EST-01",ubicazione:"Ingresso principale",anno:"2019",frequenza:180,dittaId:1,note:"Polvere ABC 6kg",interventi:[{data:"2026-03-01",tipo:"Verifica periodica",manutentore:"Rossi Antincendio Srl",tecnico:"Mario Rossi",esito:"Conforme",prossima:"2026-09-01",rapportino:"Rapp. 2026/045",rapportinoData:"2026-03-01",note:""}]},
+  {id:202,tipo:"Estintore",matricola:"EST-02",ubicazione:"Magazzino",anno:"2019",frequenza:180,dittaId:1,note:"CO2 5kg",interventi:[{data:"2026-03-01",tipo:"Verifica periodica",manutentore:"Rossi Antincendio Srl",tecnico:"Mario Rossi",esito:"Conforme",prossima:"2026-09-01",rapportino:"Rapp. 2026/045",rapportinoData:"2026-03-01",note:""}]},
+  {id:203,tipo:"Estintore",matricola:"EST-03",ubicazione:"Ufficio primo piano",anno:"2020",frequenza:180,dittaId:1,note:"Polvere ABC 6kg",interventi:[]},
+  {id:204,tipo:"Idrante",matricola:"IDR-01",ubicazione:"Cortile esterno",anno:"2015",frequenza:180,dittaId:1,note:"UNI 45",interventi:[{data:"2026-03-01",tipo:"Verifica periodica",manutentore:"Rossi Antincendio Srl",tecnico:"Mario Rossi",esito:"Conforme",prossima:"2026-09-01",rapportino:"Rapp. 2026/045",rapportinoData:"2026-03-01",note:""}]},
+  {id:205,tipo:"Porta REI",matricola:"REI-01",ubicazione:"Locale tecnico",anno:"2018",frequenza:365,dittaId:1,note:"REI 60",interventi:[]},
+  {id:206,tipo:"Illuminazione di emergenza",matricola:"ILL-01",ubicazione:"Corridoio piano terra",anno:"2020",frequenza:180,dittaId:2,note:"",interventi:[{data:"2025-09-01",tipo:"Verifica periodica",manutentore:"Elettrica Bianchi",tecnico:"Luca Bianchi",esito:"Non conforme",prossima:"2026-03-01",rapportino:"Rapp. 2025/210",rapportinoData:"2025-09-01",note:"Batteria da sostituire"}]}
+];
+PRESIDI[2]=[];
+
+var aziId=1,editPresId=null,intervPresId=null,editDittaId=null;
+
+function addDays(s,d){return Fond.addGiorni(s,d);}
+function getStatoPres(p){if(!p.interventi||!p.interventi.length)return "na";var ult=p.interventi[p.interventi.length-1];var sc=addDays(ult.data,p.frequenza);if(!sc)return "na";return Fond.statoScad(sc,30);}
+function fmtDate(d){return Fond.fmtData(d);}
+var LBL={scaduta:"Scaduta",in_scadenza:"In scadenza",ok:"Ok",na:"Mai verificato"};
+var BCL={scaduta:"bs",in_scadenza:"bi",ok:"bo",na:"bn"};
+
+/* getAzi(): unisce l'anagrafica condivisa (id, nome, datore di lavoro=ddl) con la
+   config del modulo CONFIG[aziId] (tipiAttivi). Ritorna CONFIG[aziId] così le
+   modifiche a tipiAttivi restano persistenti. */
+function getAzi(){
+  var base=CONFIG[aziId]||(CONFIG[aziId]={tipiAttivi:[]});
+  if(!base.tipiAttivi) base.tipiAttivi=[];
+  var shared=null; for(var i=0;i<AZIENDE.length;i++){ if(AZIENDE[i].id===aziId){ shared=AZIENDE[i]; break; } }
+  base.id=aziId; base.nome=shared?shared.nome:""; base.datoreLavoro=shared?(shared.ddl||""):"";
+  return base;
+}
+function getPres(){return PRESIDI[aziId]||[];}
+function getDitte(){return DITTE[aziId]||[];}
+function nomeDitta(id){var d=getDitte();for(var i=0;i<d.length;i++){if(d[i].id===id)return d[i].nome;}return "—";}
+
+function initSelAzi(){
+  var s=document.getElementById("selAzi");s.innerHTML="";
+  for(var i=0;i<AZIENDE.length;i++){var o=document.createElement("option");o.value=AZIENDE[i].id;o.textContent=AZIENDE[i].nome;if(AZIENDE[i].id===aziId)o.selected=true;s.appendChild(o);}
+}
+function cambiaAzi(){aziId=Number(document.getElementById("selAzi").value);renderAll();}
+function renderAll(){renderPresidi();renderCatalogo();renderDitte();fillAssegnaSelects();}
+
+function showTab(i){
+  for(var j=0;j<3;j++){document.getElementById("p"+j).classList.toggle("on",j===i);document.querySelectorAll(".ntab")[j].classList.toggle("on",j===i);}
+  if(i===0)renderPresidi();
+  if(i===1)renderCatalogo();
+  if(i===2){renderDitte();fillAssegnaSelects();}
+}
+
+function fillFiltroTipo(){
+  var azi=getAzi();var tipi=azi.tipiAttivi||[];
+  var sel=document.getElementById("filtroTipo");
+  var cur=sel.value||"__tutti__";
+  sel.innerHTML='<option value="__tutti__">Tutti i presidi</option>';
+  for(var i=0;i<tipi.length;i++){var o=document.createElement("option");o.value=tipi[i];o.textContent=tipi[i];sel.appendChild(o);}
+  var ok=false;var opts=sel.options;for(var i=0;i<opts.length;i++){if(opts[i].value===cur)ok=true;}
+  sel.value=ok?cur:"__tutti__";
+}
+
+function renderPresidi(){
+  var pres=getPres();var azi=getAzi();
+  var tipiAttivi=azi.tipiAttivi||[];
+  fillFiltroTipo();
+  var filtro=document.getElementById("filtroTipo").value;
+  if(filtro&&filtro!=="__tutti__")tipiAttivi=tipiAttivi.filter(function(t){return t===filtro;});
+  var h="";
+  if(!(azi.tipiAttivi||[]).length){
+    document.getElementById("presidiList").innerHTML='<div style="text-align:center;padding:3rem;color:#888">Nessun tipo di presidio attivato.<br>Vai su "Catalogo presidi" per selezionarli.</div>';
+    return;
+  }
+  for(var t=0;t<tipiAttivi.length;t++){
+    var tipo=tipiAttivi[t];
+    var gruppo=pres.filter(function(p){return p.tipo===tipo;});
+    var dittaTipo=gruppo.length&&gruppo[0].dittaId?nomeDitta(gruppo[0].dittaId):null;
+    h+='<div class="tipo-group">';
+    h+='<div class="tipo-group-hdr"><div><span class="tg-title">'+tipo+'</span><span class="tg-ditta">'+gruppo.length+' unita'+(dittaTipo?' &middot; '+dittaTipo:'')+'</span></div>';
+    h+='<div style="display:flex;gap:6px">';
+    if(gruppo.length)h+='<button class="bg" style="font-size:11px;padding:4px 9px" onclick="openManutMassivaTipo(\''+tipo.replace(/'/g,"")+'\')">Verifica tutti</button>';
+    h+='<button class="bp" style="font-size:11px;padding:4px 9px" onclick="openFormPresidio(null,\''+tipo.replace(/'/g,"")+'\')">+ Aggiungi</button>';
+    h+='</div></div>';
+    if(!gruppo.length){
+      h+='<div class="presidio"><div style="padding:12px 14px;color:#888;font-size:13px;font-style:italic">Nessuna unita. Clicca "+ Aggiungi".</div></div>';
+    }
+    for(var i=0;i<gruppo.length;i++){
+      var p=gruppo[i];var st=getStatoPres(p);
+      var ult=p.interventi&&p.interventi.length?p.interventi[p.interventi.length-1]:null;
+      var scad=ult?fmtDate(addDays(ult.data,p.frequenza)):"—";
+      h+='<div class="presidio">';
+      h+='<div class="presidio-hdr" onclick="togglePres('+p.id+')">';
+      h+='<div style="display:flex;align-items:center;gap:8px"><strong>'+p.matricola+'</strong><span style="color:#888">— '+p.ubicazione+'</span></div>';
+      h+='<div style="display:flex;align-items:center;gap:8px"><span style="font-size:12px;color:#888">Scad: '+scad+'</span><span class="badge '+BCL[st]+'">'+LBL[st]+'</span><span style="font-size:18px;color:#ccc">&#8250;</span></div></div>';
+      h+='<div class="presidio-body" id="pb'+p.id+'">';
+      h+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px">';
+      h+='<div><div style="font-size:11px;color:#888">Anno</div><div>'+p.anno+'</div></div>';
+      h+='<div><div style="font-size:11px;color:#888">Frequenza</div><div>ogni '+p.frequenza+' gg</div></div>';
+      h+='<div><div style="font-size:11px;color:#888">Ditta riferimento</div><div>'+nomeDitta(p.dittaId)+'</div></div>';
+      if(p.note)h+='<div><div style="font-size:11px;color:#888">Note</div><div>'+p.note+'</div></div>';
+      h+='</div>';
+      h+='<div style="display:flex;gap:8px;margin-bottom:12px">';
+      h+='<button class="bp" style="font-size:12px;padding:5px 10px" onclick="openFormIntervento('+p.id+')">+ Registra intervento</button>';
+      h+='<button style="font-size:12px;padding:5px 10px" onclick="openFormPresidio('+p.id+')">Modifica</button>';
+      h+='<button class="br" style="font-size:12px;padding:5px 10px" onclick="eliminaPresidio('+p.id+')">Elimina</button></div>';
+      h+='<p style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px">STORICO INTERVENTI</p>';
+      if(!p.interventi||!p.interventi.length){h+='<p style="font-size:13px;color:#888;font-style:italic">Nessun intervento registrato</p>';}
+      else{
+        for(var j=p.interventi.length-1;j>=0;j--){
+          var iv=p.interventi[j];
+          var ec=iv.esito==="Conforme"?"#27ae60":iv.esito==="Non conforme"?"#c0392b":"#e67e22";
+          h+='<div class="storico-item"><div class="si-hdr"><span class="si-data">'+fmtDate(iv.data)+' — '+iv.tipo+'</span><span style="font-size:11px;background:'+ec+';color:#fff;padding:2px 7px;border-radius:4px">'+iv.esito+'</span></div>';
+          h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;color:#555"><div>Ditta: '+iv.manutentore+'</div>';
+          if(iv.tecnico)h+='<div>Tecnico: '+iv.tecnico+'</div>';
+          h+='<div>Prossima: '+fmtDate(iv.prossima)+'</div>';
+          if(iv.rapportino)h+='<div>Rapportino: '+iv.rapportino+'</div>';
+          h+='</div>';
+          if(iv.note)h+='<div style="color:#c0392b;margin-top:4px">'+iv.note+'</div>';
+          h+='</div>';
+        }
+      }
+      h+='</div></div>';
+    }
+    h+='</div>';
+  }
+  document.getElementById("presidiList").innerHTML=h;
+}
+
+function togglePres(id){document.getElementById("pb"+id).classList.toggle("open");}
+
+function fillTipoSelect(sel,val){
+  var azi=getAzi();var tipi=azi.tipiAttivi||[];
+  sel.innerHTML="";
+  for(var i=0;i<tipi.length;i++){var o=document.createElement("option");o.value=tipi[i];o.textContent=tipi[i];if(tipi[i]===val)o.selected=true;sel.appendChild(o);}
+}
+function fillDittaSelect(sel,val){
+  var d=getDitte();sel.innerHTML='<option value="0">— nessuna —</option>';
+  for(var i=0;i<d.length;i++){var o=document.createElement("option");o.value=d[i].id;o.textContent=d[i].nome;if(d[i].id===val)o.selected=true;sel.appendChild(o);}
+}
+function fillDittaSelectNome(sel,val){
+  var d=getDitte();sel.innerHTML="";
+  for(var i=0;i<d.length;i++){var o=document.createElement("option");o.value=d[i].nome;o.textContent=d[i].nome;if(d[i].nome===val)o.selected=true;sel.appendChild(o);}
+  var o2=document.createElement("option");o2.value="__altro__";o2.textContent="Altro (manuale)";sel.appendChild(o2);
+}
+
+function openFormPresidio(id,tipoPre){
+  editPresId=id;
+  document.getElementById("mPresTit").textContent=id?"Modifica presidio":"Nuovo presidio";
+  fillTipoSelect(document.getElementById("pTipo"),tipoPre||null);
+  fillDittaSelect(document.getElementById("pDitta"),null);
+  document.getElementById("pMatr").value="";
+  document.getElementById("pUbic").value="";
+  document.getElementById("pAnno").value="";
+  document.getElementById("pFreq").value=180;
+  document.getElementById("pNote").value="";
+  if(id){
+    var pres=getPres();var p=null;
+    for(var i=0;i<pres.length;i++){if(pres[i].id===id){p=pres[i];break;}}
+    if(p){
+      fillTipoSelect(document.getElementById("pTipo"),p.tipo);
+      fillDittaSelect(document.getElementById("pDitta"),p.dittaId);
+      document.getElementById("pMatr").value=p.matricola;
+      document.getElementById("pUbic").value=p.ubicazione;
+      document.getElementById("pAnno").value=p.anno;
+      document.getElementById("pFreq").value=p.frequenza;
+      document.getElementById("pNote").value=p.note;
+    }
+  }
+  document.getElementById("mPres").classList.add("on");
+}
+
+function salvaPresidio(){
+  var obj={
+    id:editPresId||Date.now(),
+    tipo:document.getElementById("pTipo").value,
+    matricola:document.getElementById("pMatr").value,
+    ubicazione:document.getElementById("pUbic").value,
+    anno:document.getElementById("pAnno").value,
+    frequenza:Number(document.getElementById("pFreq").value),
+    dittaId:Number(document.getElementById("pDitta").value),
+    note:document.getElementById("pNote").value,
+    interventi:[]
+  };
+  if(!PRESIDI[aziId])PRESIDI[aziId]=[];
+  if(editPresId){for(var i=0;i<PRESIDI[aziId].length;i++){if(PRESIDI[aziId][i].id===editPresId){obj.interventi=PRESIDI[aziId][i].interventi;PRESIDI[aziId][i]=obj;break;}}}
+  else PRESIDI[aziId].push(obj);
+  salva();
+  chiudiModal("mPres");renderPresidi();
+}
+
+function eliminaPresidio(id){
+  if(!confirm("Eliminare questo presidio e tutto il suo storico?"))return;
+  PRESIDI[aziId]=PRESIDI[aziId].filter(function(p){return p.id!==id;});
+  salva();
+  renderPresidi();
+}
+
+function openFormIntervento(presId){
+  intervPresId=presId;
+  var pres=getPres();var p=null;
+  for(var i=0;i<pres.length;i++){if(pres[i].id===presId){p=pres[i];break;}}
+  document.getElementById("mIntervSub").textContent=p?p.tipo+" — "+p.matricola+" ("+p.ubicazione+")":"";
+  document.getElementById("iData").value=new Date().toISOString().slice(0,10);
+  document.getElementById("iTipo").value="Verifica periodica";
+  fillDittaSelectNome(document.getElementById("iMan"),p&&p.dittaId?nomeDitta(p.dittaId):null);
+  document.getElementById("iHasTec").checked=false;
+  document.getElementById("iTecWrap").style.display="none";
+  document.getElementById("iTec").value="";
+  document.getElementById("iEsito").value="Conforme";
+  document.getElementById("iPross").value="";
+  document.getElementById("iRapp").value="";
+  document.getElementById("iRappData").value="";
+  document.getElementById("iNote").value="";
+  document.getElementById("mInterv").classList.add("on");
+}
+
+function salvaIntervento(){
+  var man=document.getElementById("iMan").value;
+  if(man==="__altro__")man=prompt("Nome ditta manutentrice:")||"";
+  var obj={
+    data:document.getElementById("iData").value,
+    tipo:document.getElementById("iTipo").value,
+    manutentore:man,
+    tecnico:document.getElementById("iHasTec").checked?document.getElementById("iTec").value:"",
+    esito:document.getElementById("iEsito").value,
+    prossima:document.getElementById("iPross").value,
+    rapportino:document.getElementById("iRapp").value,
+    rapportinoData:document.getElementById("iRappData").value,
+    note:document.getElementById("iNote").value
+  };
+  for(var i=0;i<PRESIDI[aziId].length;i++){if(PRESIDI[aziId][i].id===intervPresId){PRESIDI[aziId][i].interventi.push(obj);break;}}
+  salva();
+  chiudiModal("mInterv");renderPresidi();
+}
+
+function calcProssimaMassiva(){
+  var data=document.getElementById("mmData").value;
+  var giorni=Number(document.getElementById("mmGiorni").value);
+  if(data&&giorni){var d=addDays(data,giorni);document.getElementById("mmPross").value=d.toISOString().slice(0,10);}
+}
+function toggleRappMassiva(){
+  document.getElementById("mmRappWrap").style.display=document.getElementById("mmHasRapp").checked?"grid":"none";
+}
+function toggleTecMassiva(){
+  document.getElementById("mmTecWrap").style.display=document.getElementById("mmHasTec").checked?"block":"none";
+}
+function toggleTecInterv(){
+  document.getElementById("iTecWrap").style.display=document.getElementById("iHasTec").checked?"block":"none";
+}
+
+function openManutMassiva(){
+  var pres=getPres();var azi=getAzi();var tipi=azi.tipiAttivi||[];
+  var sel=document.getElementById("mmTipo");
+  sel.innerHTML='<option value="__tutti__">Tutti i presidi ('+pres.length+')</option>';
+  for(var i=0;i<tipi.length;i++){var n=pres.filter(function(p){return p.tipo===tipi[i];}).length;if(!n)continue;var o=document.createElement("option");o.value=tipi[i];o.textContent=tipi[i]+" ("+n+")";sel.appendChild(o);}
+  document.getElementById("mmData").value=new Date().toISOString().slice(0,10);
+  document.getElementById("mmTipoInt").value="Verifica periodica";
+  fillDittaSelectNome(document.getElementById("mmMan"),null);
+  document.getElementById("mmTec").value="";
+  document.getElementById("mmEsito").value="Conforme";
+  document.getElementById("mmGiorni").value=180;
+  document.getElementById("mmHasTec").checked=false;
+  document.getElementById("mmTecWrap").style.display="none";
+  document.getElementById("mmHasRapp").checked=false;
+  document.getElementById("mmRappWrap").style.display="none";
+  document.getElementById("mmRapp").value="";
+  document.getElementById("mmRappData").value="";
+  calcProssimaMassiva();
+  updateMassivaCount();
+  document.getElementById("mMassiva").classList.add("on");
+}
+function openManutMassivaTipo(tipo){openManutMassiva();document.getElementById("mmTipo").value=tipo;updateMassivaCount();}
+function updateMassivaCount(){var pres=getPres();var sel=document.getElementById("mmTipo").value;var n=sel==="__tutti__"?pres.length:pres.filter(function(p){return p.tipo===sel;}).length;document.getElementById("mmCount").textContent=n;}
+
+function applicaMassiva(){
+  var pres=getPres();var sel=document.getElementById("mmTipo").value;
+  var target=sel==="__tutti__"?pres:pres.filter(function(p){return p.tipo===sel;});
+  if(!document.getElementById("mmData").value){alert("Inserisci la data");return;}
+  var man=document.getElementById("mmMan").value;
+  if(man==="__altro__")man=prompt("Nome ditta manutentrice:")||"";
+  var hasRapp=document.getElementById("mmHasRapp").checked;
+  var hasTec=document.getElementById("mmHasTec").checked;
+  var b={data:document.getElementById("mmData").value,tipo:document.getElementById("mmTipoInt").value,manutentore:man,tecnico:hasTec?document.getElementById("mmTec").value:"",esito:document.getElementById("mmEsito").value,prossima:document.getElementById("mmPross").value,rapportino:hasRapp?document.getElementById("mmRapp").value:"",rapportinoData:hasRapp?document.getElementById("mmRappData").value:"",note:""};
+  for(var i=0;i<target.length;i++){target[i].interventi.push({data:b.data,tipo:b.tipo,manutentore:b.manutentore,tecnico:b.tecnico,esito:b.esito,prossima:b.prossima,rapportino:b.rapportino,rapportinoData:b.rapportinoData,note:b.note});}
+  salva();
+  chiudiModal("mMassiva");renderPresidi();
+  alert("Manutenzione registrata su "+target.length+" presidi.");
+}
+
+// CATALOGO
+function renderCatalogo(){
+  document.getElementById("catNome").textContent=getAzi().nome;
+  var azi=getAzi();var attivi=azi.tipiAttivi||[];
+  var h="";
+  for(var i=0;i<TIPI_BASE.length;i++){
+    var t=TIPI_BASE[i];var chk=attivi.indexOf(t)!==-1?"checked":"";
+    h+='<div class="cat-item"><input type="checkbox" '+chk+' data-tipo="'+t+'" onchange="toggleTipoCat(this)"><div style="font-size:13px;font-weight:500">'+t+'</div></div>';
+  }
+  // tipi personalizzati gia attivi non in TIPI_BASE
+  for(var i=0;i<attivi.length;i++){
+    if(TIPI_BASE.indexOf(attivi[i])===-1){
+      h+='<div class="cat-item"><input type="checkbox" checked data-tipo="'+attivi[i]+'" onchange="toggleTipoCat(this)"><div style="font-size:13px;font-weight:500">'+attivi[i]+' <span style="color:#888;font-size:11px">(personalizzato)</span></div></div>';
+    }
+  }
+  document.getElementById("catList").innerHTML=h;
+}
+function toggleTipoCat(cb){
+  var azi=getAzi();if(!azi.tipiAttivi)azi.tipiAttivi=[];
+  var t=cb.getAttribute("data-tipo");
+  if(cb.checked){if(azi.tipiAttivi.indexOf(t)===-1)azi.tipiAttivi.push(t);}
+  else{azi.tipiAttivi=azi.tipiAttivi.filter(function(x){return x!==t;});}
+  salva();
+}
+function selTuttiCat(v){var azi=getAzi();azi.tipiAttivi=v?TIPI_BASE.slice():[];renderCatalogo();}
+function aggiungiTipoCat(){
+  var t=document.getElementById("nuovoTipoCat").value.trim();if(!t)return;
+  var azi=getAzi();if(!azi.tipiAttivi)azi.tipiAttivi=[];
+  if(azi.tipiAttivi.indexOf(t)===-1)azi.tipiAttivi.push(t);
+  document.getElementById("nuovoTipoCat").value="";renderCatalogo();
+}
+function salvaCatalogo(){renderPresidi();alert("Selezione salvata! I presidi attivati sono ora nel registro.");showTab(0);}
+
+// DITTE
+function renderDitte(){
+  var d=getDitte();var h="";
+  if(!d.length)h='<p style="color:#888;font-size:13px">Nessuna ditta registrata.</p>';
+  for(var i=0;i<d.length;i++){
+    h+='<div class="ditta-card"><div style="display:flex;justify-content:space-between;align-items:start"><div><h4>'+d[i].nome+'</h4>';
+    h+='<div style="font-size:12px;color:#666">Referente: '+(d[i].referente||"—")+' &middot; Tel: '+(d[i].tel||"—")+' &middot; '+(d[i].email||"—")+'</div></div>';
+    h+='<div style="display:flex;gap:6px"><button style="font-size:12px;padding:4px 9px" onclick="openFormDitta('+d[i].id+')">Modifica</button>';
+    h+='<button class="br" style="font-size:12px;padding:4px 9px" onclick="eliminaDitta('+d[i].id+')">Elimina</button></div></div></div>';
+  }
+  document.getElementById("ditteList").innerHTML=h;
+}
+function fillAssegnaSelects(){
+  var azi=getAzi();var tipi=azi.tipiAttivi||[];
+  var st=document.getElementById("assTipo");st.innerHTML="";
+  for(var i=0;i<tipi.length;i++){var o=document.createElement("option");o.value=tipi[i];o.textContent=tipi[i];st.appendChild(o);}
+  var d=getDitte();var sd=document.getElementById("assDitta");sd.innerHTML="";
+  for(var i=0;i<d.length;i++){var o=document.createElement("option");o.value=d[i].id;o.textContent=d[i].nome;sd.appendChild(o);}
+}
+function assegnaPerTipo(){
+  var tipo=document.getElementById("assTipo").value;var dittaId=Number(document.getElementById("assDitta").value);
+  var pres=getPres();var n=0;
+  for(var i=0;i<pres.length;i++){if(pres[i].tipo===tipo){pres[i].dittaId=dittaId;n++;}}
+  alert("Ditta assegnata a "+n+" presidi di tipo "+tipo);renderPresidi();
+}
+function openFormDitta(id){
+  editDittaId=id;
+  document.getElementById("mDittaTit").textContent=id?"Modifica ditta":"Nuova ditta";
+  document.getElementById("dNome").value="";document.getElementById("dRef").value="";document.getElementById("dTel").value="";document.getElementById("dEmail").value="";
+  if(id){var d=getDitte();for(var i=0;i<d.length;i++){if(d[i].id===id){document.getElementById("dNome").value=d[i].nome;document.getElementById("dRef").value=d[i].referente;document.getElementById("dTel").value=d[i].tel;document.getElementById("dEmail").value=d[i].email;break;}}}
+  document.getElementById("mDitta").classList.add("on");
+}
+function salvaDitta(){
+  var nome=document.getElementById("dNome").value.trim();if(!nome){alert("Inserisci il nome");return;}
+  var obj={id:editDittaId||Date.now(),nome:nome,referente:document.getElementById("dRef").value,tel:document.getElementById("dTel").value,email:document.getElementById("dEmail").value};
+  if(!DITTE[aziId])DITTE[aziId]=[];
+  if(editDittaId){for(var i=0;i<DITTE[aziId].length;i++){if(DITTE[aziId][i].id===editDittaId){DITTE[aziId][i]=obj;break;}}}
+  else DITTE[aziId].push(obj);
+  salva();
+  chiudiModal("mDitta");renderDitte();fillAssegnaSelects();
+}
+function eliminaDitta(id){if(!confirm("Eliminare questa ditta?"))return;DITTE[aziId]=DITTE[aziId].filter(function(d){return d.id!==id;});salva();renderDitte();fillAssegnaSelects();}
+
+function esportaPDF(){
+  var azi=getAzi();var pres=getPres();var tipiAttivi=azi.tipiAttivi||[];
+  var dataOggi=new Date().toLocaleDateString("it-IT");
+  var win=window.open("","_blank");
+  var h='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Registro Presidi Antincendio</title>';
+  h+='<style>body{font-family:Arial,sans-serif;font-size:12px;color:#111;margin:24px} h1{font-size:17px;border-bottom:2px solid #000;padding-bottom:6px} h2{font-size:13px;margin:18px 0 6px;background:#f0f0f0;padding:6px 10px;border-left:4px solid #c0392b} table{width:100%;border-collapse:collapse;margin-bottom:8px;font-size:10px} th{background:#333;color:#fff;padding:5px 6px;text-align:left} td{padding:5px 6px;border:1px solid #ccc} .firma{display:inline-block;width:220px;border-top:1px solid #000;margin-top:50px;margin-right:50px;text-align:center;font-size:11px;padding-top:4px} .meta{margin:4px 0}</style></head><body>';
+  h+='<h1>REGISTRO DEI CONTROLLI ANTINCENDIO</h1>';
+  h+='<p class="meta"><strong>Azienda:</strong> '+azi.nome+'</p>';
+  h+='<p class="meta"><strong>Datore di Lavoro:</strong> '+(azi.datoreLavoro||"________________")+'</p>';
+  h+='<p class="meta"><strong>Data elaborazione:</strong> '+dataOggi+'</p>';
+  h+='<p class="meta" style="font-size:10px;color:#555">Documento redatto ai sensi del DM 01/09/2021. Gli interventi tecnici sono documentati dai rapportini della ditta manutentrice.</p>';
+  for(var t=0;t<tipiAttivi.length;t++){
+    var gruppo=pres.filter(function(p){return p.tipo===tipiAttivi[t];});
+    if(!gruppo.length)continue;
+    h+='<h2>'+tipiAttivi[t]+' ('+gruppo.length+' unita)</h2>';
+    for(var i=0;i<gruppo.length;i++){
+      var p=gruppo[i];
+      h+='<table><tr><th>Matricola</th><th>Ubicazione</th><th>Anno</th><th>Freq.</th><th>Ditta rif.</th><th>Note</th></tr>';
+      h+='<tr><td>'+p.matricola+'</td><td>'+p.ubicazione+'</td><td>'+p.anno+'</td><td>'+p.frequenza+'gg</td><td>'+nomeDitta(p.dittaId)+'</td><td>'+(p.note||"—")+'</td></tr></table>';
+      if(p.interventi&&p.interventi.length){
+        h+='<table><tr><th>Data</th><th>Intervento</th><th>Ditta</th><th>Tecnico</th><th>Esito</th><th>Rapportino</th><th>Prossima</th></tr>';
+        for(var j=0;j<p.interventi.length;j++){var iv=p.interventi[j];h+='<tr><td>'+fmtDate(iv.data)+'</td><td>'+iv.tipo+'</td><td>'+iv.manutentore+'</td><td>'+iv.tecnico+'</td><td>'+iv.esito+'</td><td>'+(iv.rapportino||"—")+'</td><td>'+fmtDate(iv.prossima)+'</td></tr>';}
+        h+='</table>';
+      }else{h+='<p style="color:#888;font-style:italic;font-size:10px">Nessun intervento registrato</p>';}
+    }
+  }
+  h+='<div style="margin-top:30px"><div class="firma">'+(azi.datoreLavoro||"")+'<br>Il Datore di Lavoro</div><div class="firma">________________<br>La Ditta Manutentrice (facoltativo)</div></div>';
+  h+='<button onclick="window.print()" style="margin-top:30px;padding:8px 16px;background:#0f5e5a;color:#fff;border:none;border-radius:6px;cursor:pointer">Stampa / Salva come PDF</button>';
+  h+='</body></html>';
+  win.document.write(h);win.document.close();
+}
+
+/* Le aziende ora si gestiscono SOLO nel Modulo Aziende (anagrafica condivisa).
+   Il datore di lavoro si imposta lì (campo DDL). */
+function openNuovaAzi(){ alert("Le aziende si aggiungono nel modulo \"Aziende\".\n\nApri il Modulo Aziende, inserisci l'azienda (con il Datore di Lavoro), poi ricarica questo modulo: comparirà nell'elenco."); }
+function creaAzienda(){ openNuovaAzi(); }
+function mostraNessunAzienda(){
+  var d=document.createElement("div");
+  d.style.cssText="margin:20px;padding:16px 18px;background:#fdf3e3;border:1px solid #e6c98a;border-radius:10px;color:#7a5b1e;font-size:14px";
+  d.innerHTML="<b>Nessuna azienda in anagrafica.</b><br>Apri il modulo <b>Aziende</b>, inserisci almeno un'azienda, poi ricarica questa pagina.";
+  document.body.insertBefore(d, document.body.firstChild);
+}
+
+function chiudiModal(id){document.getElementById(id).classList.remove("on");}
+
+var mbgs=document.getElementsByClassName("mbg");
+for(var mi=0;mi<mbgs.length;mi++){mbgs[mi].addEventListener("click",function(e){if(e.target===this)this.classList.remove("on");});}
+
+/* ============ PERSISTENZA (localStorage; Firebase la sostituirà) ============ */
+/* Persiste aziende, presidi (con interventi annidati), ditte e l'azienda selezionata. */
+var LS_KEY="antincendio_dati_v1";
+function salva(){
+  /* NON si salva più AZIENDE (è dell'anagrafica condivisa); si salva CONFIG del modulo. */
+  Store.save(LS_KEY, {CONFIG:CONFIG, PRESIDI:PRESIDI, DITTE:DITTE, aziId:aziId})
+    .catch(function(e){ console.warn("Salvataggio non riuscito:", e); });
+}
+/* carica() ASINCRONA: anagrafica condivisa + dati del modulo (config, presidi, ditte). */
+function carica(){
+  return Promise.all([ Store.aziende(), Store.load(LS_KEY) ]).then(function(res){
+    AZIENDE = res[0] || [];
+    var d = res[1];
+    PRESIDI = (d && d.PRESIDI) || {};
+    DITTE = (d && d.DITTE) || {};
+    if(d && d.CONFIG){ CONFIG = d.CONFIG; }
+    else if(d && Array.isArray(d.AZIENDE)){ /* migrazione: tipiAttivi dal vecchio formato */
+      CONFIG={}; for(var i=0;i<d.AZIENDE.length;i++){ var az=d.AZIENDE[i]; CONFIG[az.id]={tipiAttivi:az.tipiAttivi||[]}; }
+    } else { CONFIG={}; }
+    if(d && d.aziId) aziId = d.aziId;
+    if(AZIENDE.length){ var ok=false; for(var i=0;i<AZIENDE.length;i++){ if(AZIENDE[i].id===aziId){ok=true;break;} } if(!ok) aziId=AZIENDE[0].id; }
+    return AZIENDE.length > 0;
+  }).catch(function(e){ console.warn("Caricamento non riuscito:", e); return false; });
+}
+/* Export/import JSON: ponte multi-PC finché non c'è Firebase */
+function esportaDati(){
+  var blob=new Blob([JSON.stringify({AZIENDE:AZIENDE, CONFIG:CONFIG, PRESIDI:PRESIDI, DITTE:DITTE}, null, 2)],{type:"application/json"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");
+  a.href=url; a.download="antincendio_dati_"+Fond.oggiIT().replace(/\//g,"-")+".json";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function importaDati(input){
+  var file=input.files && input.files[0];
+  if(!file) return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{
+      var d=JSON.parse(r.result);
+      if(!d || (!d.PRESIDI && !d.CONFIG && !d.AZIENDE)){ alert("File non valido."); return; }
+      if(!confirm("Importare i dati dal file? Presidi, ditte e configurazione verranno sostituiti (le aziende restano quelle dell'anagrafica).")) return;
+      PRESIDI=d.PRESIDI||{}; DITTE=d.DITTE||{};
+      if(d.CONFIG){ CONFIG=d.CONFIG; }
+      else if(Array.isArray(d.AZIENDE)){ CONFIG={}; for(var i=0;i<d.AZIENDE.length;i++){ var az=d.AZIENDE[i]; CONFIG[az.id]={tipiAttivi:az.tipiAttivi||[]}; } }
+      if(AZIENDE.length){ var ok=false; for(var i=0;i<AZIENDE.length;i++){ if(AZIENDE[i].id===aziId){ok=true;break;} } if(!ok) aziId=AZIENDE[0].id; }
+      salva(); initSelAzi(); renderAll();
+      alert("Dati importati.");
+    }catch(e){ alert("File non leggibile: "+e.message); }
+    input.value="";
+  };
+  r.readAsText(file);
+}
+
+/* Avvio: carica dati salvati; se assenti restano i dati seed dimostrativi già in memoria */
+carica().then(function(){
+  if(!AZIENDE.length){ mostraNessunAzienda(); return; }
+  initSelAzi(); renderAll();
+});
+</script>
+</body>
+</html>

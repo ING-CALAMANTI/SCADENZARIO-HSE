@@ -1,0 +1,2118 @@
+{
+  "meta": {
+    "nome": "Catalogo rilievi — Sicurezza sul lavoro, Antincendio, Ambiente",
+    "versione": "1.0",
+    "data_esportazione": "2026-07-22",
+    "autore": "Ing. Walter Calamanti — RSPP e Professionista Antincendio",
+    "schede_totali": 94,
+    "note": "Riferimenti normativi verificati alla data di esportazione. Le schede sono da validare dal professionista prima dell'uso in relazioni firmate. Quadro RENTRI e qualificazione manutentori antincendio in evoluzione: verificare le scadenze aggiornate.",
+    "schema": {
+      "id": "identificativo numerico univoco",
+      "cat": "categoria di appartenenza",
+      "tit": "titolo del rilievo",
+      "des": "descrizione tecnica del problema",
+      "ris": "array — rischi conseguenti",
+      "nor": "array — riferimenti normativi",
+      "azi": "array — azioni di miglioramento secondo norma",
+      "rac": "raccomandazioni conclusive"
+    }
+  },
+  "categorie": [
+    {
+      "nome": "Agenti cancerogeni",
+      "schede": 2
+    },
+    {
+      "nome": "Agenti fisici",
+      "schede": 2
+    },
+    {
+      "nome": "Ambiente - Autorizzazioni",
+      "schede": 1
+    },
+    {
+      "nome": "Ambiente - Emissioni",
+      "schede": 2
+    },
+    {
+      "nome": "Ambiente - Rifiuti",
+      "schede": 10
+    },
+    {
+      "nome": "Ambiente - Scarichi idrici",
+      "schede": 2
+    },
+    {
+      "nome": "Ambiente - Serbatoi",
+      "schede": 1
+    },
+    {
+      "nome": "Antincendio - GPL e combustibili",
+      "schede": 4
+    },
+    {
+      "nome": "Antincendio - Gestione",
+      "schede": 4
+    },
+    {
+      "nome": "Antincendio - Impianti",
+      "schede": 4
+    },
+    {
+      "nome": "Antincendio - Materiali",
+      "schede": 4
+    },
+    {
+      "nome": "Antincendio - Presidi",
+      "schede": 4
+    },
+    {
+      "nome": "Antincendio - Strutture",
+      "schede": 4
+    },
+    {
+      "nome": "Atmosfere esplosive",
+      "schede": 1
+    },
+    {
+      "nome": "Attrezzature di lavoro",
+      "schede": 6
+    },
+    {
+      "nome": "DPI",
+      "schede": 1
+    },
+    {
+      "nome": "Impianti elettrici",
+      "schede": 7
+    },
+    {
+      "nome": "Lavori in quota",
+      "schede": 2
+    },
+    {
+      "nome": "Luoghi di lavoro",
+      "schede": 11
+    },
+    {
+      "nome": "Movimentazione",
+      "schede": 3
+    },
+    {
+      "nome": "Organizzazione e gestione",
+      "schede": 6
+    },
+    {
+      "nome": "Polveri e silice",
+      "schede": 1
+    },
+    {
+      "nome": "Segnaletica",
+      "schede": 1
+    },
+    {
+      "nome": "Sostanze pericolose",
+      "schede": 5
+    },
+    {
+      "nome": "Spazi confinati",
+      "schede": 1
+    },
+    {
+      "nome": "Vie di esodo",
+      "schede": 5
+    }
+  ],
+  "rilievi": [
+    {
+      "id": 1,
+      "cat": "Antincendio - Presidi",
+      "tit": "Estintore non accessibile o ostruito",
+      "des": "L'estintore non è facilmente accessibile a causa della presenza di ostacoli (materiali di lavorazione, carrelli, stampi) o del posizionamento inadeguato.",
+      "ris": [
+        "Ritardo nell'intervento in caso di incendio",
+        "Impossibilità di utilizzare i presidi antincendio in tempo utile",
+        "Peggioramento delle conseguenze di un principio d'incendio"
+      ],
+      "nor": [
+        "Codice di Prevenzione Incendi D.M. 03/08/2015",
+        "D.M. 03/09/2021 - Gestione sicurezza antincendio nei luoghi di lavoro"
+      ],
+      "azi": [
+        "Rimuovere immediatamente qualsiasi ostacolo davanti o in prossimità degli estintori",
+        "Collocare gli estintori in posizione facilmente visibile e raggiungibile",
+        "Verificare almeno una volta per turno l'accessibilità dei presidi",
+        "Prevedere controlli interni documentati da parte del preposto o addetto antincendio"
+      ],
+      "rac": "Gli estintori e i presidi antincendio devono essere sempre liberi, visibili e pronti all'uso. Il controllo va inserito nel piano di sorveglianza antincendio aziendale."
+    },
+    {
+      "id": 2,
+      "cat": "Antincendio - Presidi",
+      "tit": "Mancanza di segnaletica presidi antincendio",
+      "des": "Mancanza di cartello di segnalazione per la presenza dell'estintore e/o del pulsante di emergenza.",
+      "ris": [
+        "Difficoltà di individuazione dei presidi in emergenza",
+        "Ritardo nell'intervento in caso di incendio"
+      ],
+      "nor": [
+        "Codice di Prevenzione Incendi D.M. 03/08/2015"
+      ],
+      "azi": [
+        "Ripristinare una corretta segnaletica di tutti i presidi antincendio: estintori, pulsanti di emergenza",
+        "Verificare periodicamente visibilità e leggibilità della segnaletica"
+      ],
+      "rac": "I presidi antincendio devono essere sempre segnalati con corretta segnaletica, visibile da ogni punto dell'area."
+    },
+    {
+      "id": 3,
+      "cat": "Vie di esodo",
+      "tit": "Vie di fuga o uscite di emergenza ostruite",
+      "des": "Ostruzioni parziali o totali delle vie di fuga e delle uscite di emergenza dovute a materiali, carrelli di movimentazione o attrezzature, con riduzione della larghezza utile di passaggio.",
+      "ris": [
+        "Difficoltà di evacuazione in caso di emergenza",
+        "Urto, inciampo o caduta a livello lungo le vie di esodo",
+        "Ostacolo al transito dei mezzi di soccorso interni"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Allegato IV, Vie e uscite di emergenza",
+        "D.Lgs. 81/2008 - Titolo I, Capo III, Sez. VI, art. 46 - Prevenzione Incendi",
+        "Codice di Prevenzione Incendi D.M. 03/08/2015"
+      ],
+      "azi": [
+        "Rimuovere immediatamente materiali e attrezzature depositati lungo le vie di fuga e presso le uscite",
+        "Verificare quotidianamente (inizio e fine turno) la libera percorribilità delle vie di esodo",
+        "Ripristinare e mantenere visibile la segnaletica orizzontale e verticale di emergenza",
+        "Riorganizzare gli spazi di deposito temporaneo con aree dedicate e delimitate",
+        "Inserire il controllo \"vie di fuga libere\" nel registro dei controlli periodici"
+      ],
+      "rac": "Assicurare la piena fruibilità delle vie di esodo in ogni momento della giornata lavorativa, anche durante le fasi di movimentazione."
+    },
+    {
+      "id": 4,
+      "cat": "Antincendio - Materiali",
+      "tit": "Materiale combustibile presso quadro elettrico",
+      "des": "Materiali combustibili o infiammabili stoccati in prossimità di un quadro elettrico, con potenziale rischio di incendio. Eventuale presenza di polveri e schizzi d'acqua nell'area.",
+      "ris": [
+        "Innesco di incendio in caso di guasto elettrico",
+        "Propagazione rapida del fuoco"
+      ],
+      "nor": [
+        "Codice di Prevenzione Incendi D.M. 03/08/2015",
+        "D.Lgs. 81/2008 - Titolo III, Capo III - Impianti e apparecchiature elettriche"
+      ],
+      "azi": [
+        "Spostare i materiali combustibili in un'area di stoccaggio sicura",
+        "Proteggere il quadro elettrico",
+        "Implementare procedure di controllo per evitare future situazioni di rischio"
+      ],
+      "rac": "Mantenere sgombra l'area attorno ai quadri elettrici; nessun materiale combustibile deve essere depositato in prossimità."
+    },
+    {
+      "id": 5,
+      "cat": "Antincendio - Materiali",
+      "tit": "Carico d'incendio superiore alla SCIA autorizzata",
+      "des": "Presenza di materiale combustibile (cartoni, imballaggi, pallet in legno, scatole) superiore a quanto previsto e dichiarato nella documentazione progettuale antincendio depositata in sede di SCIA, con aumento del carico d'incendio specifico.",
+      "ris": [
+        "Aumento del carico d'incendio specifico di reparto",
+        "Propagazione rapida dell'incendio",
+        "Maggiori difficoltà di evacuazione e intervento",
+        "Disallineamento tra stato di fatto e SCIA antincendio approvata"
+      ],
+      "nor": [
+        "D.M. 03/08/2015 - Codice di Prevenzione Incendi",
+        "D.P.R. 151/2011, art. 4 - obbligo di aggiornamento SCIA"
+      ],
+      "azi": [
+        "Ripristinare immediatamente lo stato di fatto dichiarato",
+        "Effettuare immediata valutazione tecnica del nuovo carico d'incendio specifico",
+        "Verificare la necessità di aggiornamento della SCIA antincendio",
+        "Ridurre ove possibile il materiale combustibile stoccato con piano di rotazione scorte",
+        "Valutare l'installazione di impianto idrico antincendio in funzione della nuova analisi del rischio",
+        "Aggiornare il piano di emergenza interno"
+      ],
+      "rac": "Ogni variazione sostanziale, anche temporanea, del carico d'incendio deve essere oggetto di verifica e rivalutazione del rischio con il Professionista Antincendio."
+    },
+    {
+      "id": 6,
+      "cat": "Antincendio - GPL e combustibili",
+      "tit": "Materiale combustibile presso bombola GPL",
+      "des": "Materiale combustibile accatastato in prossimità di una bombola di GPL, collocata senza idonea distanza di sicurezza e priva di barriere o delimitazioni fisiche contro urti accidentali.",
+      "ris": [
+        "Incendio o esplosione dovuta a riscaldamento della bombola",
+        "Propagazione rapida del fuoco ai materiali combustibili vicini",
+        "Rischio per gli operatori e per le strutture limitrofe"
+      ],
+      "nor": [
+        "D.M. 14/05/2004 e s.m.i. - Regola tecnica installazione serbatoi GPL",
+        "D.Lgs. 81/2008"
+      ],
+      "azi": [
+        "Rimuovere immediatamente il materiale combustibile in prossimità della bombola",
+        "Spostare la bombola in area idonea con distanza minima di almeno 3 metri da materiali infiammabili",
+        "Installare protezione fisica o barriera metallica contro urti accidentali"
+      ],
+      "rac": "Le bombole GPL devono essere sempre collocate in aree ventilate, protette e libere da materiali combustibili, con controllo giornaliero del preposto."
+    },
+    {
+      "id": 7,
+      "cat": "Antincendio - Materiali",
+      "tit": "Materiale combustibile a ridosso del fabbricato",
+      "des": "Materiale combustibile (pallet, imballaggi, cartoni) accatastato a ridosso del fabbricato e/o in prossimità di un'uscita di sicurezza.",
+      "ris": [
+        "Propagazione dell'incendio all'edificio",
+        "Ostacolo all'uscita di emergenza",
+        "Peggioramento delle condizioni di evacuazione"
+      ],
+      "nor": [
+        "D.M. 03/08/2015 - Codice di Prevenzione Incendi, Cap. S.3 e S.5",
+        "Linee guida VVF gestione aree esterne"
+      ],
+      "azi": [
+        "Rimuovere immediatamente il materiale combustibile da fabbricato e uscite di emergenza",
+        "Stabilire distanza minima di sicurezza di almeno 5 metri dalle pareti esterne",
+        "Individuare area dedicata esterna con segnaletica e delimitazione fisica",
+        "Inserire la gestione dei materiali esterni nel piano di sicurezza antincendio con controlli documentati"
+      ],
+      "rac": "Il deposito di materiali combustibili non deve mai avvenire a contatto con le strutture o in corrispondenza delle uscite di sicurezza."
+    },
+    {
+      "id": 8,
+      "cat": "Impianti elettrici",
+      "tit": "Quadro elettrico privo di coperture o protezioni",
+      "des": "Quadri elettrici con mancanza di tappi o coperture delle parti interne; aperture o rotture espongono componenti in tensione e parti metalliche.",
+      "ris": [
+        "Contatto diretto con parti in tensione",
+        "Rischio di folgorazione",
+        "Danneggiamento o cortocircuito dovuto a corpi estranei",
+        "Possibile innesco d'incendio in caso di guasto elettrico"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo III, Capo III - Impianti e apparecchiature elettriche"
+      ],
+      "azi": [
+        "Sostituire immediatamente le coperture mancanti o danneggiate",
+        "Verificare la corretta chiusura e integrità di tutti i quadri del reparto",
+        "Installare tappi ciechi o copripoli nei punti assenti"
+      ],
+      "rac": "Garantire la piena integrità e chiusura dei quadri elettrici; ogni anomalia va segnalata al manutentore elettrico e risolta prima della prosecuzione delle attività."
+    },
+    {
+      "id": 9,
+      "cat": "Impianti elettrici",
+      "tit": "Quadro elettrico non protetto e non segnalato",
+      "des": "Quadro elettrico generale non adeguatamente protetto e segnalato.",
+      "ris": [
+        "Contatto con parti in tensione",
+        "Accesso non autorizzato"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo III, Capo III - Impianti e apparecchiature elettriche"
+      ],
+      "azi": [
+        "Proteggere e segnalare adeguatamente i quadri elettrici",
+        "Assicurarsi che le porte di accesso ai locali quadro siano chiuse e protette"
+      ],
+      "rac": "Le zone pericolose devono restare chiuse e segnalate; il locale quadro non va usato come deposito."
+    },
+    {
+      "id": 10,
+      "cat": "Impianti elettrici",
+      "tit": "Promiscuità tubazioni acqua e cavi elettrici",
+      "des": "Tubazioni dell'acqua passanti all'interno di canaline degli impianti elettrici.",
+      "ris": [
+        "Pericolo di folgorazione",
+        "Cortocircuiti"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo III, Capo III - Impianti e apparecchiature elettriche"
+      ],
+      "azi": [
+        "Evitare la promiscuità di passaggio tra tubazioni d'acqua e cavi elettrici",
+        "Separare i percorsi impiantistici"
+      ],
+      "rac": "Verificare periodicamente l'integrità delle canaline e l'assenza di infiltrazioni."
+    },
+    {
+      "id": 11,
+      "cat": "Polveri e silice",
+      "tit": "Accumuli di barbottina e polveri silicotigene",
+      "des": "Diffusa presenza di materiale secco e residui di barbottina su pavimento, tubazioni, macchinari e linee di colaggio; superfici non regolarmente pulite con possibile dispersione di polveri contenenti silice libera cristallina.",
+      "ris": [
+        "Esposizione a polveri contenenti silice libera cristallina",
+        "Inalazione di polveri respirabili",
+        "Peggioramento del microclima e della qualità dell'aria",
+        "Degrado dei componenti meccanici ed elettrici per accumulo di polvere"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo IX - Sostanze pericolose (agenti cancerogeni: SLC respirabile)",
+        "D.Lgs. 81/2008 - Titolo IX, Capo I - Protezione da agenti chimici"
+      ],
+      "azi": [
+        "Implementare pulizia giornaliera e intermedia con rimozione dei residui durante i turni",
+        "Eseguire pulizie esclusivamente ad umido o con aspiratori industriali con filtro HEPA — mai a secco",
+        "Verificare periodicamente l'efficienza di aspirazioni e veli d'acqua nelle cabine",
+        "Manutenzione programmata di tubazioni e pompe per prevenire trafilamenti",
+        "Formare gli addetti sulla corretta pulizia per ridurre l'esposizione a silice"
+      ],
+      "rac": "La rimozione della polvere dal pavimento NON deve essere effettuata a secco (scope), ma ad umido con macchina lava-asciuga; palette solo per materiale grossolano."
+    },
+    {
+      "id": 12,
+      "cat": "Luoghi di lavoro",
+      "tit": "Strutture metalliche accatastate non vincolate",
+      "des": "Strutture metalliche per scaffalature accatastate verticalmente in posizione temporanea, non ancorate, delimitate o vincolate, in area di passaggio.",
+      "ris": [
+        "Ribaltamento di strutture metalliche",
+        "Urto o schiacciamento di persone",
+        "Caduta di materiali dall'alto",
+        "Danneggiamento di attrezzature e impianti"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Allegato IV - Requisiti dei luoghi di lavoro"
+      ],
+      "azi": [
+        "Rimuovere o mettere in sicurezza immediatamente le strutture accatastate",
+        "Predisporre area dedicata e delimitata per lo stoccaggio temporaneo",
+        "Vincolare le strutture con cinghie o sistemi di blocco",
+        "Installare segnaletica di divieto di accesso presso l'area di deposito"
+      ],
+      "rac": "Il materiale metallico non deve essere accatastato in verticale senza idonei sistemi di stabilizzazione o delimitazione; verifica giornaliera della disposizione."
+    },
+    {
+      "id": 13,
+      "cat": "Luoghi di lavoro",
+      "tit": "Scaffalature con materiali senza protezione",
+      "des": "Accumulo di materiali su scaffalature senza protezione adeguata.",
+      "ris": [
+        "Caduta di materiali dall'alto",
+        "Urto e schiacciamento"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Allegato IV - Requisiti dei luoghi di lavoro"
+      ],
+      "azi": [
+        "Garantire la protezione e l'organizzazione delle scaffalature",
+        "Verificare portata e ancoraggio delle scaffalature"
+      ],
+      "rac": "Mantenere ordinato lo stoccaggio a scaffale con carichi compatibili con la portata dichiarata."
+    },
+    {
+      "id": 14,
+      "cat": "Luoghi di lavoro",
+      "tit": "Rampa o zona con rischio caduta dall'alto",
+      "des": "Rampa di accesso o postazione in quota non protetta adeguatamente, rischio di caduta dall'alto.",
+      "ris": [
+        "Caduta dall'alto di persone"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Allegato IV - Requisiti dei luoghi di lavoro. Scale"
+      ],
+      "azi": [
+        "Installare protezioni adeguate (parapetti) lungo la rampa di accesso"
+      ],
+      "rac": "Verificare tutte le zone con dislivello superiore a 0,5 m e dotarle di idonee protezioni."
+    },
+    {
+      "id": 15,
+      "cat": "Luoghi di lavoro",
+      "tit": "Scala fissa non a norma",
+      "des": "Scala non a norma per installazioni fisse.",
+      "ris": [
+        "Caduta dall'alto",
+        "Infortunio durante l'accesso"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Allegato IV - Requisiti dei luoghi di lavoro. Scale"
+      ],
+      "azi": [
+        "Sostituire la scala con una conforme alle normative vigenti"
+      ],
+      "rac": "Le scale fisse devono rispettare i requisiti dimensionali e di protezione dell'Allegato IV."
+    },
+    {
+      "id": 16,
+      "cat": "Luoghi di lavoro",
+      "tit": "Griglie o pavimentazione danneggiate",
+      "des": "Griglie di drenaggio danneggiate o pavimentazione dissestata con pericolo di inciampo.",
+      "ris": [
+        "Inciampo e caduta a livello",
+        "Danni ai mezzi di movimentazione"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Allegato IV - Vie di circolazione, zone di pericolo, pavimenti e passaggi"
+      ],
+      "azi": [
+        "Riparare o sostituire le griglie danneggiate",
+        "Ripristinare la pavimentazione dissestata"
+      ],
+      "rac": "Inserire il controllo pavimentazioni e griglie nel piano di manutenzione periodica."
+    },
+    {
+      "id": 17,
+      "cat": "Sostanze pericolose",
+      "tit": "Contenitore sostanze chimiche non etichettato",
+      "des": "Contenitore di sostanze chimiche non adeguatamente etichettato e protetto.",
+      "ris": [
+        "Esposizione ad agenti chimici",
+        "Uso improprio o scambio di sostanza"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo IX, Capo I - Protezione da agenti chimici",
+        "D.Lgs. 81/2008 - Allegato XXVI - Segnaletica contenitori e tubazioni",
+        "Regolamento (CE) n. 1272/2008 (CLP)"
+      ],
+      "azi": [
+        "Etichettare e proteggere adeguatamente i contenitori di sostanze chimiche"
+      ],
+      "rac": "Ogni contenitore deve riportare etichettatura CLP conforme; vietato il travaso in contenitori anonimi."
+    },
+    {
+      "id": 18,
+      "cat": "Sostanze pericolose",
+      "tit": "Stoccaggio sostanze chimiche inadeguato",
+      "des": "Area di stoccaggio sostanze chimiche non adeguatamente organizzata e priva di misure di sicurezza.",
+      "ris": [
+        "Sversamenti e contaminazione",
+        "Esposizione ad agenti chimici",
+        "Reazioni tra sostanze incompatibili"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo IX, Capo I - Protezione da agenti chimici"
+      ],
+      "azi": [
+        "Organizzare adeguatamente l'area di stoccaggio",
+        "Predisporre i contenitori di agenti chimici su idonee vasche di contenimento",
+        "Implementare misure di sicurezza adeguate"
+      ],
+      "rac": "Verificare le schede di sicurezza per compatibilità di stoccaggio e dotazioni di emergenza."
+    },
+    {
+      "id": 19,
+      "cat": "Ambiente - Rifiuti",
+      "tit": "Deposito rifiuti o materiali abbandonati",
+      "des": "Deposito di rifiuti, rottami o materiali abbandonati in area esterna o interna, potenziale rischio ambientale e di infortunio.",
+      "ris": [
+        "Rischio ambientale",
+        "Infortuni",
+        "Rischio di incendio"
+      ],
+      "nor": [
+        "D.Lgs. 152/2006 Parte Quarta, Titolo I, Capo I, art. 192 - Divieto di abbandono"
+      ],
+      "azi": [
+        "Rimuovere i rifiuti e i materiali abbandonati garantendo adeguata gestione e smaltimento",
+        "Identificare correttamente l'area di deposito con appositi codici CER dei rifiuti presenti"
+      ],
+      "rac": "Ogni deposito temporaneo deve rispettare i limiti di quantità e tempo previsti dalla normativa ambientale."
+    },
+    {
+      "id": 20,
+      "cat": "Ambiente - Rifiuti",
+      "tit": "Stoccaggio oli esausti non conforme",
+      "des": "Stoccaggio di oli esausti in area non adeguatamente protetta o in prossimità di inneschi di natura elettrica.",
+      "ris": [
+        "Contaminazione del suolo",
+        "Rischio di incendio"
+      ],
+      "nor": [
+        "D.Lgs. 152/2006 Parte Quarta, Titolo I, Capo III, art. 216-bis - Oli usati",
+        "D.Lgs. 81/2008 - Titolo III, Capo III - Impianti elettrici"
+      ],
+      "azi": [
+        "Stoccare gli oli esausti in aree adeguatamente protette e conformi",
+        "Allontanare lo stoccaggio da possibili inneschi elettrici"
+      ],
+      "rac": "Prevedere bacino di contenimento e copertura per lo stoccaggio degli oli usati."
+    },
+    {
+      "id": 21,
+      "cat": "Ambiente - Rifiuti",
+      "tit": "Acque di prima pioggia — sistema ostruito",
+      "des": "Sistema di raccolta delle acque di prima pioggia ostruito, rischio di allagamento e danni ambientali.",
+      "ris": [
+        "Allagamento",
+        "Danni ambientali"
+      ],
+      "nor": [
+        "D.Lgs. 152/2006 - Parte Terza, Capo IV, art. 113 - Acque meteoriche di dilavamento"
+      ],
+      "azi": [
+        "Pulire il sistema di raccolta delle acque di prima pioggia"
+      ],
+      "rac": "Inserire la pulizia di caditoie e vasche di prima pioggia nel piano di manutenzione periodica."
+    },
+    {
+      "id": 22,
+      "cat": "Antincendio - GPL e combustibili",
+      "tit": "Contenitore-distributore gasolio non conforme",
+      "des": "Serbatoio/contenitore-distributore di carburante non conforme alla regola tecnica: posizionamento, protezioni contro urti, bacino di contenimento, estintori, segnaletica, messa a terra o distanze di sicurezza carenti.",
+      "ris": [
+        "Incendio",
+        "Sversamento di combustibile",
+        "Non conformità normativa"
+      ],
+      "nor": [
+        "D.M. 22/11/2017 - Contenitori-distributori carburante liquido cat. C",
+        "D.M. 10/05/2018"
+      ],
+      "azi": [
+        "Installare esclusivamente su spazio scoperto fuori da zone con atmosfere esplosive (art. 4.3)",
+        "Proteggere con idonea difesa fissa contro urti accidentali (art. 4.5)",
+        "Serbatoi a parete singola: bacino di contenimento ≥ 110% del volume (art. 4.1 b)",
+        "Almeno due estintori portatili 21A-89B in prossimità (art. 8.1)",
+        "Cartelli di divieto avvicinamento estranei, fumo e fiamme libere (art. 6.2)",
+        "Idonea messa a terra e impianto elettrico conforme (art. 7.1, 7.3)",
+        "Garantire accesso ai mezzi VVF e distanze di sicurezza (art. 3.1, 5.1)"
+      ],
+      "rac": "Se possibile spostare il contenitore-distributore all'esterno; se in box, garantire aerazione permanente ≥ 1/30 della pianta e distanze misurate dal perimetro del box."
+    },
+    {
+      "id": 23,
+      "cat": "Antincendio - GPL e combustibili",
+      "tit": "Sversamenti di liquidi combustibili",
+      "des": "Presenza di sversamenti di liquidi combustibili (gasolio) presso gruppo elettrogeno o depositi.",
+      "ris": [
+        "Incendio",
+        "Contaminazione del suolo",
+        "Scivolamento"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo III, Capo III - Impianti e apparecchiature elettriche",
+        "D.M. 13/07/2011 - Gruppi elettrogeni"
+      ],
+      "azi": [
+        "Verificare eventuali problematiche nell'installazione del collegamento combustibile",
+        "Bonificare lo sversamento e prevenire nuove perdite"
+      ],
+      "rac": "Prevedere ispezione periodica delle linee di alimentazione combustibile."
+    },
+    {
+      "id": 24,
+      "cat": "Antincendio - Strutture",
+      "tit": "Copertura combustibile presso fonte di calore",
+      "des": "Copertura realizzata in materiale combustibile (es. poliuretano espanso) a contatto con camino o fonte di innesco per alte temperature.",
+      "ris": [
+        "Innesco di incendio della copertura",
+        "Propagazione all'edificio"
+      ],
+      "nor": [
+        "Codice di Prevenzione Incendi D.M. 03/08/2015",
+        "D.Lgs. 81/2008 - art. 46 - Prevenzione Incendi"
+      ],
+      "azi": [
+        "Sostituire la copertura con materiali non combustibili"
+      ],
+      "rac": "Verificare la compatibilità di tutti i materiali costruttivi con le fonti di calore adiacenti."
+    },
+    {
+      "id": 25,
+      "cat": "Antincendio - Strutture",
+      "tit": "Locale inverter fotovoltaico non conforme",
+      "des": "Locale inverter non conforme alla Circolare VVF n. 1324 del 07/02/2012 sull'installazione di impianti fotovoltaici.",
+      "ris": [
+        "Propagazione di incendio di origine elettrica non rilevato"
+      ],
+      "nor": [
+        "Circolare VVF 1324 del 07/02/2012 - Installazione impianti fotovoltaici"
+      ],
+      "azi": [
+        "Adeguare il locale inverter ad almeno REI 60",
+        "Prevedere un sistema di rivelazione fumi al suo interno"
+      ],
+      "rac": "Coordinare l'adeguamento con il Professionista Antincendio per l'eventuale aggiornamento della pratica VVF."
+    },
+    {
+      "id": 26,
+      "cat": "Vie di esodo",
+      "tit": "Deposito disordinato con ostacolo alle vie di fuga",
+      "des": "Deposito disordinato con materiali accumulati, rischio di incendio e ostacoli alle vie di fuga (anche vani scale).",
+      "ris": [
+        "Rischio di incendio",
+        "Ostacolo all'evacuazione"
+      ],
+      "nor": [
+        "Codice di Prevenzione Incendi D.M. 03/08/2015",
+        "D.Lgs. 81/2008 - Allegato IV - Vie e uscite di emergenza",
+        "D.Lgs. 81/2008 - art. 46 - Prevenzione Incendi"
+      ],
+      "azi": [
+        "Riorganizzare il deposito con corretto stoccaggio dei materiali combustibili",
+        "Garantire la costante disponibilità delle vie di esodo, sgombre e fruibili"
+      ],
+      "rac": "I vani scale e le vie di esodo non devono mai essere usati come deposito, nemmeno temporaneo."
+    },
+    {
+      "id": 27,
+      "cat": "Luoghi di lavoro",
+      "tit": "Cancello o protezione perimetrale danneggiata",
+      "des": "Cancello non richiudibile per struttura danneggiata, protezioni non adeguate.",
+      "ris": [
+        "Accesso non autorizzato",
+        "Esposizione a sostanze pericolose"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo II, Capo I, art. 64 - Obblighi del datore di lavoro",
+        "D.Lgs. 81/2008 - Titolo IX - Sostanze pericolose"
+      ],
+      "azi": [
+        "Ripristinare la funzionalità del cancello di protezione",
+        "Sottoporre luoghi, impianti e dispositivi a regolare manutenzione tecnica"
+      ],
+      "rac": "La manutenzione dei presidi fisici di protezione va programmata e documentata."
+    },
+    {
+      "id": 28,
+      "cat": "Attrezzature di lavoro",
+      "tit": "Possibile sovraccarico di macchina/attrezzatura",
+      "des": "Attrezzatura di lavoro (es. macchina di colaggio a pacco) potenzialmente sovraccaricata da carichi o stampi di grandezza/peso eccessivi rispetto alla portata prevista dal fabbricante.",
+      "ris": [
+        "Cedimento strutturale della macchina",
+        "Ribaltamento o caduta di carichi",
+        "Infortunio agli operatori"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo III, Capo I - Uso delle attrezzature di lavoro"
+      ],
+      "azi": [
+        "Verificare la portata sul manuale di uso e manutenzione del fabbricante",
+        "In caso di superamento della portata, interrompere immediatamente l'uso e verificare le misure di adeguamento",
+        "Ogni modifica alla macchina deve prevedere l'emissione di una nuova certificazione"
+      ],
+      "rac": "L'uso delle attrezzature deve sempre rispettare i limiti e le condizioni previsti dal fabbricante."
+    },
+    {
+      "id": 29,
+      "cat": "Attrezzature di lavoro",
+      "tit": "Operatore in posizione non sicura su macchina",
+      "des": "Necessità per l'operatore di posizionarsi in zona pericolosa della macchina (es. all'interno dei binari) durante la movimentazione di stampi o componenti di grandi dimensioni, con rischio di ribaltamento.",
+      "ris": [
+        "Schiacciamento o urto per ribaltamento di stampi/componenti",
+        "Infortunio grave all'operatore"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo III, Capo I - Uso delle attrezzature di lavoro"
+      ],
+      "azi": [
+        "Identificare una modalità di esecuzione dell'attività che eviti il posizionamento in zona pericolosa",
+        "Valutare la meccanizzazione dell'attività"
+      ],
+      "rac": "Le procedure operative devono essere riviste per eliminare la necessità di accesso a zone pericolose durante il funzionamento."
+    },
+    {
+      "id": 30,
+      "cat": "Movimentazione",
+      "tit": "Movimentazione manuale carichi oltre i limiti",
+      "des": "Movimentazione manuale di carichi di grandi dimensioni e peso superiore ai 25 kg effettuata da un solo operatore, fuori norma per la movimentazione manuale dei carichi.",
+      "ris": [
+        "Patologie muscoloscheletriche",
+        "Infortunio da sforzo o caduta del carico"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo III, Capo I - Uso delle attrezzature di lavoro",
+        "D.Lgs. 81/2008 - Allegato XXXIII - Movimentazione manuale dei carichi"
+      ],
+      "azi": [
+        "Evitare che l'attività sia svolta da un solo operatore, sia in prelievo sia in posizionamento",
+        "Eseguire l'attività in due addetti oppure meccanizzarla"
+      ],
+      "rac": "Rivalutare nel DVR la movimentazione manuale dei carichi per le attività con pesi superiori ai limiti di riferimento."
+    },
+    {
+      "id": 31,
+      "cat": "Antincendio - GPL e combustibili",
+      "tit": "Serbatoio combustibile — sfiato/troppo pieno non conformi",
+      "des": "Installazione precaria della tubazione di scarico del troppo pieno nel serbatoio di deposito combustibile e/o tubo di sfiato non installato (es. gruppo elettrogeno).",
+      "ris": [
+        "Sversamento di combustibile",
+        "Accumulo di vapori infiammabili",
+        "Incendio"
+      ],
+      "nor": [
+        "D.M. 13/07/2011 - Gruppi elettrogeni"
+      ],
+      "azi": [
+        "Realizzare un'installazione idonea della tubazione di scarico",
+        "Installare tubo di sfiato con diametro interno pari a metà del tubo di carico e comunque non inferiore a 25 mm",
+        "Sfiato sfociante all'esterno ad altezza non inferiore a 2,5 m dal piano praticabile e ad almeno 1,5 m da finestre e porte",
+        "Proteggere l'estremità del tubo con sistema antifiamma"
+      ],
+      "rac": "Verificare l'intera installazione del gruppo elettrogeno secondo il D.M. 13/07/2011."
+    },
+    {
+      "id": 32,
+      "cat": "Impianti elettrici",
+      "tit": "Vegetazione e segnaletica carente presso impianti elettrici",
+      "des": "Segnaletica elettrica e di emergenza non chiara e visibile; presenza di vegetazione in prossimità di impianti elettrici con rischio di incendi.",
+      "ris": [
+        "Rischio di incendio",
+        "Difficoltà di individuazione dei comandi di emergenza"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo III, Capo III - Impianti e apparecchiature elettriche",
+        "D.Lgs. 81/2008 - art. 46 - Prevenzione Incendi"
+      ],
+      "azi": [
+        "Assicurare che la segnaletica elettrica sia chiara e visibile",
+        "Rimuovere la vegetazione e mantenere l'area libera"
+      ],
+      "rac": "Inserire il controllo delle aree esterne presso impianti elettrici nella manutenzione periodica."
+    },
+    {
+      "id": 33,
+      "cat": "Luoghi di lavoro",
+      "tit": "Pavimentazione sconnessa o scivolosa",
+      "des": "Pavimentazione delle aree di lavoro o di transito sconnessa, dissestata, con buche o resa scivolosa da versamenti non tempestivamente rimossi.",
+      "ris": [
+        "Scivolamento e caduta a livello",
+        "Inciampo",
+        "Instabilità dei mezzi di movimentazione"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Allegato IV, punto 1.3 - Pavimenti, muri, soffitti, finestre",
+        "D.Lgs. 81/2008 - Titolo II, Capo I, art. 64 - Obblighi del datore di lavoro"
+      ],
+      "azi": [
+        "Ripristinare la regolarità e l'integrità della pavimentazione",
+        "Rimuovere immediatamente i versamenti e segnalare le aree bagnate",
+        "Inserire il controllo delle pavimentazioni nel piano di manutenzione periodica"
+      ],
+      "rac": "I pavimenti devono essere fissi, stabili, antisdrucciolevoli e privi di irregolarità pericolose."
+    },
+    {
+      "id": 34,
+      "cat": "Luoghi di lavoro",
+      "tit": "Illuminazione insufficiente o non funzionante",
+      "des": "Illuminazione naturale o artificiale insufficiente rispetto all'attività svolta, corpi illuminanti guasti o non sottoposti a manutenzione.",
+      "ris": [
+        "Affaticamento visivo",
+        "Errore operativo",
+        "Urto, inciampo e caduta"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Allegato IV, punto 1.10 - Illuminazione naturale ed artificiale",
+        "Norma UNI EN 12464-1 (riferimento tecnico per i livelli di illuminamento)"
+      ],
+      "azi": [
+        "Ripristinare o integrare i corpi illuminanti",
+        "Verificare i livelli di illuminamento in rapporto ai compiti visivi svolti",
+        "Programmare la manutenzione periodica degli impianti di illuminazione"
+      ],
+      "rac": "Verificare anche l'illuminazione sussidiaria e di emergenza nelle aree con rischio in caso di mancanza di alimentazione."
+    },
+    {
+      "id": 35,
+      "cat": "Luoghi di lavoro",
+      "tit": "Aerazione o microclima inadeguati",
+      "des": "Aerazione naturale o forzata insufficiente, oppure condizioni microclimatiche non idonee (temperatura, umidità, correnti d'aria) rispetto all'attività svolta.",
+      "ris": [
+        "Disagio termico e affaticamento",
+        "Esposizione a inquinanti aerodispersi",
+        "Stress termico da caldo o da freddo"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Allegato IV, punti 1.9 e 1.9.2 - Aerazione e microclima",
+        "D.M. 09/07/2025 n. 95 - Protocollo quadro sui rischi da emergenze climatiche negli ambienti di lavoro"
+      ],
+      "azi": [
+        "Verificare l'efficienza degli impianti di ventilazione e ricambio aria",
+        "Adottare misure organizzative nelle fasi di caldo o freddo intenso (turnazione, pause, idratazione)",
+        "Valutare nel DVR il rischio da stress termico"
+      ],
+      "rac": "Per le lavorazioni con emissione di calore o inquinanti, privilegiare l'aspirazione localizzata rispetto alla sola ventilazione generale."
+    },
+    {
+      "id": 36,
+      "cat": "Luoghi di lavoro",
+      "tit": "Spazi di lavoro e transito insufficienti",
+      "des": "Larghezza dei passaggi e spazi di lavoro ridotti da depositi, attrezzature o materiali, con interferenza tra transito pedonale e mezzi di movimentazione.",
+      "ris": [
+        "Urto tra pedoni e mezzi",
+        "Schiacciamento",
+        "Difficoltà di movimento in emergenza"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Allegato IV, punto 1.4 - Vie di circolazione, zone di pericolo",
+        "D.Lgs. 81/2008 - Allegato IV, punto 1.2 - Altezza, cubatura e superficie"
+      ],
+      "azi": [
+        "Ripristinare la larghezza utile dei passaggi",
+        "Separare e segnalare a pavimento i percorsi pedonali da quelli dei mezzi",
+        "Delimitare le aree di deposito temporaneo"
+      ],
+      "rac": "La separazione fisica tra percorsi pedonali e di transito mezzi è la misura più efficace nelle aree ad alta movimentazione."
+    },
+    {
+      "id": 37,
+      "cat": "Luoghi di lavoro",
+      "tit": "Servizi igienici e spogliatoi inadeguati",
+      "des": "Servizi igienici, spogliatoi o locali di riposo insufficienti, non separati per sesso, non mantenuti in condizioni di pulizia o privi di armadietti a doppio scomparto ove necessario.",
+      "ris": [
+        "Rischio igienico-sanitario",
+        "Contaminazione degli indumenti civili con indumenti di lavoro"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Allegato IV, punti 1.12 e 1.13 - Spogliatoi, armadi, servizi igienico-assistenziali"
+      ],
+      "azi": [
+        "Adeguare numero e dotazione dei servizi igienico-assistenziali",
+        "Prevedere armadietti a doppio scomparto dove gli indumenti di lavoro possono essere contaminati",
+        "Garantire pulizia e manutenzione periodica"
+      ],
+      "rac": "La separazione tra indumenti di lavoro e civili è obbligatoria nelle lavorazioni insudicianti o con agenti chimici e polveri."
+    },
+    {
+      "id": 38,
+      "cat": "Vie di esodo",
+      "tit": "Porta di emergenza non apribile nel verso dell'esodo",
+      "des": "Porta di uscita di emergenza che non si apre nel verso dell'esodo, chiusa a chiave, bloccata o non dotata di dispositivo di apertura a semplice spinta.",
+      "ris": [
+        "Impossibilità di evacuazione",
+        "Intrappolamento del personale in emergenza"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Allegato IV, punto 1.5.6 e seguenti - Vie e uscite di emergenza",
+        "D.M. 03/08/2015 - Codice di Prevenzione Incendi, Cap. S.4 - Esodo"
+      ],
+      "azi": [
+        "Ripristinare l'apertura nel verso dell'esodo con maniglione antipanico o dispositivo a semplice spinta",
+        "Rimuovere ogni sistema di chiusura che impedisca l'apertura dall'interno",
+        "Verificare periodicamente la funzionalità di tutte le porte di emergenza"
+      ],
+      "rac": "Nessuna porta lungo il percorso di esodo deve richiedere l'uso di chiavi o attrezzi per l'apertura dall'interno."
+    },
+    {
+      "id": 39,
+      "cat": "Vie di esodo",
+      "tit": "Illuminazione di sicurezza assente o non funzionante",
+      "des": "Lampade di emergenza mancanti, guaste o con autonomia non verificata lungo le vie di esodo e presso le uscite.",
+      "ris": [
+        "Impossibilità di individuare il percorso di esodo al buio",
+        "Panico e caduta durante l'evacuazione"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Allegato IV, punto 1.5.14 - Illuminazione di sicurezza",
+        "D.M. 03/08/2015 - Codice di Prevenzione Incendi, Cap. S.4",
+        "Norma UNI EN 1838 (riferimento tecnico)"
+      ],
+      "azi": [
+        "Ripristinare o sostituire gli apparecchi non funzionanti",
+        "Verificare periodicamente autonomia e funzionamento, registrando l'esito",
+        "Integrare la copertura nei punti privi di illuminazione di sicurezza"
+      ],
+      "rac": "Registrare i controlli sull'illuminazione di sicurezza nel registro dei controlli antincendio."
+    },
+    {
+      "id": 40,
+      "cat": "Vie di esodo",
+      "tit": "Segnaletica di esodo assente o non conforme",
+      "des": "Cartelli di indicazione delle uscite e dei percorsi di esodo assenti, illeggibili, coperti o non conformi alle prescrizioni.",
+      "ris": [
+        "Errata individuazione del percorso di esodo",
+        "Ritardo nell'evacuazione"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo V - Segnaletica di salute e sicurezza",
+        "D.Lgs. 81/2008 - Allegati XXIV, XXV, XXVI e XXXII"
+      ],
+      "azi": [
+        "Installare o ripristinare la segnaletica di esodo conforme",
+        "Assicurare la visibilità della segnaletica da ogni punto dell'area",
+        "Verificare la corrispondenza tra segnaletica e planimetrie di emergenza esposte"
+      ],
+      "rac": "Le planimetrie di emergenza esposte devono essere aggiornate rispetto al layout effettivo dei reparti."
+    },
+    {
+      "id": 41,
+      "cat": "Attrezzature di lavoro",
+      "tit": "Riparo o protezione di macchina rimosso o inefficace",
+      "des": "Riparo fisso, mobile o interbloccato rimosso, manomesso o non funzionante su organi in movimento o elementi pericolosi della macchina.",
+      "ris": [
+        "Contatto con organi in movimento",
+        "Cesoiamento, trascinamento, schiacciamento",
+        "Proiezione di materiali"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo III, Capo I, artt. 70 e 71 - Uso delle attrezzature di lavoro",
+        "D.Lgs. 81/2008 - Allegato V - Requisiti di sicurezza delle attrezzature",
+        "D.Lgs. 81/2008 - art. 20 - Obblighi dei lavoratori (divieto di rimozione dei dispositivi di sicurezza)"
+      ],
+      "azi": [
+        "Ripristinare immediatamente il riparo e il relativo dispositivo di interblocco",
+        "Interdire l'uso dell'attrezzatura fino al ripristino",
+        "Verificare l'efficienza dei dispositivi di sicurezza su tutte le macchine analoghe",
+        "Formare e richiamare gli operatori sul divieto di manomissione"
+      ],
+      "rac": "La manomissione dei dispositivi di sicurezza espone a responsabilità sia il lavoratore sia il preposto che non vigila."
+    },
+    {
+      "id": 42,
+      "cat": "Attrezzature di lavoro",
+      "tit": "Dispositivo di arresto di emergenza mancante o inefficace",
+      "des": "Comando di arresto di emergenza assente, non raggiungibile, non identificabile o non funzionante sull'attrezzatura di lavoro.",
+      "ris": [
+        "Impossibilità di fermare la macchina in situazione di pericolo",
+        "Aggravamento delle conseguenze di un infortunio"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo III, Capo I, art. 71 - Uso delle attrezzature di lavoro",
+        "D.Lgs. 81/2008 - Allegato V, Parte I, punto 6 - Dispositivi di comando e arresto"
+      ],
+      "azi": [
+        "Ripristinare la funzionalità e la raggiungibilità dei comandi di arresto di emergenza",
+        "Assicurare l'identificazione cromatica e la segnalazione dei comandi",
+        "Verificarne il funzionamento nei controlli periodici documentati"
+      ],
+      "rac": "I comandi di emergenza devono essere raggiungibili dalla postazione operatore senza dover accedere a zone pericolose."
+    },
+    {
+      "id": 43,
+      "cat": "Attrezzature di lavoro",
+      "tit": "Verifiche periodiche attrezzature non effettuate",
+      "des": "Attrezzature soggette a verifica periodica (apparecchi di sollevamento, generatori di vapore, recipienti in pressione, ecc.) prive di verifica nei termini previsti o senza documentazione disponibile.",
+      "ris": [
+        "Cedimento strutturale o funzionale dell'attrezzatura",
+        "Infortunio grave",
+        "Inadempienza sanzionabile"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo III, Capo I, art. 71 comma 11 - Verifiche periodiche",
+        "D.Lgs. 81/2008 - Allegato VII - Verifiche di attrezzature",
+        "D.M. 11/04/2011 - Disciplina delle verifiche periodiche"
+      ],
+      "azi": [
+        "Richiedere la prima verifica a INAIL e le successive ad ASL o soggetti abilitati",
+        "Ricostruire e archiviare i verbali di verifica",
+        "Predisporre uno scadenzario delle verifiche periodiche per attrezzatura"
+      ],
+      "rac": "La richiesta di verifica va inoltrata in tempo utile: la responsabilità di attivarla resta in capo al datore di lavoro."
+    },
+    {
+      "id": 44,
+      "cat": "Attrezzature di lavoro",
+      "tit": "Attrezzatura priva di marcatura CE o documentazione",
+      "des": "Attrezzatura di lavoro priva di marcatura CE, dichiarazione di conformità o manuale di uso e manutenzione; oppure attrezzatura modificata senza nuova valutazione di conformità.",
+      "ris": [
+        "Uso di attrezzatura non conforme ai requisiti essenziali di sicurezza",
+        "Impossibilità di definire limiti e modalità d'uso corrette"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo III, Capo I, art. 70 - Requisiti di sicurezza",
+        "D.Lgs. 81/2008 - Allegato V (attrezzature antecedenti la marcatura CE)",
+        "Direttiva Macchine e relativo recepimento nazionale"
+      ],
+      "azi": [
+        "Reperire e archiviare dichiarazione di conformità e manuale d'uso",
+        "Per attrezzature antecedenti la marcatura CE, verificare la conformità all'Allegato V",
+        "Ogni modifica sostanziale richiede una nuova valutazione di conformità"
+      ],
+      "rac": "Il manuale d'uso deve essere disponibile in lingua italiana e accessibile agli operatori."
+    },
+    {
+      "id": 45,
+      "cat": "Movimentazione",
+      "tit": "Carrello elevatore — uso o conduzione non conformi",
+      "des": "Carrello elevatore condotto da personale privo di abilitazione specifica, utilizzato con forche sollevate in transito, con carichi instabili o per il sollevamento di persone senza cestello omologato.",
+      "ris": [
+        "Ribaltamento del carrello",
+        "Caduta del carico",
+        "Investimento di pedoni",
+        "Caduta dall'alto di persone sollevate impropriamente"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo III, Capo I, art. 73 - Informazione, formazione e addestramento",
+        "Accordo Stato-Regioni 17/04/2025 - Formazione operatori attrezzature (in vigore dal 24/05/2025)",
+        "D.Lgs. 81/2008 - Allegato VI"
+      ],
+      "azi": [
+        "Verificare abilitazione e aggiornamento quinquennale di tutti i conduttori",
+        "Richiamare le corrette modalità di transito e di gestione del carico",
+        "Vietare il sollevamento di persone senza attrezzatura specificamente predisposta",
+        "Verificare l'efficienza di freni, avvisatore acustico e dispositivi di segnalazione"
+      ],
+      "rac": "Prevedere separazione tra percorsi pedonali e percorsi dei carrelli, con specchi e segnalazioni agli incroci ciechi."
+    },
+    {
+      "id": 46,
+      "cat": "Movimentazione",
+      "tit": "Accessori di sollevamento deteriorati o non identificati",
+      "des": "Funi, catene, brache, ganci o altri accessori di sollevamento deteriorati, deformati, privi di marcatura della portata o non sottoposti a controllo periodico.",
+      "ris": [
+        "Rottura dell'accessorio e caduta del carico",
+        "Schiacciamento di persone"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo III, Capo I, art. 71 - Verifiche e controlli",
+        "D.Lgs. 81/2008 - Allegato VI, punto 3.1.2 - Accessori di sollevamento"
+      ],
+      "azi": [
+        "Mettere fuori servizio e sostituire gli accessori deteriorati",
+        "Verificare la presenza della marcatura di portata su ogni accessorio",
+        "Istituire un controllo periodico documentato degli accessori di sollevamento"
+      ],
+      "rac": "Predisporre un'area dedicata per lo stoccaggio ordinato degli accessori, protetta dagli agenti atmosferici."
+    },
+    {
+      "id": 47,
+      "cat": "Lavori in quota",
+      "tit": "Parapetto o protezione contro le cadute assente",
+      "des": "Postazione, passerella, soppalco o apertura nel vuoto priva di parapetto normale con arresto al piede o di altra protezione equivalente contro le cadute dall'alto.",
+      "ris": [
+        "Caduta dall'alto di persone",
+        "Caduta di materiali dall'alto"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo IV, Capo II, art. 122 e seguenti - Lavori in quota",
+        "D.Lgs. 81/2008 - Allegato IV, punto 1.7 - Aperture nei muri e nei pavimenti"
+      ],
+      "azi": [
+        "Installare parapetti normali con corrente superiore, corrente intermedio e tavola fermapiede",
+        "Proteggere o coprire stabilmente le aperture nel piano di calpestio",
+        "In assenza di protezioni collettive, definire un sistema di protezione individuale anticaduta con punti di ancoraggio idonei"
+      ],
+      "rac": "La protezione collettiva ha sempre priorità rispetto a quella individuale."
+    },
+    {
+      "id": 48,
+      "cat": "Lavori in quota",
+      "tit": "Scala portatile usata impropriamente o non conforme",
+      "des": "Scala portatile utilizzata come postazione di lavoro stabile, non vincolata, danneggiata, priva di dispositivi antisdrucciolo o non conforme ai requisiti costruttivi.",
+      "ris": [
+        "Caduta dall'alto",
+        "Ribaltamento o scivolamento della scala"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo IV, Capo II, art. 113 - Scale",
+        "D.Lgs. 81/2008 - Allegato XX - Costruzione e impiego di scale portatili"
+      ],
+      "azi": [
+        "Sostituire le scale danneggiate o non conformi",
+        "Assicurare stabilità mediante vincolo o presenza di operatore a terra",
+        "Limitare l'uso della scala a lavori di breve durata; per lavori prolungati adottare trabattelli o piattaforme"
+      ],
+      "rac": "Le scale devono riportare marcatura di conformità alla norma tecnica di riferimento e istruzioni d'uso."
+    },
+    {
+      "id": 49,
+      "cat": "DPI",
+      "tit": "DPI non utilizzati o non idonei al rischio",
+      "des": "Dispositivi di protezione individuale non indossati dagli operatori, non idonei al rischio specifico, deteriorati o non sottoposti a manutenzione e sostituzione.",
+      "ris": [
+        "Esposizione diretta al rischio non mitigato",
+        "Inefficacia della protezione prevista dal DVR"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo III, Capo II, artt. 75-79 - Uso dei DPI",
+        "D.Lgs. 81/2008 - Allegato VIII",
+        "D.Lgs. 81/2008 - art. 20 - Obblighi dei lavoratori",
+        "Regolamento (UE) 2016/425"
+      ],
+      "azi": [
+        "Fornire DPI adeguati al rischio specifico e in taglia idonea",
+        "Verificare la consegna documentata e l'effettivo utilizzo tramite vigilanza del preposto",
+        "Sostituire i DPI deteriorati o scaduti",
+        "Erogare informazione, formazione e, ove previsto, addestramento all'uso"
+      ],
+      "rac": "L'addestramento è obbligatorio per i DPI di terza categoria e per i dispositivi di protezione dell'udito."
+    },
+    {
+      "id": 50,
+      "cat": "Segnaletica",
+      "tit": "Segnaletica di sicurezza assente o inadeguata",
+      "des": "Segnaletica di avvertimento, divieto, prescrizione o salvataggio assente, deteriorata, coperta o non conforme nelle aree che lo richiedono.",
+      "ris": [
+        "Mancata percezione del pericolo",
+        "Comportamenti non conformi da parte di lavoratori e visitatori"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo V, artt. 161-166 - Segnaletica di salute e sicurezza",
+        "D.Lgs. 81/2008 - Allegati da XXIV a XXXII"
+      ],
+      "azi": [
+        "Installare la segnaletica mancante secondo i criteri degli Allegati",
+        "Sostituire i cartelli deteriorati o illeggibili",
+        "Verificare la coerenza tra segnaletica esposta e rischi effettivamente presenti"
+      ],
+      "rac": "La segnaletica integra ma non sostituisce le misure tecniche e organizzative di prevenzione."
+    },
+    {
+      "id": 51,
+      "cat": "Sostanze pericolose",
+      "tit": "Schede di sicurezza mancanti o non aggiornate",
+      "des": "Schede dati di sicurezza (SDS) degli agenti chimici presenti non disponibili, non aggiornate all'ultima revisione del fornitore o non accessibili agli addetti.",
+      "ris": [
+        "Valutazione del rischio chimico non aggiornata",
+        "Uso improprio della sostanza",
+        "Gestione errata di sversamenti ed emergenze"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo IX, Capo I, art. 223 - Valutazione dei rischi",
+        "D.Lgs. 81/2008 - art. 227 - Informazione e formazione",
+        "Regolamento (CE) n. 1907/2006 (REACH), art. 31"
+      ],
+      "azi": [
+        "Richiedere ai fornitori le SDS aggiornate di tutti i prodotti in uso",
+        "Rendere le schede accessibili e consultabili dagli addetti nei luoghi di utilizzo",
+        "Aggiornare la valutazione del rischio chimico in coerenza con le schede"
+      ],
+      "rac": "Mantenere un elenco aggiornato degli agenti chimici presenti, con revisione a ogni nuovo approvvigionamento."
+    },
+    {
+      "id": 52,
+      "cat": "Sostanze pericolose",
+      "tit": "Assenza di vasche di contenimento sotto i contenitori",
+      "des": "Contenitori di sostanze liquide pericolose collocati direttamente a pavimento, senza bacino o vasca di contenimento di capacità adeguata.",
+      "ris": [
+        "Sversamento incontrollato",
+        "Contaminazione di suolo e reti fognarie",
+        "Contatto accidentale degli operatori"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo IX, Capo I, art. 224 - Misure e principi generali",
+        "D.Lgs. 152/2006 - Parte Terza (tutela delle acque dall'inquinamento)"
+      ],
+      "azi": [
+        "Predisporre vasche di contenimento di capacità adeguata al volume stoccato",
+        "Dotare l'area di materiale assorbente per il pronto intervento",
+        "Definire e formare gli addetti sulla procedura di gestione degli sversamenti"
+      ],
+      "rac": "Mantenere separati per compatibilità gli agenti chimici incompatibili tra loro, secondo le indicazioni delle schede di sicurezza."
+    },
+    {
+      "id": 53,
+      "cat": "Sostanze pericolose",
+      "tit": "Aspirazione localizzata assente o inefficiente",
+      "des": "Lavorazioni con emissione di vapori, nebbie, fumi o polveri prive di sistema di aspirazione localizzata alla fonte, oppure con impianto presente ma non efficiente o non manutenuto.",
+      "ris": [
+        "Esposizione per via inalatoria ad agenti chimici",
+        "Dispersione degli inquinanti nell'ambiente di lavoro",
+        "Superamento dei valori limite di esposizione professionale"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo IX, Capo I, art. 225 - Misure specifiche di protezione e prevenzione",
+        "D.Lgs. 81/2008 - Allegato XXXVIII - Valori limite di esposizione professionale (come sostituito dal D.Lgs. 135/2024)"
+      ],
+      "azi": [
+        "Installare o ripristinare l'aspirazione localizzata alla fonte di emissione",
+        "Verificare periodicamente portata ed efficienza dell'impianto, registrando gli esiti",
+        "Programmare la sostituzione dei filtri secondo le indicazioni del costruttore"
+      ],
+      "rac": "L'aspirazione alla fonte ha priorità rispetto alla ventilazione generale e ai DPI delle vie respiratorie."
+    },
+    {
+      "id": 54,
+      "cat": "Agenti cancerogeni",
+      "tit": "Registro di esposizione ad agenti cancerogeni assente",
+      "des": "Lavoratori esposti ad agenti cancerogeni, mutageni o tossici per la riproduzione senza istituzione del registro di esposizione o senza aggiornamento e trasmissione previsti.",
+      "ris": [
+        "Impossibilità di ricostruire la storia espositiva dei lavoratori",
+        "Inadempienza sanzionabile",
+        "Pregiudizio al riconoscimento di malattie professionali"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo IX, Capo II, art. 243 - Registro di esposizione e cartelle sanitarie",
+        "D.Lgs. 81/2008 - Allegati XLII e XLIII",
+        "D.Lgs. 135/2024 - estensione del Capo II alle sostanze tossiche per la riproduzione"
+      ],
+      "azi": [
+        "Istituire e aggiornare il registro degli esposti",
+        "Trasmettere i dati secondo le modalità e le periodicità previste",
+        "Coordinare l'adempimento con il Medico Competente",
+        "Conservare le annotazioni per i periodi previsti dalla norma"
+      ],
+      "rac": "Il D.Lgs. 135/2024 ha esteso gli obblighi del Capo II alle sostanze tossiche per la riproduzione: verificare se l'estensione riguarda agenti presenti in azienda."
+    },
+    {
+      "id": 55,
+      "cat": "Agenti cancerogeni",
+      "tit": "Misure di riduzione dell'esposizione a cancerogeni carenti",
+      "des": "Lavorazioni con agenti cancerogeni o mutageni condotte senza ciclo chiuso ove tecnicamente possibile, senza riduzione al minimo del numero di esposti o senza delimitazione e segnalazione delle aree di rischio.",
+      "ris": [
+        "Esposizione ad agenti cancerogeni",
+        "Estensione dell'esposizione a lavoratori non addetti"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo IX, Capo II, artt. 235 e 237 - Sostituzione, riduzione e misure tecniche",
+        "D.Lgs. 81/2008 - art. 236 - Valutazione del rischio"
+      ],
+      "azi": [
+        "Valutare la sostituzione dell'agente o l'adozione del ciclo chiuso",
+        "Ridurre al minimo il numero di lavoratori esposti",
+        "Delimitare e segnalare le aree a rischio limitandone l'accesso agli addetti",
+        "Aggiornare la valutazione del rischio con misurazioni dell'esposizione"
+      ],
+      "rac": "Per la silice libera cristallina respirabile il riferimento è il valore limite dell'Allegato XLIII: le misure vanno tarate sui risultati del monitoraggio."
+    },
+    {
+      "id": 56,
+      "cat": "Agenti fisici",
+      "tit": "Valutazione del rischio rumore assente o non aggiornata",
+      "des": "Valutazione del rischio rumore mancante, non aggiornata a seguito di modifiche del ciclo produttivo o degli impianti, oppure priva di misurazioni fonometriche dove necessarie.",
+      "ris": [
+        "Ipoacusia da rumore",
+        "Mancata individuazione degli obblighi conseguenti al superamento dei valori d'azione"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo VIII, Capo II, artt. 189-190 - Valori limite e valutazione del rischio rumore",
+        "D.Lgs. 81/2008 - art. 181 - Valutazione dei rischi da agenti fisici"
+      ],
+      "azi": [
+        "Effettuare o aggiornare la valutazione del rischio rumore con misurazioni ove richiesto",
+        "Individuare gli obblighi conseguenti al superamento dei valori inferiori e superiori d'azione",
+        "Delimitare e segnalare le aree con superamento dei valori superiori d'azione",
+        "Verificare la fornitura e l'uso effettivo dei DPI uditivi"
+      ],
+      "rac": "La valutazione va ripetuta almeno ogni quattro anni e comunque a ogni modifica significativa che possa incidere sull'esposizione."
+    },
+    {
+      "id": 57,
+      "cat": "Agenti fisici",
+      "tit": "Valutazione del rischio vibrazioni assente",
+      "des": "Attività con uso di utensili vibranti o conduzione di mezzi prive di valutazione del rischio vibrazioni mano-braccio o corpo intero.",
+      "ris": [
+        "Patologie osteoarticolari e neurovascolari",
+        "Lombalgie da vibrazioni corpo intero"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo VIII, Capo III, artt. 200-202 - Vibrazioni meccaniche"
+      ],
+      "azi": [
+        "Effettuare la valutazione del rischio vibrazioni per le attività interessate",
+        "Verificare i valori dichiarati dai fabbricanti di utensili e mezzi",
+        "Adottare misure tecniche e organizzative di riduzione (manutenzione, turnazione, scelta attrezzature)"
+      ],
+      "rac": "La manutenzione di utensili e sedili dei mezzi incide direttamente sui livelli di esposizione."
+    },
+    {
+      "id": 58,
+      "cat": "Impianti elettrici",
+      "tit": "Dichiarazione di conformità impianto elettrico assente",
+      "des": "Impianto elettrico privo di dichiarazione di conformità o di rispondenza, oppure documentazione non aggiornata a seguito di modifiche e ampliamenti.",
+      "ris": [
+        "Impossibilità di attestare la conformità dell'impianto",
+        "Rischi elettrici non controllati",
+        "Inadempienza sanzionabile"
+      ],
+      "nor": [
+        "D.M. 22/01/2008 n. 37 - Impianti negli edifici",
+        "D.Lgs. 81/2008 - Titolo III, Capo III, art. 86 - Verifiche e controlli"
+      ],
+      "azi": [
+        "Reperire e archiviare le dichiarazioni di conformità o rispondenza",
+        "Aggiornare la documentazione a ogni modifica dell'impianto",
+        "Verificare la corrispondenza tra schemi elettrici e stato di fatto"
+      ],
+      "rac": "Gli schemi elettrici aggiornati vanno mantenuti disponibili presso i quadri principali."
+    },
+    {
+      "id": 59,
+      "cat": "Impianti elettrici",
+      "tit": "Verifiche periodiche impianto di terra non effettuate",
+      "des": "Impianto di messa a terra e dispositivi di protezione contro le scariche atmosferiche privi di verifica periodica nei termini previsti (di norma biennale o quinquennale secondo l'attività).",
+      "ris": [
+        "Inefficacia della protezione contro i contatti indiretti",
+        "Folgorazione",
+        "Inadempienza sanzionabile"
+      ],
+      "nor": [
+        "D.P.R. 462/2001 - Verifiche periodiche impianti di terra e di protezione dalle scariche atmosferiche",
+        "D.Lgs. 81/2008 - Titolo III, Capo III, art. 86"
+      ],
+      "azi": [
+        "Affidare la verifica periodica ad ASL, ARPA o organismo abilitato",
+        "Archiviare i verbali di verifica e la denuncia di messa in esercizio",
+        "Predisporre uno scadenzario delle verifiche"
+      ],
+      "rac": "La periodicità è biennale per ambienti a maggior rischio in caso di incendio e per i cantieri, quinquennale negli altri casi: verificare la classificazione dei propri ambienti."
+    },
+    {
+      "id": 60,
+      "cat": "Impianti elettrici",
+      "tit": "Cavi volanti, prolunghe e collegamenti provvisori",
+      "des": "Uso continuativo di prolunghe, ciabatte e collegamenti volanti in luogo di installazioni fisse; cavi che attraversano vie di transito o esposti a danneggiamento meccanico.",
+      "ris": [
+        "Folgorazione",
+        "Innesco di incendio per sovraccarico",
+        "Inciampo"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo III, Capo III, artt. 80-81 - Rischi elettrici",
+        "D.M. 37/2008"
+      ],
+      "azi": [
+        "Sostituire i collegamenti provvisori con installazioni fisse a norma",
+        "Proteggere meccanicamente i cavi in transito o utilizzare passacavi",
+        "Verificare l'integrità di cavi, spine e prese"
+      ],
+      "rac": "Le soluzioni provvisorie tollerate per brevi periodi non devono diventare configurazioni permanenti."
+    },
+    {
+      "id": 61,
+      "cat": "Atmosfere esplosive",
+      "tit": "Classificazione ATEX assente o non aggiornata",
+      "des": "Aree con possibile formazione di atmosfere esplosive (polveri combustibili, vapori infiammabili, gas) prive di classificazione delle zone, di documento sulla protezione contro le esplosioni o di segnaletica specifica.",
+      "ris": [
+        "Esplosione",
+        "Incendio",
+        "Esposizione dei lavoratori a evento catastrofico"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - Titolo XI - Protezione da atmosfere esplosive, artt. 287-297",
+        "D.Lgs. 81/2008 - Allegati XLIX, L e LI"
+      ],
+      "azi": [
+        "Effettuare la classificazione delle zone a rischio di esplosione",
+        "Redigere il documento sulla protezione contro le esplosioni",
+        "Installare la segnaletica specifica di zona",
+        "Verificare l'idoneità delle apparecchiature installate alla zona classificata"
+      ],
+      "rac": "Verificare la classificazione in presenza di polveri combustibili, ricariche batterie, depositi di infiammabili e impianti a gas."
+    },
+    {
+      "id": 62,
+      "cat": "Spazi confinati",
+      "tit": "Accesso a spazio confinato senza procedura",
+      "des": "Accesso a serbatoi, vasche, silos, cunicoli o altri ambienti sospetti di inquinamento o confinati senza procedura scritta, permesso di lavoro, sorveglianza esterna o attrezzature di emergenza.",
+      "ris": [
+        "Asfissia",
+        "Intossicazione acuta",
+        "Esplosione",
+        "Impossibilità di soccorso tempestivo"
+      ],
+      "nor": [
+        "D.P.R. 177/2011 - Qualificazione delle imprese operanti in ambienti confinati",
+        "D.Lgs. 81/2008 - artt. 66 e 121",
+        "D.Lgs. 81/2008 - Allegato IV, punto 3 - Vasche, canalizzazioni, tubazioni",
+        "Accordo Stato-Regioni 17/04/2025 - formazione addetti spazi confinati"
+      ],
+      "azi": [
+        "Redigere e applicare una procedura di accesso con permesso di lavoro",
+        "Effettuare bonifica, ventilazione e misurazione dell'atmosfera prima e durante l'accesso",
+        "Garantire la presenza continua di un sorvegliante esterno e di attrezzature di recupero",
+        "Verificare formazione e addestramento specifici degli addetti, incluso il personale delle imprese esterne"
+      ],
+      "rac": "Il D.P.R. 177/2011 impone requisiti stringenti di qualificazione anche alle imprese appaltatrici: verificarli prima dell'affidamento."
+    },
+    {
+      "id": 63,
+      "cat": "Organizzazione e gestione",
+      "tit": "DVR non aggiornato rispetto allo stato di fatto",
+      "des": "Documento di valutazione dei rischi non aggiornato a seguito di modifiche del ciclo produttivo, di nuove attrezzature, di infortuni significativi o di variazioni normative.",
+      "ris": [
+        "Misure di prevenzione non coerenti con i rischi effettivi",
+        "Inadempienza sanzionabile a carico del datore di lavoro"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - artt. 17, 28 e 29 - Valutazione dei rischi",
+        "D.Lgs. 81/2008 - art. 55 - Sanzioni"
+      ],
+      "azi": [
+        "Aggiornare il DVR recependo modifiche di layout, impianti, attrezzature e organizzazione",
+        "Integrare le valutazioni specifiche mancanti (chimico, rumore, vibrazioni, MMC, ATEX, stress lavoro-correlato)",
+        "Ridefinire il programma di miglioramento con priorità e responsabilità"
+      ],
+      "rac": "L'aggiornamento è obbligatorio in occasione di modifiche significative del processo produttivo o dell'organizzazione."
+    },
+    {
+      "id": 64,
+      "cat": "Organizzazione e gestione",
+      "tit": "Formazione dei lavoratori mancante o non aggiornata",
+      "des": "Lavoratori privi di formazione generale e specifica, di aggiornamento quinquennale, oppure figure aziendali (preposti, dirigenti, datore di lavoro) prive della formazione prevista.",
+      "ris": [
+        "Comportamenti non consapevoli dei rischi",
+        "Inefficacia delle misure di prevenzione",
+        "Inadempienza sanzionabile"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - artt. 36 e 37 - Informazione, formazione e addestramento",
+        "Accordo Stato-Regioni 17/04/2025 (in vigore dal 24/05/2025; nuove regole obbligatorie per i corsi dal 24/05/2026)"
+      ],
+      "azi": [
+        "Ricostruire lo stato formativo di tutto il personale e delle figure della sicurezza",
+        "Pianificare i corsi mancanti e gli aggiornamenti in scadenza",
+        "Verificare l'obbligo di formazione del Datore di Lavoro introdotto dall'Accordo 2025 (16 ore, da completare entro maggio 2027)",
+        "Documentare l'addestramento specifico per attrezzature e DPI che lo richiedono"
+      ],
+      "rac": "Il nuovo Accordo ha accorpato i precedenti accordi 2011, 2012 e 2016 e ha introdotto nuovi percorsi, tra cui spazi confinati e carroponti."
+    },
+    {
+      "id": 65,
+      "cat": "Organizzazione e gestione",
+      "tit": "Sorveglianza sanitaria non conforme al protocollo",
+      "des": "Lavoratori sottoposti a rischi che richiedono sorveglianza sanitaria senza visite nei termini previsti, oppure protocollo sanitario non aggiornato rispetto ai rischi effettivi del DVR.",
+      "ris": [
+        "Mancata individuazione precoce di patologie professionali",
+        "Inadempienza sanzionabile",
+        "Impiego di lavoratori senza giudizio di idoneità"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - artt. 41 e 25 - Sorveglianza sanitaria e obblighi del medico competente",
+        "D.Lgs. 81/2008 - art. 18, comma 1, lett. g)"
+      ],
+      "azi": [
+        "Aggiornare il protocollo sanitario con il Medico Competente in coerenza con il DVR",
+        "Recuperare le visite periodiche scadute",
+        "Verificare la disponibilità dei giudizi di idoneità e delle eventuali prescrizioni",
+        "Programmare la visita degli ambienti di lavoro annuale del Medico Competente"
+      ],
+      "rac": "Le eventuali limitazioni contenute nei giudizi di idoneità devono essere effettivamente attuate nell'assegnazione delle mansioni."
+    },
+    {
+      "id": 66,
+      "cat": "Organizzazione e gestione",
+      "tit": "Appalti — DUVRI assente o verifica idoneità non effettuata",
+      "des": "Lavori affidati a imprese esterne o lavoratori autonomi senza verifica dell'idoneità tecnico-professionale, senza DUVRI ove richiesto o senza cooperazione e coordinamento documentati.",
+      "ris": [
+        "Rischi interferenziali non gestiti",
+        "Infortuni a personale esterno o interno",
+        "Responsabilità solidale del committente"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - art. 26 - Obblighi connessi ai contratti d'appalto, d'opera o di somministrazione",
+        "D.Lgs. 81/2008 - Allegato XVII - Idoneità tecnico professionale"
+      ],
+      "azi": [
+        "Acquisire e verificare la documentazione di idoneità tecnico-professionale",
+        "Redigere il DUVRI e aggiornarlo in caso di nuovi rischi interferenziali",
+        "Documentare le riunioni di cooperazione e coordinamento",
+        "Assicurare il riconoscimento del personale esterno tramite tessera identificativa"
+      ],
+      "rac": "L'obbligo di verifica dell'idoneità e di coordinamento resta in capo al committente anche quando i lavori sono di breve durata."
+    },
+    {
+      "id": 67,
+      "cat": "Organizzazione e gestione",
+      "tit": "Squadre emergenza e primo soccorso incomplete o non formate",
+      "des": "Addetti alle emergenze antincendio e al primo soccorso non designati in numero adeguato, privi di formazione o aggiornamento nei termini previsti; presidi di primo soccorso incompleti o scaduti.",
+      "ris": [
+        "Gestione inefficace delle emergenze",
+        "Ritardo nei soccorsi",
+        "Inadempienza sanzionabile"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - artt. 18, 43, 45 e 46 - Gestione delle emergenze",
+        "D.M. 02/09/2021 - Formazione e aggiornamento addetti antincendio",
+        "D.M. 388/2003 - Primo soccorso aziendale"
+      ],
+      "azi": [
+        "Verificare designazioni, numerosità e copertura su tutti i turni",
+        "Programmare la formazione e l'aggiornamento degli addetti secondo le periodicità previste",
+        "Controllare e reintegrare i presidi di primo soccorso, verificando le scadenze",
+        "Effettuare e verbalizzare la prova di evacuazione periodica"
+      ],
+      "rac": "La copertura va garantita anche durante ferie, turni notturni e assenze programmate."
+    },
+    {
+      "id": 68,
+      "cat": "Organizzazione e gestione",
+      "tit": "Nomine e designazioni mancanti o non aggiornate",
+      "des": "Nomine di RSPP, Medico Competente, preposti, dirigenti o addetti alle emergenze assenti, non accettate formalmente o non aggiornate rispetto all'organizzazione attuale.",
+      "ris": [
+        "Incertezza nell'attribuzione di compiti e responsabilità",
+        "Vigilanza inefficace",
+        "Inadempienza sanzionabile"
+      ],
+      "nor": [
+        "D.Lgs. 81/2008 - artt. 17, 18, 19 e 31 - Obblighi e organizzazione del servizio di prevenzione",
+        "D.Lgs. 81/2008 - art. 2 - Definizioni (preposto e dirigente)"
+      ],
+      "azi": [
+        "Formalizzare e aggiornare nomine e accettazioni",
+        "Individuare i preposti effettivi in coerenza con l'organizzazione reale dei reparti",
+        "Verificare che a ogni figura corrisponda la formazione prevista"
+      ],
+      "rac": "La figura del preposto va individuata in base ai compiti effettivamente svolti, non solo all'inquadramento formale."
+    },
+    {
+      "id": 69,
+      "cat": "Antincendio - Presidi",
+      "tit": "Estintori — controllo periodico non effettuato",
+      "des": "Estintori privi di controllo semestrale documentato, con cartellino di manutenzione non aggiornato, pressione fuori range, sigillo manomesso o revisione/collaudo scaduti.",
+      "ris": [
+        "Indisponibilità o inefficacia del presidio in emergenza",
+        "Inadempienza sanzionabile"
+      ],
+      "nor": [
+        "D.M. 01/09/2021 - Criteri generali per il controllo e la manutenzione dei sistemi di sicurezza antincendio",
+        "D.Lgs. 81/2008 - art. 46 - Prevenzione incendi",
+        "Norma UNI 9994-1 (riferimento tecnico)"
+      ],
+      "azi": [
+        "Ripristinare il controllo periodico semestrale a cura di tecnico manutentore",
+        "Verificare cartellini, scadenze di revisione e collaudo di ogni presidio",
+        "Registrare gli esiti nel registro dei controlli antincendio",
+        "Verificare la qualificazione del manutentore: dal 25/09/2026 entra in vigore l'art. 4 del D.M. 01/09/2021 (proroga da D.M. 15/07/2025)"
+      ],
+      "rac": "Il registro dei controlli antincendio deve essere tenuto aggiornato e reso disponibile agli organi di vigilanza."
+    },
+    {
+      "id": 70,
+      "cat": "Antincendio - Presidi",
+      "tit": "Idranti e naspi non controllati o non funzionanti",
+      "des": "Rete idranti o naspi privi di controllo periodico e prova di funzionamento, con manichette deteriorate, cassette danneggiate o accessori mancanti.",
+      "ris": [
+        "Indisponibilità della protezione attiva in caso di incendio",
+        "Prestazioni idrauliche insufficienti"
+      ],
+      "nor": [
+        "D.M. 01/09/2021 - Controllo e manutenzione dei sistemi di sicurezza antincendio",
+        "D.Lgs. 81/2008 - art. 46",
+        "Norma UNI 10779 e UNI EN 671-3 (riferimenti tecnici)"
+      ],
+      "azi": [
+        "Effettuare controllo periodico e prova di funzionamento con verifica delle prestazioni idrauliche",
+        "Sostituire manichette, lance e accessori deteriorati o mancanti",
+        "Verificare l'efficienza di gruppo di pressurizzazione e riserva idrica",
+        "Registrare gli esiti nel registro dei controlli"
+      ],
+      "rac": "Verificare periodicamente anche l'accessibilità e la segnalazione degli attacchi di mandata per i Vigili del Fuoco."
+    },
+    {
+      "id": 71,
+      "cat": "Antincendio - Impianti",
+      "tit": "Impianto di rivelazione e allarme incendio non manutenuto",
+      "des": "Impianto di rivelazione incendi e allarme privo di controlli periodici, con rivelatori sporchi, guasti o esclusi, centrale in stato di anomalia o alimentazione di riserva non verificata.",
+      "ris": [
+        "Mancata o ritardata rivelazione dell'incendio",
+        "Mancato allarme al personale",
+        "Aggravamento delle conseguenze dell'evento"
+      ],
+      "nor": [
+        "D.M. 01/09/2021 - Controllo e manutenzione dei sistemi di sicurezza antincendio",
+        "D.M. 03/08/2015 - Codice di Prevenzione Incendi, Cap. S.7 - Rivelazione ed allarme",
+        "Norma UNI 11224 (riferimento tecnico)"
+      ],
+      "azi": [
+        "Ripristinare la piena funzionalità dell'impianto e rimuovere le esclusioni non giustificate",
+        "Effettuare i controlli periodici con verifica di centrale, rivelatori e alimentazione di riserva",
+        "Verificare l'udibilità dei dispositivi di allarme in tutte le aree, anche in presenza di rumore di fondo",
+        "Registrare gli interventi nel registro dei controlli"
+      ],
+      "rac": "Le esclusioni temporanee di zone o rivelatori vanno tracciate e ripristinate al termine dei lavori che le hanno rese necessarie."
+    },
+    {
+      "id": 72,
+      "cat": "Antincendio - Impianti",
+      "tit": "Evacuatori di fumo e calore non verificati",
+      "des": "Sistemi di evacuazione fumo e calore (SEFC/ENFC) privi di controllo periodico, con meccanismi di apertura bloccati o comandi di attivazione non funzionanti.",
+      "ris": [
+        "Mancata evacuazione dei fumi in caso di incendio",
+        "Riduzione della visibilità lungo le vie di esodo",
+        "Aggravamento delle condizioni per i soccorritori"
+      ],
+      "nor": [
+        "D.M. 01/09/2021 - Controllo e manutenzione dei sistemi di sicurezza antincendio",
+        "D.M. 03/08/2015 - Codice di Prevenzione Incendi, Cap. S.8 - Controllo di fumi e calore",
+        "Norma UNI 9494 (riferimento tecnico)"
+      ],
+      "azi": [
+        "Effettuare la prova di apertura e il controllo periodico dei dispositivi",
+        "Ripristinare i meccanismi bloccati e i comandi manuali di attivazione",
+        "Verificare l'accessibilità e la segnalazione dei comandi"
+      ],
+      "rac": "Verificare che i comandi manuali siano raggiungibili in sicurezza anche in condizioni di emergenza."
+    },
+    {
+      "id": 73,
+      "cat": "Antincendio - Strutture",
+      "tit": "Compartimentazione non integra",
+      "des": "Elementi di compartimentazione (pareti, solai, serrande tagliafuoco) attraversati da impianti senza sigillature certificate, oppure danneggiati o modificati senza ripristino delle prestazioni REI/EI.",
+      "ris": [
+        "Propagazione dell'incendio tra compartimenti",
+        "Perdita delle prestazioni dichiarate in progetto",
+        "Difformità rispetto alla pratica antincendio approvata"
+      ],
+      "nor": [
+        "D.M. 03/08/2015 - Codice di Prevenzione Incendi, Cap. S.3 - Compartimentazione",
+        "D.P.R. 151/2011 - Attività soggette a controllo VVF"
+      ],
+      "azi": [
+        "Ripristinare l'integrità dei compartimenti con sistemi di sigillatura certificati",
+        "Acquisire e archiviare le certificazioni degli interventi eseguiti",
+        "Verificare la funzionalità delle serrande tagliafuoco e dei relativi attuatori",
+        "Verificare la coerenza dello stato di fatto con la documentazione depositata"
+      ],
+      "rac": "Ogni attraversamento impiantistico su elemento resistente al fuoco richiede sistema di sigillatura certificato per la classe richiesta."
+    },
+    {
+      "id": 74,
+      "cat": "Antincendio - Strutture",
+      "tit": "Porta tagliafuoco non funzionante o tenuta aperta",
+      "des": "Porta REI/EI bloccata in posizione aperta con cunei o legacci, con dispositivo di autochiusura guasto, oppure con guarnizioni o battute danneggiate.",
+      "ris": [
+        "Propagazione di fumo e fiamme tra compartimenti",
+        "Inefficacia della compartimentazione progettata"
+      ],
+      "nor": [
+        "D.M. 03/08/2015 - Codice di Prevenzione Incendi, Cap. S.3",
+        "D.M. 01/09/2021 - Controllo e manutenzione",
+        "D.Lgs. 81/2008 - art. 46"
+      ],
+      "azi": [
+        "Rimuovere immediatamente ogni sistema di blocco in posizione aperta",
+        "Ripristinare l'autochiusura e verificare la corretta battuta della porta",
+        "Ove sia necessario mantenerla aperta per esigenze di esercizio, installare dispositivi di ritenuta elettromagnetici asserviti all'allarme incendio",
+        "Inserire il controllo delle porte tagliafuoco nel registro dei controlli"
+      ],
+      "rac": "Le porte tagliafuoco tenute aperte con mezzi impropri sono una delle non conformità più frequenti e più gravi nei controlli VVF."
+    },
+    {
+      "id": 75,
+      "cat": "Antincendio - Gestione",
+      "tit": "Registro dei controlli antincendio assente o non aggiornato",
+      "des": "Registro dei controlli antincendio non istituito, non aggiornato o privo delle registrazioni relative a presidi, impianti, prove di evacuazione e formazione degli addetti.",
+      "ris": [
+        "Impossibilità di dimostrare l'effettuazione dei controlli",
+        "Inadempienza sanzionabile in caso di verifica VVF o di infortunio"
+      ],
+      "nor": [
+        "D.M. 01/09/2021 - art. 3 - Controlli e manutenzione",
+        "D.M. 02/09/2021 - Gestione della sicurezza antincendio nei luoghi di lavoro",
+        "D.P.R. 151/2011, art. 6 - Obblighi di mantenimento delle condizioni di sicurezza"
+      ],
+      "azi": [
+        "Istituire o ripristinare il registro dei controlli antincendio",
+        "Registrare sistematicamente controlli periodici, manutenzioni, prove ed esercitazioni",
+        "Conservare i verbali di intervento dei manutentori",
+        "Individuare un responsabile della tenuta del registro"
+      ],
+      "rac": "Il registro è il primo documento richiesto in caso di controllo: la sua tenuta puntuale è parte integrante della gestione della sicurezza antincendio."
+    },
+    {
+      "id": 76,
+      "cat": "Antincendio - Gestione",
+      "tit": "Piano di emergenza assente o non aggiornato",
+      "des": "Piano di emergenza ed evacuazione mancante, non aggiornato al layout e all'organizzazione attuali, oppure non diffuso al personale; planimetrie di emergenza non corrispondenti allo stato di fatto.",
+      "ris": [
+        "Gestione disorganizzata dell'emergenza",
+        "Ritardi ed errori nell'evacuazione",
+        "Inadempienza sanzionabile"
+      ],
+      "nor": [
+        "D.M. 02/09/2021 - Gestione della sicurezza antincendio nei luoghi di lavoro",
+        "D.Lgs. 81/2008 - artt. 43 e 46 - Gestione delle emergenze"
+      ],
+      "azi": [
+        "Redigere o aggiornare il piano di emergenza secondo il livello di rischio dell'attività",
+        "Aggiornare le planimetrie esposte rendendole coerenti con lo stato di fatto",
+        "Diffondere il piano a tutto il personale e alle imprese esterne",
+        "Effettuare e verbalizzare la prova di evacuazione periodica"
+      ],
+      "rac": "Il piano deve considerare anche i lavoratori con esigenze speciali e la presenza di personale esterno o visitatori."
+    },
+    {
+      "id": 77,
+      "cat": "Antincendio - Gestione",
+      "tit": "Difformità rispetto alla SCIA antincendio depositata",
+      "des": "Stato di fatto dell'attività difforme rispetto al progetto approvato e alla SCIA depositata: modifiche di layout, di destinazione d'uso, di quantitativi stoccati o di impianti non oggetto di aggiornamento della pratica.",
+      "ris": [
+        "Perdita di validità del titolo antincendio",
+        "Condizioni di rischio diverse da quelle valutate in progetto",
+        "Sanzioni e provvedimenti in caso di controllo VVF"
+      ],
+      "nor": [
+        "D.P.R. 151/2011 - artt. 4 e 6 - SCIA e obbligo di aggiornamento in caso di modifiche",
+        "D.M. 03/08/2015 - Codice di Prevenzione Incendi"
+      ],
+      "azi": [
+        "Ripristinare lo stato di fatto conforme al progetto approvato",
+        "In alternativa, avviare la valutazione tecnica per l'aggiornamento della SCIA",
+        "Verificare il permanere delle condizioni che avevano consentito l'esclusione di determinate misure di protezione (ad esempio l'impianto idrico antincendio escluso in ragione di un carico d'incendio inferiore)",
+        "Verificare che modifiche di layout o di stoccaggi non abbiano alterato le condizioni idrauliche e prestazionali assunte in fase progettuale",
+        "Coinvolgere il Professionista Antincendio nella revisione complessiva"
+      ],
+      "rac": "Ogni modifica che incide sulle condizioni di sicurezza antincendio comporta l'obbligo di aggiornamento della pratica ai sensi dell'art. 4 del D.P.R. 151/2011. Particolare attenzione va posta quando l'aumento del carico d'incendio o la variazione degli stoccaggi fa venir meno i presupposti che avevano consentito di escludere misure di protezione attiva: in tal caso non è sufficiente verificare gli impianti esistenti, ma occorre una nuova verifica tecnico-prestazionale."
+    },
+    {
+      "id": 78,
+      "cat": "Antincendio - Gestione",
+      "tit": "Attestazione di rinnovo periodico di conformità scaduta",
+      "des": "Attività soggetta a controllo VVF con attestazione di rinnovo periodico di conformità antincendio scaduta o non presentata nei termini previsti.",
+      "ris": [
+        "Esercizio dell'attività priva di titolo antincendio in corso di validità",
+        "Sanzioni e provvedimenti dell'autorità"
+      ],
+      "nor": [
+        "D.P.R. 151/2011 - art. 5 - Rinnovo periodico di conformità antincendio",
+        "D.M. 07/08/2012 - Modalità di presentazione delle istanze"
+      ],
+      "azi": [
+        "Verificare la scadenza del rinnovo periodico per ciascuna attività soggetta",
+        "Predisporre la documentazione asseverata e presentare l'istanza nei termini",
+        "Aggiornare lo scadenzario delle pratiche antincendio"
+      ],
+      "rac": "La periodicità è generalmente quinquennale, con durata diversa per alcune attività: verificare la specifica categoria del proprio caso."
+    },
+    {
+      "id": 79,
+      "cat": "Antincendio - Materiali",
+      "tit": "Deposito di bombole di gas tecnici non conforme",
+      "des": "Bombole di gas compressi o liquefatti stoccate senza vincolo antiribaltamento, non separate per compatibilità, non protette dall'irraggiamento solare o collocate in aree non ventilate e prive di segnaletica.",
+      "ris": [
+        "Caduta e proiezione della bombola",
+        "Rilascio incontrollato di gas",
+        "Incendio o esplosione"
+      ],
+      "nor": [
+        "D.M. 03/08/2015 - Codice di Prevenzione Incendi",
+        "D.Lgs. 81/2008 - Titolo IX - Sostanze pericolose",
+        "D.Lgs. 81/2008 - Titolo XI - Atmosfere esplosive"
+      ],
+      "azi": [
+        "Vincolare le bombole in posizione verticale con catene o supporti idonei",
+        "Separare i gas incompatibili (in particolare comburenti e infiammabili) e distinguere piene da vuote",
+        "Predisporre area dedicata, ventilata, protetta dall'irraggiamento e segnalata",
+        "Verificare l'integrità di valvole, cappellotti e riduttori"
+      ],
+      "rac": "Le bombole devono essere movimentate con carrelli idonei e mai trascinate o fatte rotolare."
+    },
+    {
+      "id": 80,
+      "cat": "Antincendio - Impianti",
+      "tit": "Impianto sprinkler o di spegnimento non verificato",
+      "des": "Impianto automatico di spegnimento (sprinkler o altro) privo di controlli periodici, con erogatori ostruiti da materiali stoccati, verniciati o danneggiati, oppure con alimentazione idrica non verificata.",
+      "ris": [
+        "Mancato o parziale intervento dell'impianto in caso di incendio",
+        "Propagazione incontrollata dell'incendio"
+      ],
+      "nor": [
+        "D.M. 01/09/2021 - Controllo e manutenzione dei sistemi di sicurezza antincendio",
+        "D.M. 03/08/2015 - Codice di Prevenzione Incendi, Cap. S.6 - Controllo dell'incendio",
+        "Norma UNI EN 12845 (riferimento tecnico)"
+      ],
+      "azi": [
+        "Ripristinare la distanza libera prescritta tra erogatori e materiali stoccati",
+        "Sostituire gli erogatori danneggiati, verniciati o ostruiti",
+        "Effettuare i controlli periodici su alimentazione idrica, valvole e gruppi di pompaggio",
+        "Registrare gli esiti nel registro dei controlli"
+      ],
+      "rac": "L'altezza di stoccaggio non deve mai compromettere l'efficacia di erogazione degli sprinkler prevista in progetto."
+    },
+    {
+      "id": 81,
+      "cat": "Antincendio - Impianti",
+      "tit": "Impianto idrico antincendio — controlli periodici non effettuati",
+      "des": "Impianto idrico antincendio privo di controlli periodici documentati sull'insieme dei suoi componenti: alimentazione idrica, riserva, gruppo di pressurizzazione, valvole di intercettazione, rete di distribuzione e attacchi di mandata per i Vigili del Fuoco. Assenza di prove periodiche di avviamento delle pompe e di verifica delle prestazioni idrauliche ai punti più sfavoriti.",
+      "ris": [
+        "Indisponibilità o insufficienza dell'alimentazione idrica in caso di incendio",
+        "Mancato avviamento del gruppo di pressurizzazione",
+        "Prestazioni di portata e pressione inferiori a quelle di progetto",
+        "Impossibilità di alimentazione della rete da parte dei mezzi di soccorso",
+        "Inadempienza sanzionabile e difformità rispetto alla pratica antincendio"
+      ],
+      "nor": [
+        "D.M. 01/09/2021 - Criteri generali per il controllo e la manutenzione degli impianti, attrezzature ed altri sistemi di sicurezza antincendio",
+        "D.Lgs. 81/2008 - art. 46 - Prevenzione incendi",
+        "D.M. 03/08/2015 - Codice di Prevenzione Incendi, Cap. S.6 - Controllo dell'incendio",
+        "D.P.R. 151/2011 - art. 6 - Mantenimento delle condizioni di sicurezza",
+        "Norma UNI 10779 e UNI EN 12845 (riferimenti tecnici per rete idranti e alimentazioni)"
+      ],
+      "azi": [
+        "Istituire e documentare i controlli periodici sull'intero impianto idrico antincendio secondo le periodicità previste",
+        "Effettuare le prove periodiche di avviamento del gruppo di pressurizzazione, verificando anche l'avviamento in automatico e la pompa pilota",
+        "Verificare livello e reintegro della riserva idrica, con controllo del sistema di alimentazione e dei dispositivi di segnalazione di basso livello",
+        "Verificare posizione e sigillatura delle valvole di intercettazione, che devono risultare aperte e bloccate",
+        "Eseguire la prova di portata e pressione ai punti idraulicamente più sfavoriti, confrontando i valori con quelli di progetto",
+        "Verificare accessibilità, integrità e segnalazione degli attacchi di mandata per i Vigili del Fuoco",
+        "Registrare tutti gli esiti nel registro dei controlli antincendio, conservando i verbali del manutentore",
+        "Verificare la qualificazione del tecnico manutentore in vista dell'entrata in vigore dell'art. 4 del D.M. 01/09/2021 (25/09/2026, come prorogato dal D.M. 15/07/2025)"
+      ],
+      "rac": "L'impianto idrico antincendio va controllato come sistema e non solo nei suoi terminali: un idrante efficiente su una rete con alimentazione insufficiente non garantisce le prestazioni di progetto. In caso di alimentazione non conforme o di prestazioni inferiori a quelle di progetto, coinvolgere il Professionista Antincendio per la rivalutazione complessiva."
+    },
+    {
+      "id": 82,
+      "cat": "Ambiente - Rifiuti",
+      "tit": "Deposito temporaneo non conforme alle condizioni di legge",
+      "des": "Area di deposito temporaneo che non rispetta una o più delle condizioni previste: separazione per categorie omogenee, rispetto delle norme tecniche di stoccaggio, limiti temporali o volumetrici di avvio a recupero/smaltimento, divieto di miscelazione.",
+      "ris": [
+        "Riqualificazione del deposito come stoccaggio o gestione non autorizzata, penalmente sanzionabile",
+        "Contaminazione di suolo e acque",
+        "Rischio di incendio in caso di rifiuti combustibili"
+      ],
+      "nor": [
+        "D.Lgs. 152/2006 - art. 183, comma 1, lett. bb) - Definizione di deposito temporaneo prima della raccolta",
+        "D.Lgs. 152/2006 - art. 185-bis - Condizioni del deposito temporaneo",
+        "D.Lgs. 152/2006 - art. 187 - Divieto di miscelazione",
+        "D.Lgs. 152/2006 - art. 256 - Sanzioni per gestione non autorizzata"
+      ],
+      "azi": [
+        "Separare i rifiuti per categorie omogenee e non miscelare rifiuti di categorie diverse",
+        "Rispettare le modalità alternative di avvio a recupero o smaltimento previste dall'art. 185-bis (cadenza almeno trimestrale, oppure al raggiungimento dei limiti volumetrici previsti; in ogni caso avvio almeno annuale)",
+        "Verificare i limiti quantitativi complessivi e la quota massima riferita ai rifiuti pericolosi",
+        "Adeguare contenitori e superfici alle norme tecniche di stoccaggio, con bacini di contenimento per i liquidi",
+        "Effettuare il deposito nel luogo di produzione dei rifiuti o negli altri luoghi ammessi dalla norma"
+      ],
+      "rac": "Il deposito temporaneo è una deroga alla disciplina autorizzatoria: il venir meno anche di una sola delle condizioni previste comporta la riqualificazione come gestione non autorizzata, con conseguenze penali. La dimostrazione del rispetto delle condizioni è a carico del produttore."
+    },
+    {
+      "id": 83,
+      "cat": "Ambiente - Rifiuti",
+      "tit": "Contenitori rifiuti non etichettati o non identificati",
+      "des": "Contenitori, cassoni o aree di deposito privi di identificazione del codice EER, della descrizione del rifiuto e, per i rifiuti pericolosi, dell'etichettatura relativa alle caratteristiche di pericolo.",
+      "ris": [
+        "Errata classificazione e conferimento del rifiuto",
+        "Miscelazione accidentale di rifiuti incompatibili",
+        "Esposizione degli addetti a rifiuti pericolosi non riconosciuti"
+      ],
+      "nor": [
+        "D.Lgs. 152/2006 - art. 185-bis - Condizioni del deposito temporaneo",
+        "D.Lgs. 152/2006 - art. 184 - Classificazione dei rifiuti",
+        "Decisione 2014/955/UE - Elenco europeo dei rifiuti (codici EER)",
+        "ADR per i rifiuti classificati come merci pericolose"
+      ],
+      "azi": [
+        "Identificare ogni contenitore con codice EER e descrizione del rifiuto",
+        "Applicare l'etichettatura di pericolo ai rifiuti pericolosi",
+        "Verificare la corretta attribuzione del codice EER, ricorrendo ove necessario a caratterizzazione analitica",
+        "Formare gli addetti sulla corretta gestione e separazione dei rifiuti"
+      ],
+      "rac": "L'attribuzione del codice EER è responsabilità del produttore: per i codici a specchio è necessaria la caratterizzazione per stabilire pericolosità o non pericolosità."
+    },
+    {
+      "id": 84,
+      "cat": "Ambiente - Rifiuti",
+      "tit": "Registro di carico e scarico non tenuto o non aggiornato",
+      "des": "Registro cronologico di carico e scarico dei rifiuti assente, non aggiornato nei termini previsti, tenuto su modello non più valido oppure non coerente con i formulari emessi.",
+      "ris": [
+        "Impossibilità di tracciare i flussi di rifiuti",
+        "Inadempienza sanzionabile",
+        "Incoerenza documentale in caso di controllo"
+      ],
+      "nor": [
+        "D.Lgs. 152/2006 - art. 190 - Registro cronologico di carico e scarico",
+        "D.M. 04/04/2023 n. 59 - Istituzione del RENTRI e nuovi modelli di registro e formulario",
+        "D.Lgs. 152/2006 - art. 258 - Sanzioni"
+      ],
+      "azi": [
+        "Ripristinare la tenuta del registro nei termini previsti",
+        "Verificare l'utilizzo del modello vigente introdotto dal D.M. 59/2023, non più quello del D.M. 145/1998",
+        "Per i soggetti iscritti al RENTRI, tenere il registro in formato digitale senza mantenere sistemi paralleli",
+        "Verificare la coerenza tra registrazioni, formulari e giacenze effettive",
+        "Conservare il registro per i periodi previsti dalla norma"
+      ],
+      "rac": "Verificare puntualmente l'obbligo e le tempistiche di registrazione applicabili alla specifica azienda, che variano in funzione della tipologia di rifiuti e del numero di dipendenti."
+    },
+    {
+      "id": 85,
+      "cat": "Ambiente - Rifiuti",
+      "tit": "RENTRI — iscrizione o gestione digitale non conformi",
+      "des": "Azienda soggetta all'obbligo di iscrizione al RENTRI non iscritta, oppure iscritta ma senza attivazione del registro digitale, senza trasmissione dei dati nei termini o senza conservazione a norma della documentazione.",
+      "ris": [
+        "Inadempienza sanzionabile",
+        "Impossibilità di emettere formulari conformi",
+        "Blocco operativo dei conferimenti in caso di disallineamento con la filiera"
+      ],
+      "nor": [
+        "D.Lgs. 152/2006 - art. 188-bis - Tracciabilità dei rifiuti",
+        "D.M. 04/04/2023 n. 59 - Registro Elettronico Nazionale per la Tracciabilità dei Rifiuti"
+      ],
+      "azi": [
+        "Verificare se l'azienda rientra tra i soggetti obbligati e, in tal caso, la regolarità dell'iscrizione: le finestre di iscrizione si sono chiuse da ultimo il 13/02/2026",
+        "Attivare il registro cronologico in formato digitale dalla data di iscrizione, senza mantenere registri cartacei o fogli paralleli",
+        "Trasmettere i dati al RENTRI nei termini previsti",
+        "Verificare la corresponsione del contributo annuale",
+        "Assicurare la conservazione digitale a norma della documentazione ambientale",
+        "Verificare l'allineamento dell'intera filiera (trasportatore e destinatario) sulla modalità di formulario adottata"
+      ],
+      "rac": "Il quadro RENTRI è in evoluzione e ha già subito diverse proroghe: verificare sul portale ufficiale lo stato aggiornato degli obblighi e delle scadenze prima di ogni comunicazione al cliente. In particolare va monitorato il passaggio al formulario digitale, la cui piena operatività è stata più volte differita."
+    },
+    {
+      "id": 86,
+      "cat": "Ambiente - Rifiuti",
+      "tit": "Formulari di identificazione incompleti o non conformi",
+      "des": "Formulari di identificazione del rifiuto (FIR) compilati in modo incompleto, su modello non più valido, privi della copia controfirmata di ritorno dal destinatario nei termini previsti, o non coerenti con le registrazioni di carico e scarico.",
+      "ris": [
+        "Impossibilità di dimostrare il corretto conferimento",
+        "Responsabilità del produttore per il destino del rifiuto",
+        "Inadempienza sanzionabile"
+      ],
+      "nor": [
+        "D.Lgs. 152/2006 - art. 193 - Trasporto dei rifiuti e formulario di identificazione",
+        "D.M. 04/04/2023 n. 59 - Nuovi modelli di formulario e vidimazione tramite RENTRI"
+      ],
+      "azi": [
+        "Utilizzare il modello di formulario vigente, con vidimazione secondo le modalità attualmente previste",
+        "Verificare la completezza della compilazione in tutte le sezioni",
+        "Controllare il rientro della quarta copia controfirmata dal destinatario nei termini previsti e attivarsi in caso di mancato rientro",
+        "Archiviare i formulari in coerenza con le registrazioni del registro"
+      ],
+      "rac": "La responsabilità del produttore sul corretto destino del rifiuto si estingue solo con il ritorno della copia controfirmata dall'impianto di destino: il monitoraggio dei rientri va organizzato in modo sistematico."
+    },
+    {
+      "id": 87,
+      "cat": "Ambiente - Rifiuti",
+      "tit": "Verifica autorizzazioni di trasportatori e impianti di destino",
+      "des": "Conferimento di rifiuti a trasportatori o impianti di recupero/smaltimento senza verifica preventiva della validità delle autorizzazioni e dell'idoneità a ricevere i codici EER conferiti.",
+      "ris": [
+        "Corresponsabilità del produttore in caso di gestione illecita da parte di terzi",
+        "Conferimento a soggetti non autorizzati per la specifica tipologia di rifiuto"
+      ],
+      "nor": [
+        "D.Lgs. 152/2006 - art. 188 - Responsabilità della gestione dei rifiuti",
+        "D.Lgs. 152/2006 - art. 212 - Albo nazionale gestori ambientali"
+      ],
+      "azi": [
+        "Acquisire e archiviare copia delle autorizzazioni di trasportatori e impianti di destino",
+        "Verificare che i codici EER conferiti rientrino tra quelli autorizzati",
+        "Verificare periodicamente la validità e le scadenze delle autorizzazioni",
+        "Predisporre uno scadenzario dei rinnovi"
+      ],
+      "rac": "La responsabilità del produttore non si esaurisce con la consegna del rifiuto: la verifica preventiva dei soggetti coinvolti è la principale misura di tutela."
+    },
+    {
+      "id": 88,
+      "cat": "Ambiente - Scarichi idrici",
+      "tit": "Scarico idrico privo di autorizzazione o non conforme",
+      "des": "Scarico di acque reflue industriali o di prima pioggia privo di autorizzazione, con autorizzazione scaduta, oppure non conforme alle prescrizioni e ai valori limite previsti dal titolo autorizzativo.",
+      "ris": [
+        "Inquinamento del corpo recettore",
+        "Sanzioni amministrative e penali",
+        "Provvedimenti di sospensione dello scarico"
+      ],
+      "nor": [
+        "D.Lgs. 152/2006 - Parte Terza, artt. 124 e seguenti - Autorizzazione agli scarichi",
+        "D.Lgs. 152/2006 - art. 101 e Allegato 5 alla Parte Terza - Valori limite di emissione",
+        "D.Lgs. 152/2006 - artt. 133 e 137 - Sanzioni"
+      ],
+      "azi": [
+        "Verificare presenza, validità e scadenza dell'autorizzazione allo scarico",
+        "Effettuare gli autocontrolli analitici con le periodicità prescritte, archiviando i referti",
+        "Verificare la conformità dei parametri ai valori limite previsti",
+        "Mantenere efficienti i sistemi di trattamento e i pozzetti di prelievo, garantendone l'accessibilità per i controlli"
+      ],
+      "rac": "Verificare che la tipologia e la portata degli scarichi siano coerenti con quanto dichiarato in autorizzazione: modifiche di processo possono renderla non più adeguata."
+    },
+    {
+      "id": 89,
+      "cat": "Ambiente - Scarichi idrici",
+      "tit": "Acque meteoriche di dilavamento non gestite correttamente",
+      "des": "Aree esterne con presenza di materiali o lavorazioni potenzialmente inquinanti prive di sistema di raccolta e trattamento delle acque di prima pioggia, oppure con impianto presente ma non manutenuto.",
+      "ris": [
+        "Dilavamento di sostanze inquinanti verso il corpo recettore",
+        "Contaminazione di suolo e acque sotterranee",
+        "Non conformità alle prescrizioni autorizzative"
+      ],
+      "nor": [
+        "D.Lgs. 152/2006 - Parte Terza, art. 113 - Acque meteoriche di dilavamento e acque di prima pioggia",
+        "Normativa regionale di riferimento in materia di acque meteoriche"
+      ],
+      "azi": [
+        "Verificare gli obblighi previsti dalla normativa regionale applicabile",
+        "Mantenere efficienti e puliti i sistemi di raccolta, disoleazione e trattamento",
+        "Evitare lo stoccaggio all'aperto di materiali dilavabili o proteggerlo con coperture",
+        "Programmare la pulizia periodica di caditoie, disoleatori e vasche di prima pioggia"
+      ],
+      "rac": "La disciplina delle acque meteoriche è in larga parte regionale: verificare i requisiti specifici della Regione in cui insiste lo stabilimento."
+    },
+    {
+      "id": 90,
+      "cat": "Ambiente - Emissioni",
+      "tit": "Emissioni in atmosfera — autorizzazione o prescrizioni non rispettate",
+      "des": "Punti di emissione in atmosfera non autorizzati, difformi da quanto autorizzato, oppure con mancato rispetto delle prescrizioni relative ad autocontrolli, manutenzioni e registrazioni.",
+      "ris": [
+        "Superamento dei valori limite di emissione",
+        "Inquinamento atmosferico",
+        "Sanzioni amministrative e penali"
+      ],
+      "nor": [
+        "D.Lgs. 152/2006 - Parte Quinta, artt. 269 e seguenti - Autorizzazione alle emissioni in atmosfera",
+        "D.Lgs. 152/2006 - art. 279 - Sanzioni"
+      ],
+      "azi": [
+        "Verificare la corrispondenza tra punti di emissione esistenti e quelli autorizzati",
+        "Effettuare gli autocontrolli analitici alle periodicità prescritte e archiviare i referti",
+        "Tenere aggiornato il registro degli interventi di manutenzione dei sistemi di abbattimento",
+        "Garantire accessibilità e conformità dei punti di prelievo",
+        "Verificare la necessità di aggiornamento dell'autorizzazione in caso di modifiche di processo"
+      ],
+      "rac": "Le modifiche impiantistiche che incidono sulle emissioni richiedono comunicazione o nuova autorizzazione: verificarne la necessità prima di realizzarle."
+    },
+    {
+      "id": 91,
+      "cat": "Ambiente - Emissioni",
+      "tit": "Sistemi di abbattimento non manutenuti",
+      "des": "Impianti di abbattimento delle emissioni (filtri a maniche, scrubber, abbattitori) privi di manutenzione programmata, con elementi filtranti esausti, perdite o parametri di funzionamento non monitorati.",
+      "ris": [
+        "Superamento dei valori limite di emissione",
+        "Dispersione di inquinanti in ambiente esterno e di lavoro",
+        "Fermo impianto per guasto"
+      ],
+      "nor": [
+        "D.Lgs. 152/2006 - Parte Quinta, art. 269 e prescrizioni del titolo autorizzativo",
+        "D.Lgs. 81/2008 - Titolo IX, Capo I (per gli effetti sull'ambiente di lavoro)"
+      ],
+      "azi": [
+        "Programmare e documentare la manutenzione periodica dei sistemi di abbattimento",
+        "Sostituire gli elementi filtranti secondo le indicazioni del costruttore e le prescrizioni autorizzative",
+        "Monitorare e registrare i parametri di funzionamento previsti",
+        "Tenere il registro degli interventi a disposizione degli organi di controllo"
+      ],
+      "rac": "L'efficienza dei sistemi di abbattimento incide sia sulla conformità ambientale sia sull'esposizione dei lavoratori: i due aspetti vanno valutati insieme."
+    },
+    {
+      "id": 92,
+      "cat": "Ambiente - Autorizzazioni",
+      "tit": "AUA o autorizzazioni ambientali scadute o non aggiornate",
+      "des": "Autorizzazione Unica Ambientale o altri titoli abilitativi ambientali scaduti, non rinnovati nei termini, oppure non aggiornati rispetto alle modifiche impiantistiche o di processo intervenute.",
+      "ris": [
+        "Esercizio dell'attività priva di titolo valido",
+        "Sanzioni e provvedimenti di sospensione",
+        "Difformità tra stato di fatto e stato autorizzato"
+      ],
+      "nor": [
+        "D.P.R. 13/03/2013 n. 59 - Autorizzazione Unica Ambientale",
+        "D.Lgs. 152/2006 - Parti Terza, Quarta e Quinta per i singoli titoli"
+      ],
+      "azi": [
+        "Ricognire tutti i titoli ambientali dell'azienda con relative scadenze",
+        "Presentare le istanze di rinnovo nei termini previsti",
+        "Verificare la necessità di aggiornamento a seguito di modifiche sostanziali o non sostanziali",
+        "Predisporre uno scadenzario dei titoli ambientali"
+      ],
+      "rac": "Le modifiche di processo, anche se non sostanziali, richiedono in molti casi comunicazione all'autorità competente: valutarne la necessità in fase progettuale e non a posteriori."
+    },
+    {
+      "id": 93,
+      "cat": "Ambiente - Serbatoi",
+      "tit": "Serbatoi e cisterne — controlli e contenimento assenti",
+      "des": "Serbatoi interrati o fuori terra contenenti sostanze inquinanti privi di bacino di contenimento, di sistemi di monitoraggio delle perdite o di verifiche periodiche di tenuta.",
+      "ris": [
+        "Contaminazione di suolo e acque sotterranee",
+        "Obbligo di bonifica ai sensi della Parte Quarta, Titolo V",
+        "Rischio di incendio per i combustibili"
+      ],
+      "nor": [
+        "D.Lgs. 152/2006 - Parte Quarta, Titolo V - Bonifica dei siti contaminati, artt. 242 e seguenti",
+        "D.Lgs. 152/2006 - art. 304 - Azione di prevenzione del danno ambientale"
+      ],
+      "azi": [
+        "Dotare i serbatoi fuori terra di bacino di contenimento di capacità adeguata",
+        "Verificare periodicamente la tenuta dei serbatoi interrati e l'efficienza dei sistemi di monitoraggio dell'intercapedine",
+        "Predisporre procedure di intervento in caso di perdita, con materiale assorbente disponibile",
+        "Documentare i controlli effettuati"
+      ],
+      "rac": "In caso di contaminazione accertata scattano obblighi immediati di comunicazione e di attivazione delle procedure di bonifica: la prevenzione ha un costo incomparabilmente inferiore."
+    },
+    {
+      "id": 94,
+      "cat": "Ambiente - Rifiuti",
+      "tit": "Adempimenti dichiarativi ambientali non assolti",
+      "des": "Dichiarazioni ambientali periodiche non presentate o presentate oltre i termini: MUD, comunicazioni relative a specifiche filiere, dichiarazioni previste da prescrizioni autorizzative.",
+      "ris": [
+        "Sanzioni amministrative",
+        "Incoerenza tra dati dichiarati e documentazione aziendale"
+      ],
+      "nor": [
+        "D.Lgs. 152/2006 - art. 189 - Catasto dei rifiuti e comunicazione annuale",
+        "Legge 70/1994 - Dichiarazione ambientale unica (MUD)"
+      ],
+      "azi": [
+        "Verificare quali adempimenti dichiarativi si applicano alla specifica azienda",
+        "Predisporre uno scadenzario delle dichiarazioni ambientali periodiche",
+        "Assicurare la coerenza dei dati dichiarati con registri e formulari",
+        "Archiviare le ricevute di presentazione"
+      ],
+      "rac": "Con la progressiva entrata a regime del RENTRI alcuni adempimenti dichiarativi sono in evoluzione: verificare annualmente il quadro applicabile prima delle scadenze."
+    }
+  ]
+}

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scadenzario Sicurezza — Recipienti in Pressione</title>
+<link rel="stylesheet" href="fondamenta.css">
+<style>
+/* Variabili locali rimappate sui token condivisi (fondamenta.css) */
+:root{--blu:var(--verde);--blu2:var(--verde-scuro);--aranc:var(--arancio);--grigio:var(--testo-soft);--bg:var(--grigio);}
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif;}
+body{background:var(--bg);color:#2d3748;}
+header{background:linear-gradient(135deg,var(--blu),var(--blu2));color:#fff;padding:18px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+header h1{font-size:1.3em;}
+header .sub{font-size:.85em;opacity:.85;}
+.container{max-width:1400px;margin:0 auto;padding:18px;}
+.tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+.tab{padding:10px 18px;background:#fff;border:1px solid #cbd5e0;border-radius:8px;cursor:pointer;font-weight:600;font-size:.9em;}
+.tab.active{background:var(--blu);color:#fff;border-color:var(--blu);}
+.panel{display:none;}.panel.active{display:block;}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:18px;}
+.card{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.08);text-align:center;}
+.card .num{font-size:2em;font-weight:700;}
+.card .lbl{font-size:.8em;color:var(--grigio);text-transform:uppercase;letter-spacing:.5px;}
+.c-rosso .num{color:var(--rosso);}.c-aranc .num{color:var(--aranc);}.c-verde .num{color:var(--verde);}.c-blu .num{color:var(--blu);}
+.box{background:#fff;border-radius:10px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:16px;}
+.box h3{margin-bottom:12px;color:var(--blu);font-size:1.05em;}
+table{width:100%;border-collapse:collapse;font-size:.85em;}
+th{background:var(--blu);color:#fff;padding:8px 6px;text-align:left;white-space:nowrap;}
+td{padding:7px 6px;border-bottom:1px solid #e2e8f0;vertical-align:top;}
+tr:hover td{background:#f7fafc;}
+/* .badge, .b-scaduta, .b-scadenza, .b-ok, .b-neutro arrivano da fondamenta.css.
+   Qui restano solo le classi specifiche del modulo. */
+.badge{white-space:nowrap;}
+.b-alert{background:var(--arancio-bg);color:var(--arancio);}  /* usata per "SÌ" assoggettato */
+.b-nd{background:#eef0f0;color:var(--grigio-neutro);}         /* "?" e "no" in tabella */
+.b-dism{background:#e9d8fd;color:#553c9a;}
+.b-cat{background:#bee3f8;color:#2a4365;}
+.b-den{background:var(--rosso-bg);color:var(--rosso);border:1px dashed var(--rosso);}
+btn,button{cursor:pointer;}
+.btn{padding:8px 14px;border:none;border-radius:6px;font-weight:600;font-size:.85em;}
+.btn-p{background:var(--blu);color:#fff;}
+.btn-v{background:var(--verde);color:#fff;}
+.btn-a{background:var(--aranc);color:#fff;}
+.btn-r{background:var(--rosso);color:#fff;}
+.btn-g{background:#e2e8f0;color:#2d3748;}
+.filtri{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;align-items:center;}
+input,select,textarea{padding:8px;border:1px solid #cbd5e0;border-radius:6px;font-size:.9em;}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;}
+.form-grid label{display:block;font-size:.78em;font-weight:700;color:var(--grigio);margin-bottom:3px;text-transform:uppercase;}
+.form-grid input,.form-grid select{width:100%;}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;overflow:auto;padding:30px 12px;}
+.modal-bg.show{display:block;}
+.modal{background:#fff;border-radius:12px;max-width:900px;margin:0 auto;padding:22px;}
+.modal h3{color:var(--blu);margin-bottom:14px;}
+.riga-azioni{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;flex-wrap:wrap;}
+.sez{border-top:2px solid #e2e8f0;margin-top:14px;padding-top:12px;}
+.sez h4{color:var(--blu2);font-size:.9em;margin-bottom:8px;text-transform:uppercase;}
+.click{cursor:pointer;}
+.click:hover{text-decoration:underline;}
+.nota{font-size:.8em;color:var(--grigio);margin-top:6px;}
+.chk{width:auto!important;}
+.mail-box{background:#f7fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:10px;}
+.mail-box label{font-weight:700;font-size:.85em;}
+.tbl-wrap{overflow-x:auto;}
+@media print{.tabs,.filtri,.btn,header .sub{display:none;}body{background:#fff;}}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>Scadenzario Sicurezza — Recipienti in Pressione</h1>
+  <div class="sub">D.M. 329/2004 · D.Lgs. 81/2008 art. 71 · D.M. 11/04/2011 — Verifiche INAIL/ASL/Soggetti Abilitati</div></div>
+  <div><select id="selAzienda" onchange="cambiaAzienda()"><option>Azienda dimostrativa (dati registro 08/25)</option></select></div>
+</header>
+<div class="container">
+<div class="tabs">
+  <div class="tab active" onclick="tab('dash',this)">Dashboard</div>
+  <div class="tab" onclick="tab('elenco',this)">Recipienti</div>
+  <div class="tab" onclick="tab('scad',this)">Scadenzario</div>
+  <div class="tab" onclick="tab('bulk',this)">Registrazione massiva</div>
+  <div class="tab" onclick="tab('email',this)">Email automatiche</div>
+  <div class="tab" onclick="tab('registro',this)">Registro stampabile</div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="p-dash" class="panel active">
+  <div class="cards" id="dashCards"></div>
+  <div class="box"><h3>⚠️ Scadenze critiche (scadute o entro 90 giorni) — clicca per aprire il recipiente</h3>
+  <div class="tbl-wrap"><table><thead><tr><th>Recipiente</th><th>Descrizione</th><th>Ubicazione</th><th>Tipo verifica</th><th>Scadenza</th><th>Stato</th></tr></thead><tbody id="dashCrit"></tbody></table></div></div>
+  <div class="box"><h3>📌 Situazioni da regolarizzare</h3><div id="dashAnomalie"></div></div>
+</div>
+
+<!-- ELENCO -->
+<div id="p-elenco" class="panel">
+  <div class="filtri">
+    <input id="fCerca" placeholder="Cerca cod, matricola, descrizione…" oninput="renderElenco()" style="min-width:240px;">
+    <select id="fStato" onchange="renderElenco()"><option value="">Tutti gli stati</option><option>In servizio</option><option>Dismesso</option><option>Da denunciare</option></select>
+    <select id="fCat" onchange="renderElenco()"><option value="">Tutte le categorie PED</option><option>I</option><option>II</option><option>III</option><option>IV</option></select>
+    <button class="btn btn-p" onclick="apriRecipiente(null)">+ Nuovo recipiente</button>
+    <button class="btn btn-g" onclick="esportaJSON()">Esporta dati</button>
+  </div>
+  <div class="box tbl-wrap"><table><thead><tr><th>Cod</th><th>Descrizione</th><th>Ubicazione</th><th>V (l)</th><th>PS (bar)</th><th>P×V</th><th>Assogg.</th><th>Cat</th><th>Matricola INAIL</th><th>Pross. periodica</th><th>Scad. integrità</th><th>Valvola</th><th>Stato</th><th></th></tr></thead><tbody id="tbElenco"></tbody></table></div>
+  <div class="nota">Assoggettamento: P×V > 8000 bar·l ⇒ denuncia di messa in servizio e verifiche periodiche (per l'aria/gas gruppo 2 la periodicità di funzionamento è 3 anni per cat. III–IV, 4 anni per cat. I–II; integrità decennale). Verificare sempre il caso specifico su D.M. 329/2004 all. — le soglie variano per fluido e tipologia.</div>
+</div>
+
+<!-- SCADENZARIO -->
+<div id="p-scad" class="panel">
+  <div class="filtri">
+    <select id="fTipoScad" onchange="renderScad()"><option value="">Tutte le verifiche</option><option value="periodica">Verifica periodica di funzionamento</option><option value="integrita">Verifica di integrità (decennale)</option></select>
+    <select id="fFinestra" onchange="renderScad()"><option value="9999">Tutte</option><option value="0">Solo scadute</option><option value="90">Entro 90 gg</option><option value="180">Entro 180 gg</option><option value="365">Entro 12 mesi</option></select>
+  </div>
+  <div class="box tbl-wrap"><table><thead><tr><th>Recipiente</th><th>Descrizione</th><th>Tipo verifica</th><th>Ultima</th><th>Periodicità</th><th>Scadenza</th><th>Giorni</th><th>Stato</th><th></th></tr></thead><tbody id="tbScad"></tbody></table></div>
+</div>
+
+<!-- BULK -->
+<div id="p-bulk" class="panel">
+  <div class="box">
+    <h3>Registrazione massiva verifica eseguita</h3>
+    <div class="form-grid">
+      <div><label>Tipo verifica</label><select id="bkTipo"><option value="periodica">Periodica di funzionamento</option><option value="integrita">Integrità (decennale)</option></select></div>
+      <div><label>Data esecuzione</label><input type="date" id="bkData"></div>
+      <div><label>Verificatore / Soggetto abilitato</label><input id="bkVerif" placeholder="es. Ing. Ricci — Soggetto Abilitato"></div>
+      <div><label>N. rapporto/verbale (facoltativo)</label><input id="bkRapp"></div>
+    </div>
+    <div class="sez"><h4>Seleziona recipienti</h4>
+    <label style="font-size:.85em;"><input type="checkbox" class="chk" id="bkAll" onchange="bkSelAll()"> Seleziona tutti gli assoggettati in servizio</label>
+    <div id="bkLista" style="margin-top:8px;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:6px;font-size:.85em;"></div></div>
+    <div class="riga-azioni"><button class="btn btn-v" onclick="bkApplica()">Registra verifica su selezionati</button></div>
+    <div class="nota">La prossima scadenza viene ricalcolata automaticamente: data esecuzione + periodicità del recipiente (3/4 anni per la funzionamento, 10 anni per l'integrità).</div>
+  </div>
+</div>
+
+<!-- EMAIL -->
+<div id="p-email" class="panel">
+  <div class="box">
+    <h3>Configurazione invio automatico promemoria</h3>
+    <div class="mail-box"><label><input type="checkbox" class="chk" id="emAuto" checked> Invio automatico attivo</label>
+      <div class="form-grid" style="margin-top:8px;">
+        <div><label>Giorni di anticipo</label><input type="number" id="emGiorni" value="60"></div>
+        <div><label>Azienda indicata nell'oggetto</label><input id="emAziendaNome" value="Azienda dimostrativa"></div>
+      </div>
+    </div>
+    <div class="mail-box"><label>1 — Consulente / Amministratore</label><input id="emAdmin" placeholder="email consulente" style="width:100%;margin-top:6px;"><textarea id="emTxtAdmin" style="width:100%;margin-top:6px;" rows="2">Promemoria: verifica in scadenza per il recipiente {COD} — {DESCRIZIONE} presso {AZIENDA}. Scadenza: {SCADENZA}.</textarea></div>
+    <div class="mail-box"><label>2 — Verificatore / Soggetto abilitato / INAIL</label><input id="emForn" placeholder="email verificatore" style="width:100%;margin-top:6px;"><textarea id="emTxtForn" style="width:100%;margin-top:6px;" rows="2">Si richiede la programmazione della {TIPO_VERIFICA} per il recipiente matricola {MATRICOLA} ({DESCRIZIONE}) presso {AZIENDA}, in scadenza il {SCADENZA}.</textarea></div>
+    <div class="mail-box"><label>3 — Azienda / Datore di Lavoro</label><input id="emAzienda" placeholder="email azienda" style="width:100%;margin-top:6px;"><textarea id="emTxtAzienda" style="width:100%;margin-top:6px;" rows="2">Gentile Datore di Lavoro, il recipiente {COD} — {DESCRIZIONE} deve essere sottoposto a {TIPO_VERIFICA} entro il {SCADENZA}. Il verificatore è stato allertato.</textarea></div>
+    <div class="mail-box"><label>3b — Azienda: 2° referente (facoltativo)</label><input id="emAzienda2" placeholder="email 2° referente aziendale" style="width:100%;margin-top:6px;"><div style="font-size:11px;color:#888;margin-top:4px">Se compilato, riceve la stessa comunicazione dell'azienda (punto 3).</div></div>
+    <div class="riga-azioni"><button class="btn btn-p" onclick="anteprimaEmail()">Anteprima email in coda</button></div>
+    <div id="emAnteprima"></div>
+    <div class="nota">L'invio effettivo (SendGrid/EmailJS) sarà attivato nella fase di unificazione Firebase, come negli altri moduli.</div>
+  </div>
+</div>
+
+<!-- REGISTRO -->
+<div id="p-registro" class="panel">
+  <div class="filtri"><button class="btn btn-p" onclick="window.print()">Stampa registro</button></div>
+  <div class="box tbl-wrap">
+    <h3>Registro attrezzature in pressione (art. 71 D.Lgs. 81/2008 — D.M. 329/2004)</h3>
+    <table><thead><tr><th>Cod</th><th>Fabbricante</th><th>Anno</th><th>N.F.</th><th>Matricola</th><th>Descrizione</th><th>V(l)</th><th>PS(bar)</th><th>Fluido</th><th>Cat</th><th>Valvola (tipo / n. / PS)</th><th>Messa in servizio</th><th>Ultima periodica</th><th>Pross. periodica</th><th>Scad. integrità</th><th>Firma verificatore</th><th>Firma Datore di Lavoro</th></tr></thead><tbody id="tbRegistro"></tbody></table>
+  </div>
+</div>
+</div>
+
+<!-- MODALE RECIPIENTE -->
+<div class="modal-bg" id="mdBg">
+<div class="modal">
+<h3 id="mdTitolo">Recipiente</h3>
+<div class="form-grid">
+  <div><label>Codice interno</label><input id="mCod"></div>
+  <div><label>Stato</label><select id="mStato"><option>In servizio</option><option>Dismesso</option><option>Da denunciare</option></select></div>
+  <div><label>Fabbricante</label><input id="mFabb"></div>
+  <div><label>Anno costruzione</label><input id="mAnno"></div>
+  <div><label>N. fabbrica</label><input id="mNF"></div>
+  <div><label>Matricola INAIL</label><input id="mMatr"></div>
+  <div><label>Descrizione</label><input id="mDesc"></div>
+  <div><label>Utilizzo</label><input id="mUtil"></div>
+  <div><label>Ubicazione</label><input id="mUbic"></div>
+  <div><label>Contenuto (fluido)</label><input id="mCont"></div>
+  <div><label>Volume V (litri)</label><input type="number" id="mV" oninput="mPxV()"></div>
+  <div><label>PS (bar)</label><input type="number" step="0.1" id="mPS" oninput="mPxV()"></div>
+  <div><label>P×V (auto)</label><input id="mPxVout" readonly style="background:#f7fafc;font-weight:700;"></div>
+  <div><label>Gruppo fluido</label><select id="mGruppo"><option>I</option><option selected>II</option></select></div>
+  <div><label>Categoria PED</label><select id="mCat"><option></option><option>I</option><option>II</option><option>III</option><option>IV</option></select></div>
+</div>
+<div class="sez"><h4>Valvola di sicurezza</h4>
+<div class="form-grid">
+  <div><label>Fornitore</label><input id="mVForn"></div>
+  <div><label>Anno</label><input id="mVAnno"></div>
+  <div><label>Tipo</label><input id="mVTipo"></div>
+  <div><label>PS taratura (bar)</label><input id="mVPS"></div>
+  <div><label>Attacco (inch)</label><input id="mVIN"></div>
+  <div><label>Scarico (l/min)</label><input id="mVSca"></div>
+  <div><label>N. valvola</label><input id="mVNum"></div>
+</div></div>
+<div class="sez"><h4>Verifiche e scadenze</h4>
+<div class="form-grid">
+  <div><label>Messa in servizio</label><input type="date" id="mMS"></div>
+  <div><label>Periodicità funzionamento (anni)</label><select id="mPerA" onchange="mCalcScad()"><option></option><option>3</option><option>4</option></select></div>
+  <div><label>Ultima verifica periodica</label><input type="date" id="mUlt" onchange="mCalcScad()"></div>
+  <div><label>Prossima periodica (auto, modificabile)</label><input type="date" id="mProx"></div>
+  <div><label>Periodicità integrità (anni)</label><input type="number" id="mIntA" value="10"></div>
+  <div><label>Scadenza verifica integrità</label><input type="date" id="mIntS"></div>
+</div></div>
+<div class="riga-azioni">
+  <button class="btn btn-r" id="mElimina" onclick="eliminaRec()">Elimina</button>
+  <button class="btn btn-g" onclick="chiudiMd()">Annulla</button>
+  <button class="btn btn-v" onclick="salvaRec()">Salva</button>
+</div>
+</div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="firebase-init.js"></script>
+<script src="auth-gate.js"></script>
+<script src="fondamenta.js"></script>
+<script>
+const OGGI = new Date(); OGGI.setHours(0,0,0,0);
+const SOGLIA_PXV = 8000;
+/* Multi-azienda: AZIENDE dall'anagrafica condivisa; RECIPIENTI[aziId] = lista per azienda;
+   "recipienti" resta la VISTA dell'azienda selezionata. SEED_RECIPIENTI = registro iniziale. */
+var AZIENDE=[], aziId=null, RECIPIENTI={}, recipienti=[];
+var SEED_RECIPIENTI = [
+{cod:"A1",stato:"In servizio",fabbricante:"O.M.B.",V:100,PS:8,anno:"2006",nf:"7483",matricola:"2017/7/100/VT",descrizione:"Autoclave acqua pozzo 1",utilizzo:"Pozzi prelievo acqua",ubicazione:"Sala osmosi",contenuto:"Acqua",gruppo:"II",cat:"II",vForn:"Nuova GI",vAnno:"2018",vTipo:"D10 OT",vPS:"7,6",vIN:"3/8\"",vSca:"6415",vNum:"18138315",ms:"2019-07-26",ult:null,prox:null,perA:4,intA:10,intS:null},
+{cod:"A3",stato:"In servizio",fabbricante:"SICC",V:500,PS:32,anno:"2009",nf:"0904801011",matricola:"2017/7/101/VT",descrizione:"Serbatoio aria",utilizzo:"Presse Sacmi",ubicazione:"Sala compress. HP",contenuto:"Aria",gruppo:"II",cat:"IV",vForn:"Nuova GI",vAnno:"2024",vTipo:"D14 OT",vPS:"30",vIN:"3/4\"",vSca:"48059",vNum:"24500499",ms:"2018-07-20",ult:"2024-07-12",prox:"2027-07-12",perA:3,intA:10,intS:"2029-11-19"},
+{cod:"A4",stato:"In servizio",fabbricante:"ELBI",V:3000,PS:12,anno:"2004",nf:"11476",matricola:"2017/7/103/VT",descrizione:"Autoclave acqua riciclo",utilizzo:"H2O recupero depur.",ubicazione:"Depurazione",contenuto:"Acqua",gruppo:"II",cat:"IV",vForn:"Nuova GI",vAnno:"2018",vTipo:"G20/S OT",vPS:"8",vIN:"1\"",vSca:"28960",vNum:"18138312",ms:"2019-10-11",ult:"2024-10-04",prox:"2027-07-08",perA:3,intA:10,intS:"2024-10-04"},
+{cod:"A5",stato:"In servizio",fabbricante:"REMOIN",V:2000,PS:16,anno:"2002",nf:"V184",matricola:"2002/3/59/RM",descrizione:"Serbatoio aria",utilizzo:"Aria compressa LP",ubicazione:"Sala compressori",contenuto:"Aria",gruppo:"II",cat:"IV",vForn:"Nuova GI",vAnno:"2017+2018",vTipo:"F25 OT",vPS:"12",vIN:"1\"1/4",vSca:"67934×2",vNum:"17139478 + 18138317",ms:"2018-04-23",ult:"2024-04-22",prox:"2027-07-08",perA:3,intA:10,intS:"2027-06-13"},
+{cod:"A6",stato:"In servizio",fabbricante:"SICC",V:2000,PS:11.5,anno:"2009",nf:"0904416033",matricola:"2017/7/102/VT",descrizione:"Serbatoio aria",utilizzo:"Aria compressa LP",ubicazione:"Sala compressori",contenuto:"Aria",gruppo:"II",cat:"IV",vForn:"Nuova GI",vAnno:"2018",vTipo:"D14 OT",vPS:"11",vIN:"3/4\"",vSca:"18516",vNum:"18138316",ms:"2018-07-20",ult:"2024-07-12",prox:"2027-07-08",perA:3,intA:10,intS:"2029-10-12"},
+{cod:"A8",stato:"In servizio",fabbricante:"REMOIN",V:1300,PS:3,anno:"2000",nf:"134",matricola:"2000/3/6745/RM",descrizione:"Autoclave Impasto",utilizzo:"Vetro China",ubicazione:"Sala distrib. VC",contenuto:"Impasto",gruppo:"II",cat:"IV",vForn:"Nuova GI",vAnno:"2020",vTipo:"G20/S",vPS:"3",vIN:"1\"",vSca:"n.d.",vNum:"20199740",ms:null,ult:null,prox:null,perA:3,intA:10,intS:null},
+{cod:"A9",stato:"Dismesso",fabbricante:"REMOIN",V:1300,PS:3,anno:"2005",nf:"V512",matricola:"2017/7/104/VT",descrizione:"Autoclave Impasto",utilizzo:"Fire Clay",ubicazione:"Sala distrib. FC",contenuto:"Impasto",gruppo:"II",cat:"IV",vForn:"Nuova GI",vAnno:"2018",vTipo:"G20/S OT",vPS:"3",vIN:"1\"",vSca:"12707",vNum:"18138313",ms:null,ult:null,prox:null,perA:3,intA:10,intS:null},
+{cod:"A17",stato:"In servizio",fabbricante:"OMB",V:100,PS:8,anno:"2005",nf:"7484",matricola:"2017/7/105/VT",descrizione:"Autoclave acqua pozzo 3",utilizzo:"Pozzi prelievo acqua",ubicazione:"Sala Grecio",contenuto:"Acqua",gruppo:"II",cat:"II",vForn:"Nuova GI",vAnno:"2018",vTipo:"G14/S OT",vPS:"8",vIN:"1/2\"",vSca:"13684",vNum:"18138311",ms:"2019-07-26",ult:null,prox:null,perA:4,intA:10,intS:null},
+{cod:"A19",stato:"In servizio",fabbricante:"C.S.C.",V:2000,PS:12,anno:"2006",nf:"B3653",matricola:"2017/7/107/VT",descrizione:"Serbatoio aria",utilizzo:"Aria compressa LP",ubicazione:"Col. HP lato uffici",contenuto:"Aria",gruppo:"II",cat:"IV",vForn:"Nuova GI",vAnno:"2018",vTipo:"F32 OT",vPS:"11",vIN:"1\"1/2",vSca:"93129",vNum:"024500500",ms:"2019-10-11",ult:"2024-10-04",prox:"2027-07-08",perA:3,intA:10,intS:"2026-12-21"},
+{cod:"A20",stato:"In servizio",fabbricante:"C.S.C.",V:2000,PS:12,anno:"2006",nf:"B3680",matricola:"2017/7/106/VT",descrizione:"Serbatoio aria",utilizzo:"Aria compressa LP",ubicazione:"Col. HP lato uffici",contenuto:"Aria",gruppo:"II",cat:"IV",vForn:"Nuova GI",vAnno:"2018",vTipo:"F32 OT",vPS:"11",vIN:"1\"1/2",vSca:"93129",vNum:"024500501",ms:"2019-10-11",ult:"2024-10-04",prox:"2027-07-08",perA:3,intA:10,intS:"2026-12-21"},
+{cod:"C1",stato:"In servizio",fabbricante:"SILIT",V:200,PS:15,anno:"2018",nf:"833617",matricola:"1994/0/341/VT",descrizione:"Serbatoio olio compressore",utilizzo:"Compressore 1",ubicazione:"Sala compressori",contenuto:"Aria/olio",gruppo:"II",cat:"III",vForn:"General Instruments",vAnno:"2024",vTipo:"F25 OT",vPS:"10",vIN:"1\"1/4",vSca:"57409",vNum:"24638176",ms:"2020-03-16",ult:"2022-11-21",prox:"2025-11-21",perA:3,intA:10,intS:"2027-06-13"},
+{cod:"C2",stato:"In servizio",fabbricante:"EFEREST",V:185,PS:16,anno:"2006",nf:"40004",matricola:"2017/7/109/VT",descrizione:"Serbatoio olio compressore",utilizzo:"Compressore 2",ubicazione:"Sala compressori",contenuto:"Aria/olio",gruppo:"II",cat:"III",vForn:"General Instruments",vAnno:"2024",vTipo:"B20 OT",vPS:"11,5",vIN:"1\"",vSca:"38880",vNum:"024638175",ms:"2018-04-12",ult:"2022-11-21",prox:"2025-11-21",perA:3,intA:10,intS:"2028-04-12"},
+{cod:"C3",stato:"In servizio",fabbricante:"EFEREST",V:185,PS:16,anno:"2006",nf:"40018",matricola:"2017/7/110/VT",descrizione:"Serbatoio olio compressore",utilizzo:"Compressore 3",ubicazione:"Sala compressori",contenuto:"Aria/olio",gruppo:"II",cat:"III",vForn:"General Instruments",vAnno:"2024",vTipo:"B20 OT",vPS:"11,5",vIN:"1\"",vSca:"38880",vNum:"024528965",ms:"2018-04-12",ult:"2022-11-21",prox:"2025-11-21",perA:3,intA:10,intS:"2028-04-12"},
+{cod:"C4",stato:"In servizio",fabbricante:"AIRCOM",V:135,PS:16,anno:"2013",nf:"76612",matricola:"2017/7/111/VT",descrizione:"Serbatoio olio compressore",utilizzo:"Compressore 4",ubicazione:"Sala compressori",contenuto:"Aria/olio",gruppo:"II",cat:"III",vForn:"General Instruments",vAnno:"2024",vTipo:"B20 OT",vPS:"10",vIN:"1\"",vSca:"34180",vNum:"024665119",ms:"2018-04-19",ult:"2022-11-21",prox:"2025-11-21",perA:3,intA:10,intS:"2028-04-19"},
+{cod:"C5",stato:"In servizio",fabbricante:"AIRCOM",V:75,PS:16,anno:"2010",nf:"13869",matricola:"2017/7/112/VT",descrizione:"Serbatoio olio compressore",utilizzo:"Compressore 5",ubicazione:"Sala compressori",contenuto:"Aria/olio",gruppo:"II",cat:"III",vForn:"General Instruments",vAnno:"2024",vTipo:"D14 OT",vPS:"10",vIN:"3/4\"",vSca:"16962",vNum:"024638171",ms:"2018-04-19",ult:"2022-11-21",prox:"2025-11-21",perA:3,intA:10,intS:"2028-04-19"},
+{cod:"F1",stato:"In servizio",fabbricante:"AIRCOM",V:135,PS:16,anno:"2014",nf:"15370",matricola:"2017/7/113/VT",descrizione:"Filtro rete",utilizzo:"Rete",ubicazione:"Sala compressori",contenuto:"Aria",gruppo:"II",cat:"III",vForn:"—",vAnno:"",vTipo:"",vPS:"",vIN:"",vSca:"",vNum:"",ms:"2018-04-23",ult:"2022-11-21",prox:"2025-11-21",perA:3,intA:10,intS:"2028-04-23"},
+{cod:"F2",stato:"In servizio",fabbricante:"AIRCOM",V:48,PS:16,anno:"2010",nf:"2372",matricola:"2017/7/114/VT",descrizione:"Filtro rete",utilizzo:"Rete",ubicazione:"Sala compressori",contenuto:"Aria",gruppo:"II",cat:"II",vForn:"—",vAnno:"",vTipo:"",vPS:"",vIN:"",vSca:"",vNum:"",ms:"2018-04-23",ult:"2022-11-21",prox:"2026-11-21",perA:4,intA:10,intS:"2028-04-23"},
+{cod:"F3",stato:"Da denunciare",fabbricante:"FEAL",V:50,PS:16,anno:"2017",nf:"213_2017",matricola:"",descrizione:"Filtro rete",utilizzo:"Rete",ubicazione:"Sala compressori",contenuto:"Aria",gruppo:"II",cat:"II",vForn:"—",vAnno:"",vTipo:"",vPS:"",vIN:"",vSca:"",vNum:"",ms:null,ult:null,prox:null,perA:4,intA:10,intS:null},
+{cod:"G1",stato:"In servizio",fabbricante:"CORDIVARI",V:978,PS:12,anno:"2023",nf:"P181944",matricola:"2024/7/50003/VT",descrizione:"Serbatoio aria",utilizzo:"Prototipatore",ubicazione:"Modellazione",contenuto:"Aria",gruppo:"II",cat:"IV",vForn:"Padovan Valerio",vAnno:"2023",vTipo:"TA21",vPS:"18",vIN:"1\"",vSca:"38858",vNum:"493123/1",ms:"2024-03-15",ult:"2024-08-02",prox:"2027-08-02",perA:3,intA:10,intS:"2034-03-15"},
+{cod:"G2",stato:"In servizio",fabbricante:"CORDIVARI",V:978,PS:12,anno:"2023",nf:"P184618",matricola:"2024/7/50004/VT",descrizione:"Serbatoio aria",utilizzo:"Prototipatore",ubicazione:"Modellazione",contenuto:"Aria",gruppo:"II",cat:"IV",vForn:"Padovan Valerio",vAnno:"2023",vTipo:"TA21",vPS:"18",vIN:"1\"",vSca:"38858",vNum:"493123/1",ms:"2024-03-15",ult:"2024-08-02",prox:"2027-08-02",perA:3,intA:10,intS:"2034-03-15"},
+{cod:"G3",stato:"In servizio",fabbricante:"CORDIVARI",V:2750,PS:12,anno:"2024",nf:"P192184",matricola:"2024/7/50019/VT",descrizione:"Serbatoio aria sala smalti",utilizzo:"Impianto esterno Sala Smalti",ubicazione:"Sala Smalti",contenuto:"Aria",gruppo:"II",cat:"IV",vForn:"Nuova GI",vAnno:"2024",vTipo:"B20 OT",vPS:"11,2",vIN:"1\"",vSca:"37940",vNum:"024244261",ms:"2024-11-04",ult:"2024-11-04",prox:"2027-11-04",perA:3,intA:10,intS:"2034-11-04"},
+{cod:"G4",stato:"In servizio",fabbricante:"CORDIVARI",V:2750,PS:12,anno:"2024",nf:"P192185",matricola:"2024/7/50020/VT",descrizione:"Serbatoio aria sala smalti",utilizzo:"Impianto esterno Sala Smalti",ubicazione:"Sala Smalti",contenuto:"Aria",gruppo:"II",cat:"IV",vForn:"Nuova GI",vAnno:"2024",vTipo:"B20 OT",vPS:"11,2",vIN:"1\"",vSca:"37940",vNum:"024244262",ms:"2024-11-06",ult:"2024-11-06",prox:"2027-11-06",perA:3,intA:10,intS:"2034-11-06"},
+{cod:"G5 (a+b+c)",stato:"In servizio",fabbricante:"FB TANKS S.r.l",V:308,PS:12,anno:"2024",nf:"12828.24",matricola:"2025/7/50006/VT",descrizione:"Propulsori impianto sala smalti (3 recipienti)",utilizzo:"Impianto propulsori Sala Smalti",ubicazione:"Sala Smalti",contenuto:"Aria",gruppo:"II",cat:"III",vForn:"Universal",vAnno:"2024",vTipo:"R40N",vPS:"7,6",vIN:"1\"1/2",vSca:"64741",vNum:"6769",ms:"2025-04-28",ult:null,prox:null,perA:3,intA:10,intS:null},
+{cod:"G6 (a+b+c)",stato:"In servizio",fabbricante:"FB TANKS S.r.l",V:308,PS:12,anno:"2024",nf:"12829.24",matricola:"2025/7/50005/VT",descrizione:"Propulsori impianto sala smalti (3 recipienti)",utilizzo:"Impianto propulsori Sala Smalti",ubicazione:"Sala Smalti",contenuto:"Aria",gruppo:"II",cat:"III",vForn:"Universal",vAnno:"2024",vTipo:"R40N",vPS:"7,6",vIN:"1\"1/2",vSca:"64741",vNum:"6770",ms:"2025-04-09",ult:null,prox:null,perA:3,intA:10,intS:null},
+{cod:"G7",stato:"Da denunciare",fabbricante:"",V:null,PS:null,anno:"",nf:"",matricola:"",descrizione:"Serbatoio aria",utilizzo:"Aria compressa LP umida",ubicazione:"Sala compressori",contenuto:"Aria",gruppo:"II",cat:"",vForn:"Nuova GI",vAnno:"2025",vTipo:"F40 OT",vPS:"11,5",vIN:"2\"",vSca:"134136",vNum:"25267814",ms:null,ult:null,prox:null,perA:null,intA:10,intS:null}
+];
+
+function pxv(r){return (r.V&&r.PS)?Math.round(r.V*r.PS):null;}
+function assogg(r){const p=pxv(r);return p!==null&&p>SOGLIA_PXV;}
+function fmt(d){return Fond.fmtData(d);}
+function giorni(d){return Fond.giorniA(d);}
+/* badgeScad resta specifico del modulo (soglia 90 gg, testo esteso) ma usa
+   le classi badge condivise di fondamenta.css */
+function badgeScad(d){const g=giorni(d);
+ if(g===null)return'<span class="badge b-neutro">n.d.</span>';
+ if(g<0)return'<span class="badge b-scaduta">SCADUTA '+fmt(d)+'</span>';
+ if(g<=90)return'<span class="badge b-scadenza">'+fmt(d)+' ('+g+' gg)</span>';
+ return'<span class="badge b-ok">'+fmt(d)+'</span>';}
+function scadenze(r){const out=[];
+ if(r.stato!=="In servizio")return out;
+ if(assogg(r)){
+  out.push({tipo:"periodica",nome:"Verifica periodica di funzionamento",ult:r.ult,per:(r.perA?r.perA+" anni":"n.d."),scad:r.prox});
+  out.push({tipo:"integrita",nome:"Verifica di integrità (decennale)",ult:r.ms,per:(r.intA?r.intA+" anni":"n.d."),scad:r.intS});
+ }
+ return out;}
+
+function tab(id,el){document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));el.classList.add("active");
+ document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));document.getElementById("p-"+id).classList.add("active");
+ renderTutto();}
+function nomeAzi(){ for(var i=0;i<AZIENDE.length;i++){ if(AZIENDE[i].id===aziId) return AZIENDE[i].nome; } return ""; }
+function initSelAzienda(){
+ var s=document.getElementById("selAzienda"); if(!s) return; s.innerHTML="";
+ for(var i=0;i<AZIENDE.length;i++){ var o=document.createElement("option"); o.value=AZIENDE[i].id; o.textContent=AZIENDE[i].nome; if(AZIENDE[i].id===aziId) o.selected=true; s.appendChild(o); }
+}
+function cambiaAzienda(){
+ aziId = Number(document.getElementById("selAzienda").value);
+ if(!RECIPIENTI[aziId]) RECIPIENTI[aziId]=[];
+ recipienti = RECIPIENTI[aziId];
+ var em=document.getElementById("emAziendaNome"); if(em) em.value = nomeAzi();
+ renderTutto();
+}
+function mostraNessunAzienda(){
+ var d=document.createElement("div");
+ d.style.cssText="margin:20px;padding:16px 18px;background:#fdf3e3;border:1px solid #e6c98a;border-radius:10px;color:#7a5b1e;font-size:14px";
+ d.innerHTML="<b>Nessuna azienda in anagrafica.</b><br>Apri il modulo <b>Aziende</b>, inserisci almeno un'azienda, poi ricarica questa pagina.";
+ document.body.insertBefore(d, document.body.firstChild);
+}
+function vaiScad(finestra){
+ var tabs=document.querySelectorAll(".tab");tabs.forEach(t=>t.classList.remove("active"));
+ tabs.forEach(t=>{if(t.getAttribute("onclick")&&t.getAttribute("onclick").indexOf("'scad'")>-1)t.classList.add("active");});
+ document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+ document.getElementById("p-scad").classList.add("active");
+ document.getElementById("fTipoScad").value="";
+ document.getElementById("fFinestra").value=finestra;
+ renderScad();
+}
+function vaiElenco(filtroStato){
+ var tabs=document.querySelectorAll(".tab");tabs.forEach(t=>t.classList.remove("active"));
+ tabs.forEach(t=>{if(t.getAttribute("onclick")&&t.getAttribute("onclick").indexOf("'elenco'")>-1)t.classList.add("active");});
+ document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+ document.getElementById("p-elenco").classList.add("active");
+ document.getElementById("fStato").value=filtroStato||"";
+ document.getElementById("fCerca").value="";document.getElementById("fCat").value="";
+ renderElenco();
+}
+
+function renderDash(){
+ const inServ=recipienti.filter(r=>r.stato==="In servizio");
+ const ass=inServ.filter(assogg);
+ let scadute=0,critiche=0,righe="";
+ const crit=[];
+ recipienti.forEach(r=>scadenze(r).forEach(s=>{const g=giorni(s.scad);
+  if(g===null)return;
+  if(g<0){scadute++;crit.push({r,s,g});}
+  else if(g<=90){critiche++;crit.push({r,s,g});}}));
+ crit.sort((a,b)=>a.g-b.g);
+ crit.forEach(c=>{righe+=`<tr class="click" onclick="apriDaCod('${c.r.cod}')"><td><b>${c.r.cod}</b></td><td>${c.r.descrizione}</td><td>${c.r.ubicazione}</td><td>${c.s.nome}</td><td>${fmt(c.s.scad)}</td><td>${badgeScad(c.s.scad)}</td></tr>`;});
+ document.getElementById("dashCrit").innerHTML=righe||'<tr><td colspan="6">Nessuna scadenza critica</td></tr>';
+ document.getElementById("dashCards").innerHTML=`
+  <div class="card c-blu" onclick="vaiElenco('')" style="cursor:pointer"><div class="num">${recipienti.length}</div><div class="lbl">Recipienti censiti</div></div>
+  <div class="card c-blu" onclick="vaiElenco('In servizio')" style="cursor:pointer"><div class="num">${ass.length}</div><div class="lbl">Assoggettati a verifica</div></div>
+  <div class="card c-rosso" onclick="vaiScad(0)" style="cursor:pointer"><div class="num">${scadute}</div><div class="lbl">Verifiche scadute</div></div>
+  <div class="card c-aranc" onclick="vaiScad(90)" style="cursor:pointer"><div class="num">${critiche}</div><div class="lbl">In scadenza (90 gg)</div></div>
+  <div class="card c-verde" onclick="vaiElenco('Da denunciare')" style="cursor:pointer"><div class="num">${recipienti.filter(r=>r.stato==="Da denunciare").length}</div><div class="lbl">Da denunciare INAIL</div></div>`;
+ let an="";
+ recipienti.filter(r=>r.stato==="Da denunciare").forEach(r=>an+=`<div><b>${r.cod}</b> — ${r.descrizione} (${r.ubicazione}): denuncia di messa in servizio da presentare su CIVA.</div>`);
+ recipienti.filter(r=>r.stato==="Dismesso").forEach(r=>an+=`<div><b>${r.cod}</b> — ${r.descrizione}: dismesso (comunicazione già effettuata; nuova denuncia se rimesso in uso).</div>`);
+ recipienti.filter(r=>r.stato==="In servizio"&&assogg(r)&&!r.prox).forEach(r=>an+=`<div><b>${r.cod}</b> — ${r.descrizione}: assoggettato ma senza prossima verifica periodica registrata.</div>`);
+ document.getElementById("dashAnomalie").innerHTML=an||"Nessuna anomalia.";
+}
+
+function renderElenco(){
+ const q=(document.getElementById("fCerca").value||"").toLowerCase();
+ const fs=document.getElementById("fStato").value,fc=document.getElementById("fCat").value;
+ let h="";
+ recipienti.forEach((r,i)=>{
+  const testo=(r.cod+" "+(r.matricola||"")+" "+(r.descrizione||"")+" "+(r.ubicazione||"")).toLowerCase();
+  if(q&&!testo.includes(q))return;
+  if(fs&&r.stato!==fs)return;
+  if(fc&&r.cat!==fc)return;
+  const p=pxv(r);
+  const stB=r.stato==="Dismesso"?'<span class="badge b-dism">Dismesso</span>':r.stato==="Da denunciare"?'<span class="badge b-den">Da denunciare</span>':'<span class="badge b-ok">In servizio</span>';
+  h+=`<tr><td><b>${r.cod}</b></td><td>${r.descrizione||""}</td><td>${r.ubicazione||""}</td><td>${r.V??"—"}</td><td>${r.PS??"—"}</td><td>${p??"—"}</td>
+  <td>${p===null?'<span class="badge b-nd">?</span>':(assogg(r)?'<span class="badge b-alert">SÌ</span>':'<span class="badge b-nd">no</span>')}</td>
+  <td>${r.cat?'<span class="badge b-cat">'+r.cat+'</span>':"—"}</td><td>${r.matricola||"—"}</td>
+  <td>${r.stato==="In servizio"&&assogg(r)?badgeScad(r.prox):"—"}</td>
+  <td>${r.stato==="In servizio"&&assogg(r)?badgeScad(r.intS):"—"}</td>
+  <td style="font-size:.8em;">${r.vTipo?r.vTipo+" n."+r.vNum:"—"}</td>
+  <td>${stB}</td><td><button class="btn btn-g" onclick="apriRecipiente(${i})">Modifica</button></td></tr>`;});
+ document.getElementById("tbElenco").innerHTML=h;
+}
+
+function renderScad(){
+ const ft=document.getElementById("fTipoScad").value;const fin=+document.getElementById("fFinestra").value;
+ const righe=[];
+ recipienti.forEach((r,i)=>scadenze(r).forEach(s=>{
+  if(ft&&s.tipo!==ft)return;
+  const g=giorni(s.scad);
+  if(fin===0){if(g===null||g>=0)return;}
+  else if(fin<9999){if(g===null||g>fin)return;}
+  righe.push({r,i,s,g:(g===null?99999:g)});}));
+ righe.sort((a,b)=>a.g-b.g);
+ let h="";righe.forEach(x=>{h+=`<tr><td><b>${x.r.cod}</b></td><td>${x.r.descrizione}</td><td>${x.s.nome}</td><td>${fmt(x.s.ult)}</td><td>${x.s.per}</td><td>${fmt(x.s.scad)}</td><td>${x.s.scad?giorni(x.s.scad):"—"}</td><td>${badgeScad(x.s.scad)}</td><td><button class="btn btn-g" onclick="apriRecipiente(${x.i})">Modifica</button></td></tr>`;});
+ document.getElementById("tbScad").innerHTML=h||'<tr><td colspan="9">Nessuna scadenza nel filtro selezionato.</td></tr>';
+}
+
+function renderBulk(){
+ let h="";recipienti.forEach((r,i)=>{if(r.stato!=="In servizio")return;
+  h+=`<label><input type="checkbox" class="chk bkchk" data-i="${i}" ${assogg(r)?"":"disabled"}> <b>${r.cod}</b> ${r.descrizione} ${assogg(r)?"":"(non assogg.)"}</label>`;});
+ document.getElementById("bkLista").innerHTML=h;
+}
+function bkSelAll(){const on=document.getElementById("bkAll").checked;document.querySelectorAll(".bkchk:not(:disabled)").forEach(c=>c.checked=on);}
+function bkApplica(){
+ const data=document.getElementById("bkData").value;if(!data){alert("Inserire la data di esecuzione.");return;}
+ const tipo=document.getElementById("bkTipo").value;let n=0;
+ document.querySelectorAll(".bkchk:checked").forEach(c=>{const r=recipienti[+c.dataset.i];
+  if(tipo==="periodica"){r.ult=data;if(r.perA)r.prox=addAnni(data,r.perA);}
+  else{r.intS=addAnni(data,r.intA||10);}
+  n++;});
+ alert("Verifica registrata su "+n+" recipienti. Scadenze ricalcolate.");salva();renderTutto();
+}
+function addAnni(d,a){const x=new Date(d);x.setFullYear(x.getFullYear()+Number(a));return x.toISOString().slice(0,10);}
+
+let mdIdx=null;
+function apriDaCod(c){const i=recipienti.findIndex(r=>r.cod===c);if(i>=0)apriRecipiente(i);}
+function apriRecipiente(i){mdIdx=i;const r=i===null?{stato:"In servizio",gruppo:"II",intA:10}:recipienti[i];
+ document.getElementById("mdTitolo").textContent=i===null?"Nuovo recipiente":"Recipiente "+r.cod;
+ const set=(id,v)=>document.getElementById(id).value=(v??"");
+ set("mCod",r.cod);set("mStato",r.stato);set("mFabb",r.fabbricante);set("mAnno",r.anno);set("mNF",r.nf);set("mMatr",r.matricola);
+ set("mDesc",r.descrizione);set("mUtil",r.utilizzo);set("mUbic",r.ubicazione);set("mCont",r.contenuto);
+ set("mV",r.V);set("mPS",r.PS);set("mGruppo",r.gruppo||"II");set("mCat",r.cat);
+ set("mVForn",r.vForn);set("mVAnno",r.vAnno);set("mVTipo",r.vTipo);set("mVPS",r.vPS);set("mVIN",r.vIN);set("mVSca",r.vSca);set("mVNum",r.vNum);
+ set("mMS",r.ms);set("mPerA",r.perA);set("mUlt",r.ult);set("mProx",r.prox);set("mIntA",r.intA);set("mIntS",r.intS);
+ document.getElementById("mElimina").style.display=i===null?"none":"inline-block";
+ mPxV();document.getElementById("mdBg").classList.add("show");}
+function mPxV(){const v=+document.getElementById("mV").value,p=+document.getElementById("mPS").value;
+ const out=document.getElementById("mPxVout");
+ if(v&&p){const x=Math.round(v*p);out.value=x+(x>SOGLIA_PXV?"  → ASSOGGETTATO":"  → non assoggettato");}else out.value="";}
+function mCalcScad(){const u=document.getElementById("mUlt").value,a=document.getElementById("mPerA").value;
+ if(u&&a)document.getElementById("mProx").value=addAnni(u,a);}
+function chiudiMd(){document.getElementById("mdBg").classList.remove("show");}
+function salvaRec(){const g=id=>document.getElementById(id).value||null;
+ const r={cod:g("mCod"),stato:g("mStato"),fabbricante:g("mFabb"),anno:g("mAnno"),nf:g("mNF"),matricola:g("mMatr"),
+  descrizione:g("mDesc"),utilizzo:g("mUtil"),ubicazione:g("mUbic"),contenuto:g("mCont"),
+  V:g("mV")?+g("mV"):null,PS:g("mPS")?+g("mPS"):null,gruppo:g("mGruppo"),cat:g("mCat"),
+  vForn:g("mVForn"),vAnno:g("mVAnno"),vTipo:g("mVTipo"),vPS:g("mVPS"),vIN:g("mVIN"),vSca:g("mVSca"),vNum:g("mVNum"),
+  ms:g("mMS"),perA:g("mPerA")?+g("mPerA"):null,ult:g("mUlt"),prox:g("mProx"),intA:g("mIntA")?+g("mIntA"):null,intS:g("mIntS")};
+ if(!r.cod){alert("Inserire il codice.");return;}
+ if(mdIdx===null)recipienti.push(r);else recipienti[mdIdx]=r;
+ salva();chiudiMd();renderTutto();}
+function eliminaRec(){if(mdIdx!==null&&confirm("Eliminare il recipiente?")){recipienti.splice(mdIdx,1);salva();chiudiMd();renderTutto();}}
+
+function anteprimaEmail(){
+ const gg=+document.getElementById("emGiorni").value||60;const az=document.getElementById("emAziendaNome").value;
+ let h='<div class="sez"><h4>Email in coda (scadenze entro '+gg+' giorni)</h4>';let n=0;
+ recipienti.forEach(r=>scadenze(r).forEach(s=>{const g=giorni(s.scad);
+  if(g===null||g>gg)return;n++;
+  const sost=t=>t.replaceAll("{COD}",r.cod).replaceAll("{DESCRIZIONE}",r.descrizione||"").replaceAll("{AZIENDA}",az).replaceAll("{SCADENZA}",fmt(s.scad)).replaceAll("{MATRICOLA}",r.matricola||"n.d.").replaceAll("{TIPO_VERIFICA}",s.nome);
+  h+=`<div class="mail-box"><b>[${az}] ${r.cod} — ${s.nome} — scad. ${fmt(s.scad)}</b>
+   <div class="nota">→ Consulente: ${sost(document.getElementById("emTxtAdmin").value)}</div>
+   <div class="nota">→ Verificatore: ${sost(document.getElementById("emTxtForn").value)}</div>
+   <div class="nota">→ Azienda: ${sost(document.getElementById("emTxtAzienda").value)}</div>${document.getElementById("emAzienda2").value?`<div class="nota">→ Azienda (2° referente): ${sost(document.getElementById("emTxtAzienda").value)}</div>`:``}</div>`;}));
+ h+=n===0?"Nessuna email in coda.":"";h+="</div>";
+ document.getElementById("emAnteprima").innerHTML=h;
+}
+
+function renderRegistro(){
+ let h="";recipienti.forEach(r=>{
+  h+=`<tr><td><b>${r.cod}</b>${r.stato!=="In servizio"?"<br><small>("+r.stato+")</small>":""}</td><td>${r.fabbricante||""}</td><td>${r.anno||""}</td><td>${r.nf||""}</td><td>${r.matricola||""}</td><td>${r.descrizione||""}</td><td>${r.V??""}</td><td>${r.PS??""}</td><td>${r.contenuto||""}</td><td>${r.cat||""}</td><td>${r.vTipo?r.vTipo+" / n."+r.vNum+" / "+r.vPS+" bar":""}</td><td>${fmt(r.ms)}</td><td>${fmt(r.ult)}</td><td>${fmt(r.prox)}</td><td>${fmt(r.intS)}</td><td style="min-width:110px;"></td><td style="min-width:110px;"></td></tr>`;});
+ document.getElementById("tbRegistro").innerHTML=h;
+}
+
+function esportaJSON(){const blob=new Blob([JSON.stringify(recipienti,null,1)],{type:"application/json"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="recipienti_pressione.json";a.click();}
+
+/* ============ PERSISTENZA (Firebase; fallback localStorage) ============ */
+/* Prima questo modulo non salvava nulla: le modifiche si perdevano al reload.
+   Ora persiste l'array "recipienti" tramite Store (Firebase o localStorage). */
+var LS_KEY="recipienti_dati_v1";
+function salva(){
+ Store.save(LS_KEY, {RECIPIENTI:RECIPIENTI, aziId:aziId})
+  .catch(function(e){ console.warn("Salvataggio non riuscito:", e); });
+}
+/* carica() ASINCRONA: anagrafica condivisa + dati per-azienda. Con migrazione dal vecchio formato piatto. */
+function carica(){
+ return Promise.all([ Store.aziende(), Store.load(LS_KEY) ]).then(function(res){
+  AZIENDE = res[0] || [];
+  var d = res[1];
+  var firstId = AZIENDE.length ? AZIENDE[0].id : null;
+  if(d && d.RECIPIENTI){ RECIPIENTI = d.RECIPIENTI; if(d.aziId) aziId = d.aziId; }
+  else if(d && Array.isArray(d.recipienti)){ RECIPIENTI = {}; if(firstId!==null) RECIPIENTI[firstId] = d.recipienti; }   /* vecchio formato piatto → prima azienda */
+  else { RECIPIENTI = {}; if(firstId!==null) RECIPIENTI[firstId] = SEED_RECIPIENTI.slice(); }                             /* primo avvio: registro seed alla prima azienda */
+  if(AZIENDE.length){ var ok=false; for(var i=0;i<AZIENDE.length;i++){ if(AZIENDE[i].id===aziId){ok=true;break;} } if(!ok) aziId = firstId; }
+  else aziId = null;
+  if(aziId!==null){ if(!RECIPIENTI[aziId]) RECIPIENTI[aziId]=[]; recipienti = RECIPIENTI[aziId]; } else recipienti = [];
+  return AZIENDE.length > 0;
+ }).catch(function(e){ console.warn("Caricamento non riuscito:", e); return false; });
+}
+
+function renderTutto(){renderDash();renderElenco();renderScad();renderBulk();renderRegistro();}
+/* avvio asincrono: prima i dati (anagrafica + per-azienda), poi si disegna */
+carica().then(function(){
+ if(!AZIENDE.length){ mostraNessunAzienda(); return; }
+ initSelAzienda();
+ var em=document.getElementById("emAziendaNome"); if(em) em.value = nomeAzi();
+ renderTutto();
+});
+</script>
+</body>
+</html>

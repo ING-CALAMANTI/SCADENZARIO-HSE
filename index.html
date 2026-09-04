@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scadenzario Sicurezza — Home</title>
+<link rel="stylesheet" href="fondamenta.css">
+<style>
+  :root{ --verde:#0f5e5a; --verde-scuro:#0a4340; --verde-chiaro:#e6f0ef; --bordo:#d8dedd;
+         --testo:#1f2a29; --testo-soft:#5b6b69; --grigio:#f4f6f6; }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--grigio);color:var(--testo);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;}
+
+  /* ---- Header ---- */
+  .hero{background:linear-gradient(135deg,var(--verde) 0%,var(--verde-scuro) 100%);
+    color:#fff;padding:34px 30px 40px;position:relative;overflow:hidden;}
+  .hero::after{content:"";position:absolute;right:-60px;top:-60px;width:240px;height:240px;
+    border-radius:50%;background:rgba(255,255,255,.06);}
+  .hero-in{max-width:1120px;margin:0 auto;position:relative;z-index:1;}
+  .hero h1{margin:0;font-size:26px;font-weight:800;letter-spacing:.2px;}
+  .hero .sub{margin-top:6px;font-size:13.5px;opacity:.92;text-transform:capitalize;}
+
+  main{max-width:1120px;margin:-20px auto 0;padding:0 22px 64px;position:relative;z-index:2;}
+  .sezione{font-size:11.5px;font-weight:800;color:var(--testo-soft);
+    text-transform:uppercase;letter-spacing:.6px;margin:26px 4px 14px;}
+
+  .griglia{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;}
+  .card{display:flex;align-items:center;gap:15px;background:#fff;
+    border:1px solid var(--bordo);border-radius:16px;padding:18px 18px;
+    text-decoration:none;color:inherit;position:relative;
+    transition:box-shadow .18s ease,transform .18s ease,border-color .18s ease;}
+  .card:hover{box-shadow:0 10px 28px rgba(15,94,90,.14);transform:translateY(-3px);
+    border-color:var(--verde);}
+  .card .ico-wrap{flex:0 0 auto;width:50px;height:50px;border-radius:13px;
+    background:var(--verde-chiaro);color:var(--verde);
+    display:flex;align-items:center;justify-content:center;
+    transition:background .18s ease,color .18s ease;}
+  .card:hover .ico-wrap{background:var(--verde);color:#fff;}
+  .card .ico{width:26px;height:26px;}
+  .card .txt{min-width:0;}
+  .card .nome{display:block;font-size:15.5px;font-weight:700;color:var(--verde-scuro);}
+  .card .desc{display:block;font-size:12.5px;color:var(--testo-soft);margin-top:4px;line-height:1.4;}
+  .card .arrow{position:absolute;right:16px;top:50%;transform:translateY(-50%) translateX(-4px);
+    opacity:0;color:var(--verde);transition:opacity .18s ease,transform .18s ease;font-size:18px;}
+  .card:hover .arrow{opacity:1;transform:translateY(-50%) translateX(0);}
+
+  /* card "base" un filo più marcata */
+  .card.base{border-left:4px solid var(--verde);}
+
+  footer{max-width:1120px;margin:0 auto;padding:6px 26px 44px;
+    font-size:12px;color:var(--testo-soft);}
+  @media(max-width:520px){ .hero{padding:26px 20px 34px;} .hero h1{font-size:22px;} }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-in">
+    <h1>Scadenzario Sicurezza</h1>
+    <div class="sub"><span id="saluto">Bentornato</span> · <span id="data-oggi"></span></div>
+  </div>
+</header>
+
+<main>
+  <div class="sezione">Anagrafica di base</div>
+  <div class="griglia">
+    <a class="card base" href="Modulo%20aziende.html">
+      <span class="ico-wrap"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="10" height="18" rx="1.5"/><path d="M13 8h6a1.5 1.5 0 0 1 1.5 1.5V21H13"/><path d="M6.5 7h3M6.5 11h3M6.5 15h3M16 12h2M16 16h2"/></svg></span>
+      <span class="txt"><span class="nome">Aziende</span><span class="desc">Anagrafica aziende, unità produttive e contatti. La fonte da cui pescano tutti gli altri moduli.</span></span>
+      <span class="arrow">→</span>
+    </a>
+  </div>
+
+  <div class="sezione">Moduli</div>
+  <div class="griglia">
+    <a class="card" href="adempimenti_scadenzario_v5.html">
+      <span class="ico-wrap"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2.5" width="8" height="4" rx="1"/><path d="M8.5 13l2 2 4-4"/></svg></span>
+      <span class="txt"><span class="nome">Adempimenti</span><span class="desc">Scadenzario degli adempimenti di sicurezza per azienda.</span></span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="card" href="formazione%20rev.2.html">
+      <span class="ico-wrap"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 9 12 4 2 9l10 5 10-5z"/><path d="M6 11v5c0 1 2.7 2.5 6 2.5s6-1.5 6-2.5v-5"/><path d="M22 9v5"/></svg></span>
+      <span class="txt"><span class="nome">Formazione</span><span class="desc">Corsi, scadenze formative e organizzazione sessioni.</span></span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="card" href="Registro%20Antincendio.html">
+      <span class="ico-wrap"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.2.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></span>
+      <span class="txt"><span class="nome">Registro Antincendio</span><span class="desc">Presidi antincendio, ditte e registro dei controlli.</span></span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="card" href="Modulo%20DUVRI.html">
+      <span class="ico-wrap"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M8.5 13h7M8.5 16.5h7M8.5 9.5h2"/></svg></span>
+      <span class="txt"><span class="nome">DUVRI</span><span class="desc">Appalti, richieste DURC e visure CCIAA dei fornitori.</span></span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="card" href="MODULO%20NEAR%20MISS.html">
+      <span class="ico-wrap"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4.5M12 17.2h.01"/></svg></span>
+      <span class="txt"><span class="nome">Near Miss</span><span class="desc">Segnalazioni, azioni correttive e classifica segnalatori.</span></span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="card" href="modulo_audit_diario.html">
+      <span class="ico-wrap"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 10.5h7"/></svg></span>
+      <span class="txt"><span class="nome">Audit e Diario</span><span class="desc">Diario delle attività e rilievi di audit.</span></span>
+      <span class="arrow">→</span>
+    </a>
+    <a class="card" href="recipienti%20in%20pressione.html">
+      <span class="ico-wrap"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="7" ry="2.5"/><path d="M5 5v14c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5V5"/><path d="M5 12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5"/></svg></span>
+      <span class="txt"><span class="nome">Recipienti in pressione</span><span class="desc">Registro attrezzature PED e verifiche periodiche.</span></span>
+      <span class="arrow">→</span>
+    </a>
+  </div>
+</main>
+
+<footer>Accesso riservato · i dati sono condivisi tra gli utenti dello studio.</footer>
+
+<!-- Firebase + login condiviso (stessa impalcatura dei moduli) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="firebase-init.js"></script>
+<script src="auth-gate.js"></script>
+<script>
+  (function(){
+    function saluto(){ var h=new Date().getHours(); return h<13?"Buongiorno":(h<18?"Buon pomeriggio":"Buonasera"); }
+    var el=document.getElementById("saluto"); if(el) el.textContent=saluto();
+    var dt=document.getElementById("data-oggi");
+    if(dt){ try{ dt.textContent=new Date().toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long",year:"numeric"}); }catch(e){} }
+  })();
+</script>
+</body>
+</html>

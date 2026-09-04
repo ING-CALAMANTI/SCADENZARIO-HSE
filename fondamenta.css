@@ -1,0 +1,90 @@
+/* ============================================================
+   FONDAMENTA CONDIVISE — Scadenzario Sicurezza
+   Un unico punto per colori, struttura e componenti comuni.
+   Modificare qui = cambia in tutti i moduli.
+   Versione 1.0 — 30/07/2026
+   ============================================================ */
+
+:root{
+  /* --- Colore principale: verde petrolio (guida di stile progetto) --- */
+  --verde:#0f5e5a;
+  --verde-scuro:#0a4340;      /* hover, header scuri, bordi accento */
+  --verde-chiaro:#e6f0ef;     /* sfondi tenui, righe evidenziate */
+
+  /* --- Badge di stato scadenza (semantica invariata) --- */
+  --rosso:#c0392b;      --rosso-bg:#fdecea;   /* scaduto */
+  --arancio:#e67e22;    --arancio-bg:#fdf3e3; /* in scadenza */
+  --ok:#27ae60;         --ok-bg:#e9f7ef;      /* regolare */
+
+  /* --- Neutri --- */
+  --grigio-neutro:#374151;   /* testo informativo (date storico ecc.) */
+  --grigio:#f5f6f6;          /* sfondo pagina */
+  --bordo:#d8dedd;
+  --testo:#1f2a29;
+  --testo-soft:#5b6b69;
+}
+
+/* ---------- Base ---------- */
+*{box-sizing:border-box;}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--grigio);color:var(--testo);font-size:14px;line-height:1.45;}
+
+/* ---------- Header standard ---------- */
+.fond-header{background:var(--verde);color:#fff;padding:16px 24px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+.fond-header h1{margin:0;font-size:18px;font-weight:600;letter-spacing:.2px;}
+.fond-header .marchio{font-size:12px;opacity:.9;text-align:right;line-height:1.3;}
+
+/* ---------- Tab standard ---------- */
+.fond-tabs{display:flex;flex-wrap:wrap;gap:2px;background:var(--verde-scuro);padding:0 12px;}
+.fond-tabs button{background:transparent;border:0;color:#cfe0de;padding:11px 18px;
+  cursor:pointer;font-size:13px;font-weight:500;border-bottom:3px solid transparent;}
+.fond-tabs button:hover{color:#fff;}
+.fond-tabs button.attivo{color:#fff;border-bottom-color:#fff;}
+
+/* ---------- Dashboard card ---------- */
+.fond-dash{display:flex;flex-wrap:wrap;gap:14px;padding:18px 24px;}
+.fond-card{flex:1 1 160px;background:#fff;border:1px solid var(--bordo);border-radius:10px;
+  padding:16px 18px;cursor:pointer;transition:box-shadow .15s;}
+.fond-card:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);}
+.fond-card .num{font-size:26px;font-weight:700;}
+.fond-card .lbl{font-size:12px;color:var(--testo-soft);margin-top:2px;}
+.fond-card.c-rosso .num{color:var(--rosso);}
+.fond-card.c-arancio .num{color:var(--arancio);}
+.fond-card.c-ok .num{color:var(--ok);}
+
+/* ---------- Tabelle standard ---------- */
+.fond-tab{width:100%;border-collapse:collapse;background:#fff;}
+.fond-tab th{background:var(--verde-scuro);color:#fff;text-align:left;padding:10px 12px;
+  font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
+.fond-tab td{padding:10px 12px;border-bottom:1px solid var(--bordo);}
+.fond-tab tr:hover td{background:var(--verde-chiaro);}
+
+/* ---------- Badge scadenza (classi comuni) ---------- */
+.badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:600;}
+.b-scaduta{background:var(--rosso-bg);color:var(--rosso);}
+.b-scadenza{background:var(--arancio-bg);color:var(--arancio);}
+.b-ok{background:var(--ok-bg);color:var(--ok);}
+.b-neutro{background:#eef0f0;color:var(--grigio-neutro);}
+
+/* ---------- Pulsanti ---------- */
+.btn{border:0;border-radius:8px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;}
+.btn-primario{background:var(--verde);color:#fff;}
+.btn-primario:hover{background:var(--verde-scuro);}
+.btn-neutro{background:#eef0f0;color:var(--testo);}
+
+/* ============================================================
+   ALIAS BADGE — i moduli usano nomi diversi (.b-rosso, .b-aranc,
+   .b-scaduta...). Qui li mappiamo tutti agli stessi colori, così
+   nessun modulo si rompe prima del riallineamento definitivo.
+   ============================================================ */
+.b-rosso,.b-scaduta{background:var(--rosso-bg);color:var(--rosso);}
+.b-aranc,.b-arancio,.b-scadenza{background:var(--arancio-bg);color:var(--arancio);}
+.b-verde{background:var(--ok-bg);color:var(--ok);}
+.b-grigio{background:#eef0f0;color:var(--grigio-neutro);}
+.b-blu{background:#e8f0f9;color:#2563a8;}
+
+/* ---------- Storico invii (supporto) ---------- */
+.stor-tb{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;}
+.stor-tb .search{flex:1;min-width:200px;}
+.col-azienda{color:#2563a8;font-weight:600;font-size:11px;white-space:nowrap;}

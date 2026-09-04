@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Modulo Formazione Personale — Rev 2</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="fondamenta.css">
+<style>
+/* Colori locali rimappati sui token condivisi (fondamenta.css):
+   il nero originale diventa verde petrolio; i badge puntano ai token comuni. */
+:root{
+  --nero:var(--verde);
+  --nero-scuro:var(--verde-scuro);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;font-size:14px;background:#f4f4f2;color:#1a1a1a}
+input,select,textarea,button{font-family:inherit;font-size:13px}
+input,select,textarea{border:1px solid #ccc;border-radius:6px;padding:6px 10px;background:#fff}
+input[type=checkbox]{width:auto;margin:0;cursor:pointer}
+button{border:1px solid #ccc;border-radius:6px;padding:6px 12px;background:#fff;cursor:pointer}
+button:hover{background:#eee}
+.bp{background:var(--nero);color:#fff;border-color:var(--nero)}.bp:hover{background:var(--nero-scuro)}
+.br{background:#c0392b;color:#fff;border-color:#c0392b}.br:hover{background:#a93226}
+.bg{background:#27ae60;color:#fff;border-color:#27ae60}.bg:hover{background:#219150}
+.hdr{background:var(--nero);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.hdr h1{font-size:15px;font-weight:600}
+.hdr select{background:var(--nero-scuro);color:#fff;border-color:#555;width:auto}
+.nav{background:#fff;border-bottom:1px solid #ddd;display:flex;padding:0 20px;overflow-x:auto}
+.ntab{padding:11px 18px;font-size:13px;cursor:pointer;border-bottom:3px solid transparent;color:#666;white-space:nowrap;font-weight:500}
+.ntab.on{border-bottom-color:var(--nero);color:var(--nero)}
+.pg{padding:20px;max-width:1300px;margin:0 auto;display:none}.pg.on{display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:20px}
+.card{background:#fff;border-radius:8px;padding:14px;border:1px solid #ddd}
+.card .n{font-size:26px;font-weight:700;margin-top:4px}
+.cr{background:#fdf0f0}.cr .n,.cr .l{color:#c0392b}
+.co{background:#fdf5e6}.co .n,.co .l{color:#e67e22}
+.cg{background:#edf7ed}.cg .n,.cg .l{color:#27ae60}
+.badge{font-size:11px;padding:2px 7px;border-radius:4px;white-space:nowrap;display:inline-block;font-weight:500}
+.bs{background:#fdf0f0;color:#c0392b}.bi{background:#fdf5e6;color:#e67e22}.bo{background:#edf7ed;color:#27ae60}.bn{background:#f0f0ee;color:#888}
+.tb{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.tb input.search{flex:1;min-width:160px}
+.tw{overflow-x:auto;border-radius:8px;border:1px solid #ddd}
+table{width:100%;border-collapse:collapse;background:#fff;min-width:700px}
+th{background:#f5f5f3;padding:8px 10px;text-align:left;font-weight:600;font-size:11px;border-bottom:1px solid #ddd;white-space:nowrap;text-transform:uppercase;letter-spacing:.4px;color:#555}
+td{padding:8px 10px;border-bottom:1px solid #f0f0ee;font-size:12px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafaf8}
+.info-box{background:#e8f4fd;border:1px solid #b3d7f5;border-radius:8px;padding:12px;font-size:13px;color:#1a5276;margin-bottom:16px}
+.mbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:center;justify-content:center}
+.mbg.on{display:flex}
+.mdl{background:#fff;border-radius:12px;padding:22px;width:94%;max-width:600px;max-height:88vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+.mdl h3{font-size:15px;font-weight:600;margin-bottom:14px}
+.fld{margin-bottom:10px}
+.fld label{display:block;font-size:12px;color:#666;margin-bottom:3px;font-weight:500}
+.fld input,.fld select,.fld textarea{width:100%}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.persona-hdr{background:var(--nero-scuro);color:#fff;padding:10px 14px;border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:space-between;cursor:pointer;flex-wrap:wrap;gap:8px}
+.persona-body{background:#fff;border:1px solid #ddd;border-top:none;border-radius:0 0 8px 8px;padding:0;display:none;margin-bottom:12px}
+.persona-body.open{display:block}
+.persona-wrap{margin-bottom:12px}
+.cat-item{background:#fff;border:1px solid #ddd;border-radius:8px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.doc-chip{display:inline-flex;align-items:center;gap:4px;background:#eef2fb;color:#3d5a99;border-radius:4px;padding:2px 6px;font-size:11px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>Modulo Formazione Personale</h1>
+  <div style="display:flex;gap:8px;align-items:center">
+    <select id="selAzi" onchange="cambiaAzi()" style="min-width:170px"></select>
+    <button class="bp" onclick="openNuovaAzi()">+ Azienda</button>
+    <button class="bp" onclick="esportaDati()" title="Scarica i dati in un file per portarli su un altro PC">Esporta</button>
+    <button class="bp" onclick="document.getElementById('impFile').click()" title="Carica un file di dati esportato">Importa</button>
+    <input type="file" id="impFile" accept=".json" style="display:none" onchange="importaDati(this)">
+  </div>
+</div>
+
+<div class="nav">
+  <div class="ntab on" onclick="showTab(0)">Dashboard</div>
+  <div class="ntab" onclick="showTab(1)">Per persona</div>
+  <div class="ntab" onclick="showTab(2)">Per corso</div>
+  <div class="ntab" onclick="showTab(3)">Dipendenti</div>
+  <div class="ntab" onclick="showTab(4)">Catalogo corsi</div>
+  <div class="ntab" onclick="showTab(5)">Vista consulente</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="pg on" id="p0">
+  <div class="cards">
+    <div class="card cr"><div class="l">Scaduti</div><div class="n" id="cS">0</div></div>
+    <div class="card co"><div class="l">In scadenza</div><div class="n" id="cI">0</div></div>
+    <div class="card cg"><div class="l">Regolari</div><div class="n" id="cO">0</div></div>
+    <div class="card"><div class="l">Dipendenti</div><div class="n" id="cD">0</div></div>
+    <div class="card" style="cursor:pointer" onclick="showTab(3)" title="Vai a Dipendenti"><div class="l">C.I. scadute/in scad.</div><div class="n" id="cCI">0</div></div>
+  </div>
+  <p style="font-size:13px;font-weight:600;color:#555;margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px">Corsi urgenti</p>
+  <div id="urgenti"></div>
+</div>
+
+<!-- PER PERSONA -->
+<div class="pg" id="p1">
+  <div class="tb">
+    <input type="text" class="search" id="cercaP" placeholder="Cerca dipendente..." oninput="renderPerPersona()">
+    <select id="filtroStatoP" onchange="renderPerPersona()" style="width:auto">
+      <option value="tutti">Tutti gli stati</option>
+      <option value="scaduta">Con corsi scaduti</option>
+      <option value="in_scadenza">Con corsi in scadenza</option>
+    </select>
+  </div>
+  <div id="perPersonaList"></div>
+</div>
+
+<!-- PER CORSO -->
+<div class="pg" id="p2">
+  <div class="tb">
+    <select id="filtroCorso" onchange="renderPerCorso()" style="min-width:220px"><option value="__tutti__">Tutti i corsi</option></select>
+    <select id="filtroStatoC" onchange="renderPerCorso()" style="width:auto">
+      <option value="tutti">Tutti gli stati</option>
+      <option value="scaduta">Scaduti</option>
+      <option value="in_scadenza">In scadenza</option>
+      <option value="ok">Regolari</option>
+    </select>
+  </div>
+  <div id="perCorsoList"></div>
+</div>
+
+<!-- DIPENDENTI -->
+<div class="pg" id="p3">
+  <div class="tb">
+    <input type="text" class="search" id="cercaD" placeholder="Cerca dipendente..." oninput="renderDipendenti()">
+    <button class="bp" onclick="openFormDip(null)">+ Nuovo dipendente</button>
+    <button class="bg" onclick="document.getElementById('fileImport').click()">Importa Excel</button>
+    <input type="file" id="fileImport" accept=".xlsx,.xls" style="display:none" onchange="importaExcel(this)">
+  </div>
+  <div class="info-box">Usa il pulsante <b>Importa Excel</b> con il modello precompilato (fogli "Dipendenti" e "Corsi") per caricare i dati in maniera massiva. I dipendenti gi&agrave; presenti vengono aggiornati, quelli nuovi vengono creati.</div>
+  <div class="tw"><table>
+    <thead><tr><th>Cognome e Nome</th><th>Mansione</th><th>Livello</th><th>Codice Fiscale</th><th>Scad. C.I.</th><th>Doc.</th><th>N. corsi</th><th></th></tr></thead>
+    <tbody id="tbodyDip"></tbody>
+  </table></div>
+</div>
+
+<!-- CATALOGO CORSI -->
+<div class="pg" id="p4">
+  <div class="info-box">Libreria dei corsi di formazione. Aggiungi, modifica o elimina i corsi. La validita (in anni) determina il calcolo automatico della scadenza.</div>
+  <div class="tb">
+    <input type="text" class="search" id="cercaCat" placeholder="Cerca corso..." oninput="renderCatalogo()">
+    <button class="bp" onclick="openFormCat(null)">+ Nuovo corso</button>
+  </div>
+  <div id="catList"></div>
+</div>
+
+<!-- VISTA CONSULENTE -->
+<div class="pg" id="p5">
+  <div class="info-box">Panoramica formazione di tutte le aziende gestite. Filtra per <b>corso</b> e <b>data</b> per organizzare una sessione unica su più aziende.</div>
+  <div class="tb" style="margin-bottom:14px;align-items:flex-end;gap:10px;flex-wrap:wrap">
+    <div class="fld" style="margin:0"><label>Finestra scadenze</label><select id="consGiorni" onchange="renderConsulente()"><option value="30">entro 30 giorni</option><option value="60" selected>entro 60 giorni</option><option value="90">entro 90 giorni</option><option value="180">entro 180 giorni</option><option value="365">entro 12 mesi</option></select></div>
+    <div class="fld" style="margin:0"><label>Azienda (facoltativa)</label><select id="consAzienda" onchange="renderConsulente()"><option value="">Tutte le aziende</option></select></div>
+    <div class="fld" style="margin:0"><label>Corso (facoltativo)</label><select id="consCorso" onchange="renderConsulente()"><option value="">Tutti i corsi</option></select></div>
+    <button onclick="azzeraFiltriConsulente()">Azzera</button>
+    <button class="bp" onclick="esportaScadenzeConsulente()">Esporta CSV</button>
+  </div>
+  <div id="consList"></div>
+</div>
+
+<!-- MODAL DIPENDENTE -->
+<div class="mbg" id="mDip">
+  <div class="mdl">
+    <h3 id="mDipTit">Nuovo dipendente</h3>
+    <div class="fld"><label>Cognome e Nome</label><input type="text" id="dNome" placeholder="Es: Rossi Mario"></div>
+    <div class="g2">
+      <div class="fld"><label>Mansione</label><input type="text" id="dMansione"></div>
+      <div class="fld"><label>Livello</label><input type="text" id="dLivello"></div>
+    </div>
+    <div class="fld"><label>Codice Fiscale</label><input type="text" id="dCF" placeholder="Es: RSSMRA80A01H501U" maxlength="16" style="text-transform:uppercase"></div>
+    <div style="background:#f9f9f7;border-radius:8px;padding:12px;margin-bottom:12px;border:1px solid #eee">
+      <p style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px">CARTA D'IDENTIT&Agrave;</p>
+      <div class="g2">
+        <div class="fld"><label>Numero documento</label><input type="text" id="dCINum" placeholder="Es: CA12345AB"></div>
+        <div class="fld"><label>Scadenza C.I.</label><input type="date" id="dCIScad"></div>
+      </div>
+      <div class="fld"><label>Allegato (immagine o PDF)</label><input type="file" id="dCIDoc" accept="image/*,.pdf" onchange="onCIDocSelected()"><div id="ciDocCurrent" style="margin-top:6px"></div></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:6px"><button class="bp" onclick="salvaDip()">Salva</button><button onclick="chiudiModal('mDip')">Annulla</button></div>
+  </div>
+</div>
+
+<!-- MODAL CORSO -->
+<div class="mbg" id="mCorso">
+  <div class="mdl">
+    <h3 id="mCorsoTit">Assegna corso</h3>
+    <p style="font-size:12px;color:#888;margin-bottom:14px" id="mCorsoSub"></p>
+    <div class="fld"><label>Corso</label><select id="cCorso" onchange="onCorsoCatChange()"></select></div>
+    <div class="g3">
+      <div class="fld"><label>Data esecuzione</label><input type="date" id="cData" onchange="calcScadenzaCorso()"></div>
+      <div class="fld"><label>Validita (giorni)</label><input type="number" id="cValidita" value="1825" onchange="calcScadenzaCorso()"></div>
+      <div class="fld"><label>Scadenza (calcolata)</label><input type="date" id="cScadenza"></div>
+    </div>
+    <div class="g2">
+      <div class="fld"><label>Ente formatore</label><input type="text" id="cEnte"></div>
+      <div class="fld"><label>Ore</label><input type="text" id="cOre"></div>
+    </div>
+    <div style="background:#f9f9f7;border-radius:8px;padding:12px;margin-bottom:12px;border:1px solid #eee">
+      <p style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px">ATTESTATO</p>
+      <input type="file" id="cDoc" onchange="onDocSelected()">
+      <div id="docCurrent" style="margin-top:6px"></div>
+    </div>
+    <div style="background:#f9f9f7;border-radius:8px;padding:12px;margin-bottom:12px;border:1px solid #eee">
+      <p style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px">DESTINATARI EMAIL DI QUESTO CORSO</p>
+      <div class="fld"><label>Email ente formatore (chi eroga il corso)</label><input type="email" id="cEmailForm" placeholder="formatore@example.com"></div>
+      <div class="fld"><label>Email 2° referente aziendale (facoltativa)</label><input type="email" id="cEA2" placeholder="secondo.referente@azienda.it"></div>
+      <p style="font-size:11px;color:#888;margin:2px 0 10px">Il referente aziendale e il consulente arrivano dall'anagrafica. Qui l'ente formatore (diverso per corso) ed eventualmente un 2° referente.</p>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><input type="checkbox" id="cHasEmail" onchange="toggleEmailCorso()"><label for="cHasEmail" style="margin:0;font-size:13px;font-weight:600;cursor:pointer">Testo email personalizzato (override)</label></div>
+      <div id="emailCorsoFields" style="display:none">
+        <div class="fld"><label>Giorni di preavviso (prima della scadenza)</label><input type="number" id="cPreavviso" value="60"></div>
+        <div class="fld"><label>Testo email a te (consulente)</label><textarea id="cTxtAdmin" rows="2" placeholder="Promemoria rinnovo corso..."></textarea></div>
+        <div class="fld"><label>Testo email all'ente formatore</label><textarea id="cTxtForm" rows="2" placeholder="Si richiede programmazione corso di aggiornamento..."></textarea></div>
+        <div class="fld"><label>Testo email all'azienda</label><textarea id="cTxtAzi" rows="2" placeholder="Si comunica scadenza formazione del dipendente..."></textarea></div>
+        <div style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="cAuto"><label for="cAuto" style="margin:0;font-size:13px;cursor:pointer">Invio automatico senza conferma</label></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px"><button class="bp" onclick="salvaCorso()">Salva</button><button onclick="chiudiModal('mCorso')">Annulla</button></div>
+  </div>
+</div>
+
+<!-- MODAL AGGIORNAMENTO MASSIVO CORSO -->
+<div class="mbg" id="mMassivo">
+  <div class="mdl">
+    <h3>Aggiornamento massivo corso</h3>
+    <p style="font-size:12px;color:#888;margin-bottom:14px" id="mMassivoSub"></p>
+    <div class="g2">
+      <div class="fld"><label>Nuova data esecuzione</label><input type="date" id="mmData" onchange="calcScadMassivo()"></div>
+      <div class="fld"><label>Scadenza (calcolata)</label><input type="date" id="mmScad"></div>
+    </div>
+    <div class="fld"><label>Ente formatore (opzionale, per tutti)</label><input type="text" id="mmEnte"></div>
+    <p style="font-size:12px;font-weight:600;color:#555;margin:6px 0 8px">SELEZIONA PARTECIPANTI</p>
+    <div style="display:flex;gap:8px;margin-bottom:8px"><button onclick="selMassivo(true)" style="font-size:12px;padding:4px 9px">Tutti</button><button onclick="selMassivo(false)" style="font-size:12px;padding:4px 9px">Nessuno</button></div>
+    <div id="massivoList" style="max-height:240px;overflow-y:auto;border:1px solid #eee;border-radius:8px;padding:8px;margin-bottom:14px"></div>
+    <div style="display:flex;gap:8px"><button class="bg" onclick="applicaMassivo()">Applica ai selezionati</button><button onclick="chiudiModal('mMassivo')">Annulla</button></div>
+  </div>
+</div>
+
+<!-- MODAL CATALOGO CORSO -->
+<div class="mbg" id="mCat">
+  <div class="mdl">
+    <h3 id="mCatTit">Nuovo corso in catalogo</h3>
+    <div class="fld"><label>Nome corso</label><input type="text" id="catNome" placeholder="Es: Formazione specifica settore X"></div>
+    <div class="g2">
+      <div class="fld"><label>Riferimento normativo</label><input type="text" id="catRif" placeholder="Es: Art.37 D.Lgs.81/08"></div>
+      <div class="fld"><label>Validita (anni, 0 = non scade)</label><input type="number" id="catAnni" value="5"></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:6px"><button class="bp" onclick="salvaCat()">Salva</button><button onclick="chiudiModal('mCat')">Annulla</button></div>
+  </div>
+</div>
+
+<!-- MODAL EMAIL -->
+<div class="mbg" id="mEmail">
+  <div class="mdl">
+    <h3>Anteprima email</h3>
+    <div id="mEmailAzienda" style="background:#1a1a1a;color:#fff;border-radius:6px;padding:8px 12px;font-size:13px;margin-bottom:6px;font-weight:600"></div>
+    <p style="font-size:12px;color:#888;margin-bottom:14px" id="mEmailSub"></p>
+    <div id="mEmailCorpo"></div>
+    <div style="display:flex;gap:8px;margin-top:14px"><button class="bp" onclick="inviaEmail()">Invia ora</button><button onclick="chiudiModal('mEmail')">Chiudi</button></div>
+  </div>
+</div>
+
+<!-- MODAL AZIENDA -->
+<div class="mbg" id="mAzi">
+  <div class="mdl">
+    <h3>Nuova azienda</h3>
+    <div class="fld" style="margin-top:10px"><label>Nome azienda</label><input type="text" id="nomeAzi"></div>
+    <div style="display:flex;gap:8px;margin-top:14px"><button class="bp" onclick="creaAzienda()">Crea</button><button onclick="chiudiModal('mAzi')">Annulla</button></div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="firebase-init.js"></script>
+<script src="auth-gate.js"></script>
+<script src="fondamenta.js"></script>
+<script>
+var oggi=new Date();oggi.setHours(0,0,0,0);
+
+var CATALOGO=[
+  {nome:"Formazione Generale Lavoratori",rif:"Art.37 D.Lgs.81/08, ASR",validita:99999},
+  {nome:"Formazione Specifica Rischio Basso",rif:"Art.37 D.Lgs.81/08, ASR",validita:1825},
+  {nome:"Formazione Specifica Rischio Medio",rif:"Art.37 D.Lgs.81/08, ASR",validita:1825},
+  {nome:"Formazione Specifica Rischio Alto",rif:"Art.37 D.Lgs.81/08, ASR",validita:1825},
+  {nome:"Formazione Dirigenti",rif:"Art.37 D.Lgs.81/08, ASR",validita:1825},
+  {nome:"Formazione Preposti",rif:"Art.37 D.Lgs.81/08, ASR 2025",validita:730},
+  {nome:"Formazione RLS",rif:"Art.37 D.Lgs.81/08",validita:365},
+  {nome:"Formazione Datore di Lavoro RSPP",rif:"Art.34 D.Lgs.81/08",validita:1825},
+  {nome:"Formazione RSPP Modulo B",rif:"Art.32 D.Lgs.81/08",validita:1825},
+  {nome:"Addetti Primo Soccorso",rif:"DM 388/2003",validita:1095},
+  {nome:"Addetti Antincendio (rischio basso)",rif:"DM 02/09/2021",validita:1825},
+  {nome:"Addetti Antincendio (rischio medio)",rif:"DM 02/09/2021",validita:1825},
+  {nome:"Addetti Antincendio (rischio alto)",rif:"DM 02/09/2021",validita:1825},
+  {nome:"Retraining Defibrillatore BLSD",rif:"Linee guida IRC",validita:730},
+  {nome:"Carrelli Elevatori",rif:"ASR 22/02/2012",validita:1825},
+  {nome:"Piattaforme Elevabili PLE",rif:"ASR 22/02/2012",validita:1825},
+  {nome:"Gru a torre",rif:"ASR 22/02/2012",validita:1825},
+  {nome:"Gru per autocarro",rif:"ASR 22/02/2012",validita:1825},
+  {nome:"Gru mobili",rif:"ASR 22/02/2012",validita:1825},
+  {nome:"Trattori agricoli/forestali",rif:"ASR 22/02/2012",validita:1825},
+  {nome:"Escavatori e macchine movimento terra",rif:"ASR 22/02/2012",validita:1825},
+  {nome:"Lavori in quota e DPI anticaduta",rif:"Art.77 D.Lgs.81/08",validita:1825},
+  {nome:"Ambienti confinati",rif:"DPR 177/2011",validita:1825},
+  {nome:"Rischio chimico specifico",rif:"Art.36-37 D.Lgs.81/08",validita:1825},
+  {nome:"Rischio rumore/vibrazioni",rif:"Art.37 D.Lgs.81/08",validita:1825},
+  {nome:"Movimentazione Manuale Carichi",rif:"Art.168 D.Lgs.81/08",validita:1825},
+  {nome:"Videoterminali VDT",rif:"Art.174 D.Lgs.81/08",validita:1825},
+  {nome:"Preposto sorveglianza ambienti confinati",rif:"DPR 177/2011",validita:1825},
+  {nome:"PES/PAV/PEI lavori elettrici",rif:"CEI 11-27",validita:1825},
+  {nome:"Addetto montaggio ponteggi",rif:"All.XXI D.Lgs.81/08",validita:1460},
+  {nome:"Formazione HACCP",rif:"Reg. CE 852/2004",validita:1095}
+];
+
+/* Lista aziende dall'ANAGRAFICA CONDIVISA (Modulo Aziende): popolata in carica(). */
+var AZIENDE=[];
+
+function C(nome,data,validita){return {nome:nome,data:data,validita:validita,ente:"",ore:"",docNome:"",preavviso:60,emailForm:"",emailAzienda2:"",testoAdmin:"",testoFornitore:"",testoAzienda:"",invioAuto:false};}
+function D(id,nome,mansione,livello,corsi){return {id:id,nome:nome,mansione:mansione,livello:livello,cf:"",ciNum:"",ciScad:"",ciDoc:"",corsi:corsi};}
+
+var DIP={};
+DIP[1]=[
+  D(1,"Adornato Fabio","Impiegato","II",[C("Formazione Specifica Rischio Basso","2023-05-09",1825)]),
+  D(2,"Barassi Alessia","Impiegato","III",[C("Formazione Specifica Rischio Basso","2026-03-19",1825)]),
+  D(3,"Bartoli Massimiliano","Autista trasportatore","V",[C("Formazione Specifica Rischio Basso","2022-08-02",1825),C("Carrelli Elevatori","2024-10-10",1825)]),
+  D(4,"Caracciolo Massimo","Autista trasportatore","IV",[C("Formazione Specifica Rischio Basso","2022-06-17",1825),C("Carrelli Elevatori","2024-10-10",1825)]),
+  D(5,"Carminati Antonio","Torrefattore","III",[C("Formazione Specifica Rischio Basso","2022-06-17",1825),C("Addetti Primo Soccorso","2023-09-22",1095),C("Addetti Antincendio (rischio medio)","2026-02-18",1825),C("Carrelli Elevatori","2024-10-10",1825)]),
+  D(6,"Cecconi Alessio","Addetto Manutenzione","IV",[C("Formazione Specifica Rischio Basso","2022-06-17",1825),C("Carrelli Elevatori","2024-10-10",1825)]),
+  D(7,"D'Alfonso Andrea","Impiegato","IV",[C("Formazione Specifica Rischio Basso","2022-08-02",1825)]),
+  D(8,"D'Oria Cinzia","Impiegato","IV",[C("Formazione Specifica Rischio Basso","2022-08-02",1825)]),
+  D(9,"Danesi Giordana","Dirigente","",[C("Formazione Dirigenti","2023-01-17",1825)]),
+  D(10,"Danesi Giorgia","Dirigente","",[C("Formazione Dirigenti","2023-01-17",1825)]),
+  D(11,"Danesi Ilaria","Dirigente","",[C("Formazione Dirigenti","2022-01-17",1825)]),
+  D(12,"Deias Antonio","Addetto Manutenzione Macchine Caffe","III",[C("Formazione Specifica Rischio Basso","2026-03-08",1825)]),
+  D(13,"Di Carlo Elisabetta","Impiegato","IV",[C("Formazione Specifica Rischio Basso","2023-04-02",1825)]),
+  D(14,"Di Giammarino Maria","Impiegata Centralino","V",[C("Formazione Specifica Rischio Basso","2022-06-17",1825)]),
+  D(15,"Di Gioia Francesco","Addetto Confezionamento","IV",[C("Formazione Specifica Rischio Basso","2022-06-17",1825),C("Carrelli Elevatori","2024-10-10",1825)]),
+  D(16,"Di Ruscio Danilo","Addetto Manutenzione","II",[C("Formazione Preposti","2025-12-08",730),C("Addetti Antincendio (rischio medio)","2026-02-18",1825),C("Carrelli Elevatori","2024-10-09",1825),C("Piattaforme Elevabili PLE","2024-10-09",1825)]),
+  D(17,"Fantilli Massimiliano","Addetto Confezionamento","V",[C("Formazione Specifica Rischio Basso","2022-06-17",1825),C("Carrelli Elevatori","2024-10-10",1825)]),
+  D(18,"Filippi Maurizio","Impiegato","II",[C("Formazione Specifica Rischio Basso","2022-06-17",1825),C("Addetti Antincendio (rischio medio)","2026-02-18",1825),C("Carrelli Elevatori","2024-10-10",1825)]),
+  D(19,"Furghieri Paola","Impiegato Quadro","QUADRO",[C("Formazione Specifica Rischio Basso","2026-05-06",1825)]),
+  D(20,"Guidobaldi Patrizia","Impiegato","IV",[C("Formazione Specifica Rischio Basso","2022-06-17",1825)]),
+  D(21,"Ismeli Gabriele","Addetto Confezionamento","V",[C("Formazione Specifica Rischio Basso","2024-03-19",1825),C("Carrelli Elevatori","2024-10-17",1825)]),
+  D(22,"Magnoni Giovanni","Impiegato","I",[C("Formazione Preposti","2025-12-08",730)]),
+  D(23,"Malandruccolo Roberto","Addetto Confezionamento (RLS)","IV",[C("Formazione Specifica Rischio Basso","2022-06-17",1825),C("Formazione RLS","2026-01-28",365),C("Addetti Primo Soccorso","2023-09-22",1095),C("Addetti Antincendio (rischio medio)","2021-02-19",1825),C("Carrelli Elevatori","2024-10-10",1825)]),
+  D(24,"Manciagli Manlio","Autista trasportatore","IV",[C("Formazione Specifica Rischio Basso","2022-06-17",1825),C("Carrelli Elevatori","2024-10-10",1825)]),
+  D(25,"Minniti Alessia","Impiegato","IV",[C("Formazione Specifica Rischio Basso","2024-03-19",1825)]),
+  D(26,"Naso Marta","Impiegato","",[C("Formazione Specifica Rischio Basso","2026-04-10",1825)]),
+  D(27,"Nugnes Giuseppe Leandro","Impiegato","III",[C("Formazione Specifica Rischio Basso","2022-06-17",1825),C("Addetti Primo Soccorso","2023-09-22",1095),C("Addetti Antincendio (rischio medio)","2026-02-18",1825)]),
+  D(28,"Pegoraro Marco","Torrefattore","III",[C("Formazione Specifica Rischio Basso","2024-10-01",1825),C("Carrelli Elevatori","2024-10-17",1825)]),
+  D(29,"Petrelli Silvia","Impiegato","II",[C("Formazione Specifica Rischio Basso","2026-03-19",1825)]),
+  D(30,"Pierro Giusti Alessio","","",[C("Formazione Specifica Rischio Basso","2026-03-19",1825)]),
+  D(31,"Scarpa Tiziana","Addetto Confezionamento","V",[C("Formazione Specifica Rischio Basso","2022-06-17",1825),C("Carrelli Elevatori","2024-10-10",1825)]),
+  D(32,"Scifoni Sara","Addetto Confezionamento","IV",[C("Formazione Specifica Rischio Basso","2022-06-17",1825),C("Carrelli Elevatori","2024-10-10",1825)]),
+  D(33,"Scortichini Fabio","Impiegato","III",[C("Formazione Specifica Rischio Basso","2023-10-19",1825)]),
+  D(34,"Sigismondi Tiziana","Impiegato","III",[C("Formazione Specifica Rischio Basso","2022-06-17",1825),C("Addetti Antincendio (rischio medio)","2026-02-18",1825)]),
+  D(35,"Tancini Graziella","Impiegato","IV",[C("Formazione Specifica Rischio Basso","2022-06-17",1825)])
+];
+DIP[2]=[];
+
+var aziId=1,editDipId=null,corsoDipId=null,corsoIdx=null,pendingDoc="",massivoCorso="",massivoSel={},editCatIdx=null;
+
+function addDays(s,d){return Fond.addGiorni(s,d);}
+function fmtDate(d){return Fond.fmtData(d);}
+function scadenzaCorso(c){if(c.validita>=99999)return null;return addDays(c.data,c.validita);}
+function statoCorso(c){var sc=scadenzaCorso(c);if(!sc)return "ok";return Fond.statoScad(sc,60);}
+function diffCorso(c){var sc=scadenzaCorso(c);if(!sc)return null;return Fond.giorniA(sc);}
+var LBL={scaduta:"Scaduto",in_scadenza:"In scadenza",ok:"Ok"};
+var BCL={scaduta:"bs",in_scadenza:"bi",ok:"bo"};
+var pendingCIDoc="";
+function statoCI(p){if(!p.ciScad)return "nd";return Fond.statoScad(p.ciScad,90);}
+function vaiACorso(azId,dipId,idx){if(aziId!==azId){aziId=azId;initSelAzi();renderAll();}openFormCorso(dipId,idx);}
+
+function getAzi(){for(var i=0;i<AZIENDE.length;i++){if(AZIENDE[i].id===aziId)return AZIENDE[i];}return AZIENDE[0];}
+function getDip(){return DIP[aziId]||[];}
+function validitaCat(nome){for(var i=0;i<CATALOGO.length;i++){if(CATALOGO[i].nome===nome)return CATALOGO[i].validita;}return 1825;}
+
+function initSelAzi(){var s=document.getElementById("selAzi");s.innerHTML="";for(var i=0;i<AZIENDE.length;i++){var o=document.createElement("option");o.value=AZIENDE[i].id;o.textContent=AZIENDE[i].nome;if(AZIENDE[i].id===aziId)o.selected=true;s.appendChild(o);}}
+function cambiaAzi(){aziId=Number(document.getElementById("selAzi").value);renderAll();}
+function renderAll(){renderDash();renderPerPersona();renderPerCorso();renderDipendenti();renderCatalogo();renderConsulente();}
+
+function showTab(i){for(var j=0;j<6;j++){document.getElementById("p"+j).classList.toggle("on",j===i);document.querySelectorAll(".ntab")[j].classList.toggle("on",j===i);}
+  if(i===0)renderDash();if(i===1)renderPerPersona();if(i===2)renderPerCorso();if(i===3)renderDipendenti();if(i===4)renderCatalogo();if(i===5)renderConsulente();}
+
+function tuttiCorsiAzi(azId){var dip=DIP[azId]||[];var out=[];for(var i=0;i<dip.length;i++){for(var j=0;j<dip[i].corsi.length;j++){out.push({dip:dip[i],corso:dip[i].corsi[j],idx:j});}}return out;}
+function tuttiCorsi(){return tuttiCorsiAzi(aziId);}
+
+function renderDash(){
+  var all=tuttiCorsi();var sc=0,ins=0,ok=0;
+  for(var i=0;i<all.length;i++){var s=statoCorso(all[i].corso);if(s==="scaduta")sc++;else if(s==="in_scadenza")ins++;else ok++;}
+  document.getElementById("cS").textContent=sc;document.getElementById("cI").textContent=ins;document.getElementById("cO").textContent=ok;document.getElementById("cD").textContent=getDip().length;
+  var nCI=0;var dipAll=getDip();for(var i=0;i<dipAll.length;i++){var sci=statoCI(dipAll[i]);if(sci==="scaduta"||sci==="in_scadenza")nCI++;}
+  document.getElementById("cCI").textContent=nCI;
+  var urg=all.filter(function(x){var s=statoCorso(x.corso);return s==="scaduta"||s==="in_scadenza";});
+  urg.sort(function(a,b){return diffCorso(a.corso)-diffCorso(b.corso);});
+  var el=document.getElementById("urgenti");
+  if(!urg.length){el.innerHTML='<p style="color:#888;font-size:13px">Nessun corso urgente.</p>';return;}
+  var h="";
+  for(var i=0;i<urg.length;i++){var x=urg[i];var d=diffCorso(x.corso);var st=statoCorso(x.corso);var col=st==="scaduta"?"#c0392b":"#e67e22";var dTxt=d<0?(Math.abs(d)+"gg fa"):("tra "+d+"gg");
+    h+='<div style="background:#fff;border-radius:8px;border:1px solid #ddd;border-left:3px solid '+col+';padding:11px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;cursor:pointer" onclick="openFormCorso('+x.dip.id+','+x.idx+')" title="Clicca per aprire il corso"><div><div style="font-size:14px;font-weight:600">'+x.corso.nome+'</div><div style="font-size:12px;color:#888;margin-top:2px">'+x.dip.nome+'</div></div><div style="display:flex;gap:8px;align-items:center"><span class="badge '+BCL[st]+'">'+dTxt+'</span><button onclick="event.stopPropagation();apriEmailCorso('+x.dip.id+','+x.idx+')" style="font-size:11px;padding:3px 8px">&#9993; Email</button></div></div>';
+  }
+  el.innerHTML=h;
+}
+
+function renderPerPersona(){
+  var cerca=(document.getElementById("cercaP").value||"").toLowerCase();var fStato=document.getElementById("filtroStatoP").value;
+  var dip=getDip().filter(function(p){if(cerca&&p.nome.toLowerCase().indexOf(cerca)===-1)return false;if(fStato!=="tutti"){var has=false;for(var j=0;j<p.corsi.length;j++){if(statoCorso(p.corsi[j])===fStato)has=true;}if(!has)return false;}return true;});
+  var h="";
+  for(var i=0;i<dip.length;i++){var p=dip[i];var nsc=0,nins=0;for(var j=0;j<p.corsi.length;j++){var s=statoCorso(p.corsi[j]);if(s==="scaduta")nsc++;else if(s==="in_scadenza")nins++;}
+    h+='<div class="persona-wrap"><div class="persona-hdr" onclick="togglePersona('+p.id+')"><div><span style="font-weight:600">'+p.nome+'</span> <span style="opacity:.8;font-size:12px">'+(p.mansione||"")+(p.livello?" &middot; "+p.livello:"")+'</span></div><div style="display:flex;gap:6px;align-items:center">';
+    if(nsc)h+='<span class="badge bs">'+nsc+' scaduti</span>';if(nins)h+='<span class="badge bi">'+nins+' in scad.</span>';
+    h+='<span style="opacity:.7;font-size:12px">'+p.corsi.length+' corsi</span><span style="font-size:18px">&#8250;</span></div></div>';
+    h+='<div class="persona-body" id="pers'+p.id+'"><div class="tw" style="border:none"><table><thead><tr><th>Corso</th><th>Data</th><th>Scadenza</th><th>Stato</th><th>Att.</th><th></th></tr></thead><tbody>';
+    if(!p.corsi.length)h+='<tr><td colspan="6" style="color:#888;font-style:italic">Nessun corso</td></tr>';
+    for(var j=0;j<p.corsi.length;j++){var c=p.corsi[j];var s=statoCorso(c);var sc=scadenzaCorso(c);
+      h+='<tr><td style="font-weight:600">'+c.nome+'</td><td>'+fmtDate(c.data)+'</td><td>'+(sc?fmtDate(sc):"Non scade")+'</td><td><span class="badge '+BCL[s]+'">'+LBL[s]+'</span></td><td>'+(c.docNome?'<span class="doc-chip">Doc</span>':'—')+'</td><td style="white-space:nowrap"><button onclick="apriEmailCorso('+p.id+','+j+')" style="font-size:11px;padding:3px 7px;margin-right:4px" title="Anteprima email ai 3 destinatari">&#9993;</button><button onclick="openFormCorso('+p.id+','+j+')" style="font-size:11px;padding:3px 7px;margin-right:4px">Modifica</button><button onclick="eliminaCorso('+p.id+','+j+')" style="font-size:11px;padding:3px 7px;color:#c0392b">Elimina</button></td></tr>';
+    }
+    h+='</tbody></table></div><div style="padding:10px 14px"><button class="bp" style="font-size:12px;padding:5px 10px" onclick="openFormCorso('+p.id+',null)">+ Assegna corso</button></div></div></div>';
+  }
+  if(!h)h='<p style="color:#888;font-size:13px">Nessun dipendente.</p>';
+  document.getElementById("perPersonaList").innerHTML=h;
+}
+function togglePersona(id){document.getElementById("pers"+id).classList.toggle("open");}
+
+function fillFiltroCorso(){
+  var corsi=[];var all=tuttiCorsi();for(var i=0;i<all.length;i++){if(corsi.indexOf(all[i].corso.nome)===-1)corsi.push(all[i].corso.nome);}corsi.sort();
+  var sel=document.getElementById("filtroCorso");var cur=sel.value||"__tutti__";sel.innerHTML='<option value="__tutti__">Tutti i corsi</option>';
+  for(var i=0;i<corsi.length;i++){var o=document.createElement("option");o.value=corsi[i];o.textContent=corsi[i];sel.appendChild(o);}
+  var ok=false;var opts=sel.options;for(var i=0;i<opts.length;i++){if(opts[i].value===cur)ok=true;}sel.value=ok?cur:"__tutti__";
+}
+
+function renderPerCorso(){
+  fillFiltroCorso();
+  var fCorso=document.getElementById("filtroCorso").value;var fStato=document.getElementById("filtroStatoC").value;
+  var all=tuttiCorsi().filter(function(x){if(fCorso!=="__tutti__"&&x.corso.nome!==fCorso)return false;if(fStato!=="tutti"&&statoCorso(x.corso)!==fStato)return false;return true;});
+  var gruppi={};var ordine=[];for(var i=0;i<all.length;i++){var n=all[i].corso.nome;if(!gruppi[n]){gruppi[n]=[];ordine.push(n);}gruppi[n].push(all[i]);}ordine.sort();
+  var h="";
+  for(var g=0;g<ordine.length;g++){var nome=ordine[g];var lista=gruppi[nome];lista.sort(function(a,b){return diffCorso(a.corso)-diffCorso(b.corso);});
+    h+='<div style="margin-bottom:18px"><div style="background:#333;color:#fff;padding:8px 14px;border-radius:8px 8px 0 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><div style="font-weight:600;font-size:13px">'+nome+' <span style="opacity:.7;font-weight:400">('+lista.length+')</span></div>';
+    h+='<button class="bg" style="font-size:11px;padding:4px 9px" onclick="openMassivo(\''+nome.replace(/'/g,"\\'")+'\')">Aggiorna data per gruppo</button></div>';
+    h+='<div class="tw" style="border-radius:0 0 8px 8px"><table><thead><tr><th>Dipendente</th><th>Mansione</th><th>Data</th><th>Scadenza</th><th>Giorni</th><th>Stato</th><th></th></tr></thead><tbody>';
+    for(var i=0;i<lista.length;i++){var x=lista[i];var c=x.corso;var s=statoCorso(c);var d=diffCorso(c);var sc=scadenzaCorso(c);var dTxt=d===null?"Non scade":(d<0?Math.abs(d)+"gg fa":d+"gg");var dCol=(d!==null&&d<0)?"color:#c0392b":(d!==null&&d<60?"color:#e67e22":"");
+      h+='<tr><td style="font-weight:600">'+x.dip.nome+'</td><td style="color:#888">'+(x.dip.mansione||"")+'</td><td>'+fmtDate(c.data)+'</td><td>'+(sc?fmtDate(sc):"Non scade")+'</td><td style="'+dCol+';font-weight:600">'+dTxt+'</td><td><span class="badge '+BCL[s]+'">'+LBL[s]+'</span></td><td style="white-space:nowrap"><button onclick="apriEmailCorso('+x.dip.id+','+x.idx+')" style="font-size:11px;padding:3px 7px;margin-right:4px" title="Anteprima email ai 3 destinatari">&#9993;</button><button onclick="openFormCorso('+x.dip.id+','+x.idx+')" style="font-size:11px;padding:3px 7px">Modifica</button></td></tr>';
+    }
+    h+='</tbody></table></div></div>';
+  }
+  if(!h)h='<p style="color:#888;font-size:13px">Nessun corso da mostrare.</p>';
+  document.getElementById("perCorsoList").innerHTML=h;
+}
+
+// AGGIORNAMENTO MASSIVO
+function openMassivo(nomeCorso){
+  massivoCorso=nomeCorso;massivoSel={};
+  document.getElementById("mMassivoSub").textContent="Corso: "+nomeCorso;
+  document.getElementById("mmData").value=new Date().toISOString().slice(0,10);
+  document.getElementById("mmEnte").value="";
+  calcScadMassivo();
+  renderMassivoList();
+  document.getElementById("mMassivo").classList.add("on");
+}
+function renderMassivoList(){
+  var all=tuttiCorsi().filter(function(x){return x.corso.nome===massivoCorso;});
+  var h="";
+  for(var i=0;i<all.length;i++){var x=all[i];var key=x.dip.id+"_"+x.idx;if(massivoSel[key]===undefined)massivoSel[key]=true;
+    h+='<label style="display:flex;align-items:center;gap:8px;padding:5px 4px;font-size:13px;cursor:pointer"><input type="checkbox" '+(massivoSel[key]?"checked":"")+' onchange="massivoSel[\''+key+'\']=this.checked"> '+x.dip.nome+' <span style="color:#888;font-size:11px">(attuale: '+fmtDate(x.corso.data)+')</span></label>';
+  }
+  document.getElementById("massivoList").innerHTML=h;
+}
+function selMassivo(v){var all=tuttiCorsi().filter(function(x){return x.corso.nome===massivoCorso;});for(var i=0;i<all.length;i++){massivoSel[all[i].dip.id+"_"+all[i].idx]=v;}renderMassivoList();}
+function calcScadMassivo(){var data=document.getElementById("mmData").value;var val=validitaCat(massivoCorso);if(data&&val<99999){document.getElementById("mmScad").value=addDays(data,val).toISOString().slice(0,10);}else document.getElementById("mmScad").value="";}
+function applicaMassivo(){
+  var data=document.getElementById("mmData").value;if(!data){alert("Inserisci la data");return;}
+  var ente=document.getElementById("mmEnte").value;
+  var all=tuttiCorsi().filter(function(x){return x.corso.nome===massivoCorso;});var n=0;
+  for(var i=0;i<all.length;i++){var x=all[i];var key=x.dip.id+"_"+x.idx;if(!massivoSel[key])continue;x.corso.data=data;if(ente)x.corso.ente=ente;n++;}
+  chiudiModal("mMassivo");salva();renderAll();
+  alert("Aggiornata la data per "+n+" dipendenti sul corso: "+massivoCorso);
+}
+
+function renderDipendenti(){
+  var cerca=(document.getElementById("cercaD").value||"").toLowerCase();
+  var dip=getDip().filter(function(p){return !cerca||p.nome.toLowerCase().indexOf(cerca)!==-1;});
+  var h="";
+  for(var i=0;i<dip.length;i++){var p=dip[i];var sci=statoCI(p);var ciTxt;
+    if(sci==="nd")ciTxt='<span style="color:#bbb">—</span>';
+    else if(sci==="scaduta")ciTxt='<span class="badge bs">'+fmtDate(p.ciScad)+'</span>';
+    else if(sci==="in_scadenza")ciTxt='<span class="badge bi">'+fmtDate(p.ciScad)+'</span>';
+    else ciTxt='<span class="badge bo">'+fmtDate(p.ciScad)+'</span>';
+    h+='<tr><td style="font-weight:600">'+p.nome+'</td><td>'+(p.mansione||"—")+'</td><td>'+(p.livello||"—")+'</td><td style="font-family:monospace;font-size:11px">'+(p.cf||"—")+'</td><td>'+ciTxt+'</td><td>'+(p.ciDoc?'<span class="doc-chip" title="'+p.ciDoc+'">Doc</span>':"—")+'</td><td style="text-align:center">'+p.corsi.length+'</td><td style="white-space:nowrap"><button onclick="openFormDip('+p.id+')" style="font-size:11px;padding:3px 7px;margin-right:4px">Modifica</button><button onclick="eliminaDip('+p.id+')" style="font-size:11px;padding:3px 7px;color:#c0392b">Elimina</button></td></tr>';}
+  if(!h)h='<tr><td colspan="8" style="text-align:center;padding:2rem;color:#888">Nessun dipendente</td></tr>';
+  document.getElementById("tbodyDip").innerHTML=h;
+}
+function onCIDocSelected(){var f=document.getElementById("dCIDoc").files[0];if(f){pendingCIDoc=f.name;document.getElementById("ciDocCurrent").innerHTML='<span class="doc-chip">Doc '+f.name+'</span> <span style="font-size:11px;color:#888">(salvato con Firebase nella versione finale)</span>';}}
+function openFormDip(id){editDipId=id;pendingCIDoc="";document.getElementById("mDipTit").textContent=id?"Modifica dipendente":"Nuovo dipendente";document.getElementById("dNome").value="";document.getElementById("dMansione").value="";document.getElementById("dLivello").value="";document.getElementById("dCF").value="";document.getElementById("dCINum").value="";document.getElementById("dCIScad").value="";document.getElementById("dCIDoc").value="";document.getElementById("ciDocCurrent").innerHTML="";if(id){var dip=getDip();for(var i=0;i<dip.length;i++){if(dip[i].id===id){var p=dip[i];document.getElementById("dNome").value=p.nome;document.getElementById("dMansione").value=p.mansione;document.getElementById("dLivello").value=p.livello;document.getElementById("dCF").value=p.cf||"";document.getElementById("dCINum").value=p.ciNum||"";document.getElementById("dCIScad").value=p.ciScad||"";pendingCIDoc=p.ciDoc||"";if(p.ciDoc)document.getElementById("ciDocCurrent").innerHTML='<span class="doc-chip">Doc '+p.ciDoc+'</span>';break;}}}document.getElementById("mDip").classList.add("on");}
+function salvaDip(){var nome=document.getElementById("dNome").value.trim();if(!nome){alert("Inserisci nome");return;}if(!DIP[aziId])DIP[aziId]=[];var cf=document.getElementById("dCF").value.trim().toUpperCase();var ciNum=document.getElementById("dCINum").value.trim();var ciScad=document.getElementById("dCIScad").value;if(editDipId){for(var i=0;i<DIP[aziId].length;i++){if(DIP[aziId][i].id===editDipId){var p=DIP[aziId][i];p.nome=nome;p.mansione=document.getElementById("dMansione").value;p.livello=document.getElementById("dLivello").value;p.cf=cf;p.ciNum=ciNum;p.ciScad=ciScad;p.ciDoc=pendingCIDoc;break;}}}else DIP[aziId].push({id:Date.now(),nome:nome,mansione:document.getElementById("dMansione").value,livello:document.getElementById("dLivello").value,cf:cf,ciNum:ciNum,ciScad:ciScad,ciDoc:pendingCIDoc,corsi:[]});chiudiModal("mDip");salva();renderAll();}
+function eliminaDip(id){if(!confirm("Eliminare questo dipendente e i suoi corsi?"))return;DIP[aziId]=DIP[aziId].filter(function(p){return p.id!==id;});salva();renderAll();}
+
+function fillCorsoSelect(val){var sel=document.getElementById("cCorso");sel.innerHTML="";for(var i=0;i<CATALOGO.length;i++){var o=document.createElement("option");o.value=CATALOGO[i].nome;o.textContent=CATALOGO[i].nome;if(CATALOGO[i].nome===val)o.selected=true;sel.appendChild(o);}var o2=document.createElement("option");o2.value="__altro__";o2.textContent="Altro (personalizzato)";if(val==="__altro__")o2.selected=true;sel.appendChild(o2);}
+function onCorsoCatChange(){var v=document.getElementById("cCorso").value;for(var i=0;i<CATALOGO.length;i++){if(CATALOGO[i].nome===v){document.getElementById("cValidita").value=CATALOGO[i].validita>=99999?99999:CATALOGO[i].validita;calcScadenzaCorso();return;}}}
+function calcScadenzaCorso(){var data=document.getElementById("cData").value;var val=Number(document.getElementById("cValidita").value);if(data&&val&&val<99999){document.getElementById("cScadenza").value=addDays(data,val).toISOString().slice(0,10);}else document.getElementById("cScadenza").value="";}
+
+function openFormCorso(dipId,idx){
+  corsoDipId=dipId;corsoIdx=idx;pendingDoc="";
+  document.getElementById("mCorsoTit").textContent=idx===null?"Assegna corso":"Modifica corso";
+  var dip=getDip();var p=null;for(var i=0;i<dip.length;i++){if(dip[i].id===dipId){p=dip[i];break;}}
+  document.getElementById("mCorsoSub").textContent=p?p.nome:"";
+  fillCorsoSelect(null);document.getElementById("cData").value="";document.getElementById("cValidita").value=1825;document.getElementById("cScadenza").value="";document.getElementById("cEnte").value="";document.getElementById("cOre").value="";document.getElementById("cDoc").value="";document.getElementById("docCurrent").innerHTML="";
+  document.getElementById("cHasEmail").checked=false;document.getElementById("emailCorsoFields").style.display="none";
+  document.getElementById("cPreavviso").value=60;document.getElementById("cEmailForm").value="";document.getElementById("cEA2").value="";document.getElementById("cTxtAdmin").value="";document.getElementById("cTxtForm").value="";document.getElementById("cTxtAzi").value="";document.getElementById("cAuto").checked=false;
+  if(idx!==null&&p){var c=p.corsi[idx];fillCorsoSelect(c.nome);var inCat=false;for(var i=0;i<CATALOGO.length;i++){if(CATALOGO[i].nome===c.nome)inCat=true;}if(!inCat)document.getElementById("cCorso").value="__altro__";document.getElementById("cData").value=c.data;document.getElementById("cValidita").value=c.validita;document.getElementById("cEnte").value=c.ente||"";document.getElementById("cOre").value=c.ore||"";pendingDoc=c.docNome||"";if(c.docNome)document.getElementById("docCurrent").innerHTML='<span class="doc-chip">Doc '+c.docNome+'</span>';
+    document.getElementById("cPreavviso").value=c.preavviso||60;document.getElementById("cEmailForm").value=c.emailForm||"";document.getElementById("cEA2").value=c.emailAzienda2||"";document.getElementById("cTxtAdmin").value=c.testoAdmin||"";document.getElementById("cTxtForm").value=c.testoFornitore||"";document.getElementById("cTxtAzi").value=c.testoAzienda||"";document.getElementById("cAuto").checked=!!c.invioAuto;
+    if(c.testoAdmin||c.testoFornitore||c.testoAzienda||c.invioAuto){document.getElementById("cHasEmail").checked=true;document.getElementById("emailCorsoFields").style.display="block";}
+    calcScadenzaCorso();}
+  document.getElementById("mCorso").classList.add("on");
+}
+function onDocSelected(){var f=document.getElementById("cDoc").files[0];if(f){pendingDoc=f.name;document.getElementById("docCurrent").innerHTML='<span class="doc-chip">Doc '+f.name+'</span> <span style="font-size:11px;color:#888">(salvato con Firebase nella versione finale)</span>';}}
+function toggleEmailCorso(){document.getElementById("emailCorsoFields").style.display=document.getElementById("cHasEmail").checked?"block":"none";}
+function salvaCorso(){var nome=document.getElementById("cCorso").value;if(nome==="__altro__"){nome=prompt("Nome del corso personalizzato:")||"";if(!nome)return;}var data=document.getElementById("cData").value;if(!data){alert("Inserisci la data");return;}var c={nome:nome,data:data,validita:Number(document.getElementById("cValidita").value),ente:document.getElementById("cEnte").value,ore:document.getElementById("cOre").value,docNome:pendingDoc,preavviso:Number(document.getElementById("cPreavviso").value),emailForm:document.getElementById("cEmailForm").value,emailAzienda2:document.getElementById("cEA2").value,testoAdmin:document.getElementById("cTxtAdmin").value,testoFornitore:document.getElementById("cTxtForm").value,testoAzienda:document.getElementById("cTxtAzi").value,invioAuto:document.getElementById("cAuto").checked};var dip=getDip();for(var i=0;i<dip.length;i++){if(dip[i].id===corsoDipId){if(corsoIdx===null)dip[i].corsi.push(c);else dip[i].corsi[corsoIdx]=c;break;}}chiudiModal("mCorso");salva();renderAll();}
+
+function apriEmailCorso(dipId,idx){
+  var dip=getDip();var p=null;for(var i=0;i<dip.length;i++){if(dip[i].id===dipId){p=dip[i];break;}}
+  if(!p)return;var c=p.corsi[idx];var azi=getAzi();var sc=scadenzaCorso(c);var scTxt=sc?fmtDate(sc):"non scade";
+  document.getElementById("mEmailAzienda").textContent="Azienda: "+azi.nome;
+  document.getElementById("mEmailSub").textContent=c.nome+" — "+p.nome+" — Scadenza: "+scTxt;
+  var voci=[
+    {dest:"Consulente (te)",em:"",testo:c.testoAdmin||"Promemoria: il corso '"+c.nome+"' di "+p.nome+" ("+azi.nome+") scade il "+scTxt+"."},
+    {dest:"Ente formatore",em:c.emailForm||"(email formatore non impostata)",testo:c.testoFornitore||"Si richiede la programmazione del corso di aggiornamento '"+c.nome+"' per un lavoratore di "+azi.nome+", in scadenza il "+scTxt+"."},
+    {dest:"Azienda cliente",em:(azi.emailRef||"(email referente non impostata)"),testo:c.testoAzienda||"Si comunica che la formazione '"+c.nome+"' del dipendente "+p.nome+" e in scadenza il "+scTxt+". Si sta provvedendo al rinnovo."}
+  ];
+  if(c.emailAzienda2){
+    voci.push({dest:"Azienda — 2° referente",em:c.emailAzienda2,testo:c.testoAzienda||"Si comunica che la formazione '"+c.nome+"' del dipendente "+p.nome+" e in scadenza il "+scTxt+"."});
+  }
+  var h="";for(var i=0;i<voci.length;i++){h+='<div style="background:#f9f9f7;border-radius:8px;padding:12px;margin-bottom:10px;border:1px solid #eee"><div style="font-size:11px;color:#888;margin-bottom:2px;font-weight:600;text-transform:uppercase">A: '+voci[i].dest+(voci[i].em?' &lt;'+voci[i].em+'&gt;':'')+'</div><div style="font-size:13px">'+voci[i].testo+'</div></div>';}
+  document.getElementById("mEmailCorpo").innerHTML=h;
+  document.getElementById("mEmail").classList.add("on");
+}
+function inviaEmail(){alert("Simulazione invio completata!\nL'invio reale sara attivo con SendGrid.");chiudiModal("mEmail");}
+function eliminaCorso(dipId,idx){if(!confirm("Eliminare questo corso?"))return;var dip=getDip();for(var i=0;i<dip.length;i++){if(dip[i].id===dipId){dip[i].corsi.splice(idx,1);break;}}salva();renderAll();}
+
+// CATALOGO gestibile
+function renderCatalogo(){
+  var cerca=(document.getElementById("cercaCat").value||"").toLowerCase();var h="";
+  for(var i=0;i<CATALOGO.length;i++){var c=CATALOGO[i];if(cerca){var blob=(c.nome+" "+c.rif).toLowerCase();if(blob.indexOf(cerca)===-1)continue;}var vTxt=c.validita>=99999?"Non scade":"validita "+Math.round(c.validita/365)+" anni";
+    h+='<div class="cat-item"><div style="flex:1"><div style="font-size:13px;font-weight:600">'+c.nome+'</div><div style="font-size:12px;color:#888">'+c.rif+' — '+vTxt+'</div></div><div style="display:flex;gap:6px"><button onclick="openFormCat('+i+')" style="font-size:11px;padding:3px 8px">Modifica</button><button onclick="eliminaCat('+i+')" style="font-size:11px;padding:3px 8px;color:#c0392b">Elimina</button></div></div>';
+  }
+  if(!h)h='<p style="color:#888;font-size:13px">Nessun corso trovato.</p>';
+  document.getElementById("catList").innerHTML=h;
+}
+function openFormCat(idx){editCatIdx=idx;document.getElementById("mCatTit").textContent=idx===null?"Nuovo corso in catalogo":"Modifica corso";document.getElementById("catNome").value="";document.getElementById("catRif").value="";document.getElementById("catAnni").value=5;if(idx!==null){var c=CATALOGO[idx];document.getElementById("catNome").value=c.nome;document.getElementById("catRif").value=c.rif;document.getElementById("catAnni").value=c.validita>=99999?0:Math.round(c.validita/365);}document.getElementById("mCat").classList.add("on");}
+function salvaCat(){var nome=document.getElementById("catNome").value.trim();if(!nome){alert("Inserisci il nome del corso");return;}var anni=Number(document.getElementById("catAnni").value);var val=anni<=0?99999:anni*365;var obj={nome:nome,rif:document.getElementById("catRif").value,validita:val};if(editCatIdx!==null)CATALOGO[editCatIdx]=obj;else CATALOGO.push(obj);chiudiModal("mCat");renderCatalogo();}
+function eliminaCat(idx){if(!confirm("Eliminare questo corso dal catalogo? (non tocca i corsi gia assegnati ai dipendenti)"))return;CATALOGO.splice(idx,1);renderCatalogo();}
+
+var _consItems=[];   /* ultimo elenco filtrato, per l'export CSV */
+/* Riempie le tendine "Azienda" e "Corso" della Vista consulente. */
+function popolaFiltriConsulente(){
+  var sel=document.getElementById("consCorso"); if(!sel) return;
+  var prev=sel.value, nomi={};
+  for(var a=0;a<AZIENDE.length;a++){var all=tuttiCorsiAzi(AZIENDE[a].id);for(var i=0;i<all.length;i++){if(all[i].corso&&all[i].corso.nome)nomi[all[i].corso.nome]=true;}}
+  var lista=Object.keys(nomi).sort();
+  var o='<option value="">Tutti i corsi</option>';
+  for(var i=0;i<lista.length;i++){o+='<option value="'+lista[i].replace(/"/g,'&quot;')+'">'+lista[i]+'</option>';}
+  sel.innerHTML=o; sel.value=prev;
+  var selA=document.getElementById("consAzienda");
+  if(selA){ var pa=selA.value; var oa='<option value="">Tutte le aziende</option>';
+    for(var a=0;a<AZIENDE.length;a++){ oa+='<option value="'+AZIENDE[a].id+'">'+AZIENDE[a].nome+'</option>'; }
+    selA.innerHTML=oa; selA.value=pa; }
+}
+/* Export CSV dell'elenco corsi in scadenza attualmente filtrato (rispetta finestra/azienda/corso). */
+function esportaScadenzeConsulente(){
+  var items=_consItems||[];
+  if(!items.length){ alert("Nessuna scadenza da esportare con i filtri attuali."); return; }
+  var LB={scaduta:"Scaduto",in_scadenza:"In scadenza",ok:"Regolare"};
+  var righe=[["Azienda","Dipendente","Mansione","Corso","Scadenza","Stato","Ente formatore","Email ente"]];
+  for(var i=0;i<items.length;i++){var it=items[i];var st=statoCorso(it.x.corso);
+    righe.push([it.azienda,(it.x.dip.nome||""),(it.x.dip.mansione||""),(it.x.corso.nome||""),(it.scd?fmtDate(it.scd):""),(LB[st]||st),(it.x.corso.ente||""),(it.x.corso.emailForm||"")]);
+  }
+  var csv=righe.map(function(r){return r.map(function(c){return '"'+(""+c).replace(/"/g,'""')+'"';}).join(";");}).join("\r\n");
+  var blob=new Blob(["﻿"+csv],{type:"text/csv;charset=utf-8"});
+  var a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="scadenze_formazione_"+Fond.oggiIT().replace(/\//g,"-")+".csv";
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(a.href);
+}
+function azzeraFiltriConsulente(){document.getElementById("consCorso").value="";document.getElementById("consAzienda").value="";document.getElementById("consGiorni").value="60";renderConsulente();}
+
+function renderConsulente(){
+  popolaFiltriConsulente();
+  /* tabella riepilogo per azienda */
+  var h='<div class="tw"><table><thead><tr><th>Azienda</th><th>Scaduti</th><th>In scadenza</th><th>Regolari</th><th>Dipendenti</th></tr></thead><tbody>';
+  for(var a=0;a<AZIENDE.length;a++){var all=tuttiCorsiAzi(AZIENDE[a].id);var sc=0,ins=0,ok=0;for(var i=0;i<all.length;i++){var s=statoCorso(all[i].corso);if(s==="scaduta")sc++;else if(s==="in_scadenza")ins++;else ok++;}
+    h+='<tr><td style="font-weight:600">'+AZIENDE[a].nome+'</td><td><span class="badge bs">'+sc+'</span></td><td><span class="badge bi">'+ins+'</span></td><td><span class="badge bo">'+ok+'</span></td><td style="font-weight:600">'+(DIP[AZIENDE[a].id]||[]).length+'</td></tr>';
+  }
+  h+='</tbody></table></div>';
+
+  /* FINESTRA SCADENZE (in giorni) + corso opzionale — vista pianificazione multi-azienda */
+  var corsoSel=document.getElementById("consCorso").value;
+  var aziSel=document.getElementById("consAzienda").value;
+  var giorni=Number(document.getElementById("consGiorni").value)||60;
+  var entro=new Date(); entro.setHours(23,59,59,999); entro.setDate(entro.getDate()+giorni);
+
+  /* corso/dipendente/azienda in scadenza entro la finestra (inclusi i già scaduti) */
+  var items=[];
+  for(var a=0;a<AZIENDE.length;a++){
+    if(aziSel && String(AZIENDE[a].id)!==aziSel) continue;
+    var all=tuttiCorsiAzi(AZIENDE[a].id);
+    for(var i=0;i<all.length;i++){
+      var corso=all[i].corso;
+      if(corsoSel && corso.nome!==corsoSel) continue;
+      var scd=scadenzaCorso(corso);
+      if(scd && scd<=entro) items.push({azienda:AZIENDE[a].nome,aziId:AZIENDE[a].id,x:all[i],scd:scd});
+    }
+  }
+  items.sort(function(m,n){ if(m.x.corso.nome!==n.x.corso.nome) return m.x.corso.nome<n.x.corso.nome?-1:1; return (m.scd?m.scd.getTime():0)-(n.scd?n.scd.getTime():0); });
+  _consItems=items;
+
+  var azTot={}; for(var i=0;i<items.length;i++) azTot[items[i].azienda]=true;
+  var nAzTot=Object.keys(azTot).length;
+  h+='<p style="font-size:13px;font-weight:600;color:#555;margin:20px 0 10px;text-transform:uppercase;letter-spacing:.4px">In scadenza entro '+giorni+' giorni'+(corsoSel?' — '+corsoSel:'')+': '+items.length+' corsi &middot; '+nAzTot+' aziend'+(nAzTot===1?'a':'e')+'</p>';
+  if(!items.length){ h+='<p style="color:#888;font-size:13px">Nessun corso in scadenza in questa finestra.</p>'; }
+  else{
+    /* raggruppati per corso, così vedi subito quanti ne racimoli su più aziende */
+    var gruppi={},ordine=[];
+    for(var i=0;i<items.length;i++){var nm=items[i].x.corso.nome;if(!gruppi[nm]){gruppi[nm]=[];ordine.push(nm);}gruppi[nm].push(items[i]);}
+    for(var g=0;g<ordine.length;g++){
+      var nm=ordine[g],lst=gruppi[nm],azSet={};
+      for(var i=0;i<lst.length;i++)azSet[lst[i].azienda]=true;
+      var nAz=Object.keys(azSet).length;
+      h+='<div style="background:#fff;border:1px solid #ddd;border-radius:8px;padding:12px 14px;margin-bottom:10px">';
+      h+='<div style="font-size:14px;font-weight:700;color:#0f5e5a;margin-bottom:4px">'+nm+' <span style="font-size:12px;font-weight:600;color:#888">— '+lst.length+' person'+(lst.length===1?'a':'e')+' &middot; '+nAz+' aziend'+(nAz===1?'a':'e')+'</span></div>';
+      for(var i=0;i<lst.length;i++){var it=lst[i];var st=statoCorso(it.x.corso);var col=st==="scaduta"?"#c0392b":(st==="in_scadenza"?"#e67e22":"#27ae60");
+        h+='<div onclick="vaiACorso('+it.aziId+','+it.x.dip.id+','+it.x.idx+')" title="Apri il corso" style="cursor:pointer;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;border-top:1px solid #f0f0f0;padding:6px 0">';
+        h+='<span style="font-size:13px"><b>'+it.x.dip.nome+'</b> <span style="color:#888">&middot; '+it.azienda+'</span></span>';
+        h+='<span style="font-size:12px;color:'+col+';font-weight:600">'+(it.scd?fmtDate(it.scd):'—')+'</span></div>';
+      }
+      h+='</div>';
+    }
+  }
+  document.getElementById("consList").innerHTML=h;
+}
+
+/* Le aziende ora si gestiscono SOLO nel Modulo Aziende (anagrafica condivisa). */
+function openNuovaAzi(){ alert("Le aziende si aggiungono nel modulo \"Aziende\".\n\nApri il Modulo Aziende, inserisci l'azienda, poi ricarica questo modulo: comparirà nell'elenco."); }
+function creaAzienda(){ openNuovaAzi(); }
+function mostraNessunAzienda(){
+  var cont=document.querySelector("main")||document.body;
+  var d=document.createElement("div");
+  d.style.cssText="margin:20px;padding:16px 18px;background:#fdf3e3;border:1px solid #e6c98a;border-radius:10px;color:#7a5b1e;font-size:14px";
+  d.innerHTML="<b>Nessuna azienda in anagrafica.</b><br>Apri il modulo <b>Aziende</b>, inserisci almeno un'azienda, poi ricarica questa pagina.";
+  cont.insertBefore(d, cont.firstChild);
+}
+
+function chiudiModal(id){document.getElementById(id).classList.remove("on");}
+var mbgs=document.getElementsByClassName("mbg");
+for(var mi=0;mi<mbgs.length;mi++){mbgs[mi].addEventListener("click",function(e){if(e.target===this)this.classList.remove("on");});}
+
+// IMPORT EXCEL MASSIVO (modello: fogli "Dipendenti" e "Corsi")
+function normDate(v){
+  if(v===undefined||v===null||v==="")return "";
+  if(v instanceof Date&&!isNaN(v))return v.toISOString().slice(0,10);
+  if(typeof v==="number"){var d=new Date(Math.round((v-25569)*86400000));return isNaN(d)?"":d.toISOString().slice(0,10);}
+  var s=String(v).trim();
+  var m=s.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})$/);if(m)return m[3]+"-"+("0"+m[2]).slice(-2)+"-"+("0"+m[1]).slice(-2);
+  m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return m[1]+"-"+m[2]+"-"+m[3];
+  return "";
+}
+function pickCol(row,names){for(var i=0;i<names.length;i++){for(var k in row){if(k.toLowerCase().replace(/[^a-z]/g,"").indexOf(names[i])!==-1)return row[k];}}return "";}
+function findDipByName(nome){var dip=getDip();var n=nome.trim().toLowerCase();for(var i=0;i<dip.length;i++){if(dip[i].nome.trim().toLowerCase()===n)return dip[i];}return null;}
+function importaExcel(inp){
+  var f=inp.files[0];if(!f)return;
+  if(typeof XLSX==="undefined"){alert("Libreria Excel non caricata: verifica la connessione internet e ricarica la pagina.");inp.value="";return;}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var wb=XLSX.read(new Uint8Array(e.target.result),{type:"array",cellDates:true});
+      var nDipNew=0,nDipUpd=0,nCorsi=0,errori=[];
+      if(!DIP[aziId])DIP[aziId]=[];
+      var shD=wb.Sheets["Dipendenti"];
+      if(shD){
+        var rows=XLSX.utils.sheet_to_json(shD,{defval:""});
+        for(var i=0;i<rows.length;i++){var r=rows[i];
+          var nome=String(pickCol(r,["cognomeenome","nominativo","nome"])||"").trim();if(!nome)continue;
+          var p=findDipByName(nome);
+          var mans=String(pickCol(r,["mansione"])||"").trim();
+          var liv=String(pickCol(r,["livello"])||"").trim();
+          var cf=String(pickCol(r,["codicefiscale","cf"])||"").trim().toUpperCase();
+          var ciN=String(pickCol(r,["numeroci","numci","numerodocumento","cinumero"])||"").trim();
+          var ciS=normDate(pickCol(r,["scadenzaci","ciscadenza","scadci"]));
+          if(p){if(mans)p.mansione=mans;if(liv)p.livello=liv;if(cf)p.cf=cf;if(ciN)p.ciNum=ciN;if(ciS)p.ciScad=ciS;nDipUpd++;}
+          else{DIP[aziId].push({id:Date.now()+Math.floor(Math.random()*100000),nome:nome,mansione:mans,livello:liv,cf:cf,ciNum:ciN,ciScad:ciS,ciDoc:"",corsi:[]});nDipNew++;}
+        }
+      }
+      var shC=wb.Sheets["Corsi"];
+      if(shC){
+        var rowsC=XLSX.utils.sheet_to_json(shC,{defval:""});
+        for(var i=0;i<rowsC.length;i++){var r=rowsC[i];
+          var nome=String(pickCol(r,["dipendente","cognomeenome","nominativo","nome"])||"").trim();
+          var corso=String(pickCol(r,["corso"])||"").trim();
+          var data=normDate(pickCol(r,["dataesecuzione","data"]));
+          if(!nome||!corso||!data){if(nome||corso)errori.push("Riga "+(i+2)+" foglio Corsi: dati incompleti");continue;}
+          var p=findDipByName(nome);
+          if(!p){p={id:Date.now()+Math.floor(Math.random()*100000),nome:nome,mansione:"",livello:"",cf:"",ciNum:"",ciScad:"",ciDoc:"",corsi:[]};DIP[aziId].push(p);nDipNew++;}
+          var val=Number(pickCol(r,["validitagiorni","validita"]))||validitaCat(corso);
+          var ente=String(pickCol(r,["ente","formatore"])||"").trim();
+          var ore=String(pickCol(r,["ore"])||"").trim();
+          var esiste=null;for(var j=0;j<p.corsi.length;j++){if(p.corsi[j].nome.toLowerCase()===corso.toLowerCase())esiste=p.corsi[j];}
+          if(esiste){esiste.data=data;esiste.validita=val;if(ente)esiste.ente=ente;if(ore)esiste.ore=ore;}
+          else p.corsi.push({nome:corso,data:data,validita:val,ente:ente,ore:ore,docNome:"",preavviso:60,emailForm:"",testoAdmin:"",testoFornitore:"",testoAzienda:"",invioAuto:false});
+          nCorsi++;
+        }
+      }
+      if(!shD&&!shC){alert("Il file non contiene i fogli 'Dipendenti' o 'Corsi'. Usa il modello Excel fornito.");inp.value="";return;}
+      salva();
+      renderAll();
+      var msg="Import completato su "+getAzi().nome+":\n- "+nDipNew+" dipendenti nuovi\n- "+nDipUpd+" dipendenti aggiornati\n- "+nCorsi+" corsi caricati/aggiornati";
+      if(errori.length)msg+="\n\nRighe saltate:\n"+errori.join("\n");
+      alert(msg);
+    }catch(err){alert("Errore nella lettura del file: "+err.message);}
+    inp.value="";
+  };
+  reader.readAsArrayBuffer(f);
+}
+
+/* ============ PERSISTENZA (localStorage; Firebase la sostituirà) ============ */
+/* Si persistono AZIENDE, DIP (dipendenti con corsi annidati) e l'azienda selezionata.
+   Il CATALOGO corsi no: è libreria statica nel codice. */
+var LS_KEY="formazione_dati_v1";
+function salva(){
+  /* NON si salva più AZIENDE: la lista aziende è dell'anagrafica condivisa. */
+  Store.save(LS_KEY, {DIP:DIP, aziId:aziId})
+    .catch(function(e){ console.warn("Salvataggio non riuscito:", e); });
+}
+/* carica() ASINCRONA: in parallelo l'ANAGRAFICA CONDIVISA (aziende) e i dati del modulo (DIP, azienda selezionata). */
+function carica(){
+  return Promise.all([ Store.aziende(), Store.load(LS_KEY) ]).then(function(res){
+    AZIENDE = res[0] || [];
+    var d = res[1];
+    DIP = (d && d.DIP) || {};
+    if(d && d.aziId) aziId = d.aziId;
+    if(AZIENDE.length){
+      var ok=false; for(var i=0;i<AZIENDE.length;i++){ if(AZIENDE[i].id===aziId){ ok=true; break; } }
+      if(!ok) aziId = AZIENDE[0].id;
+    }
+    return AZIENDE.length > 0;
+  }).catch(function(e){ console.warn("Caricamento non riuscito:", e); return false; });
+}
+/* Export/import JSON: ponte per lavorare tra più PC finché non c'è Firebase */
+function esportaDati(){
+  var blob=new Blob([JSON.stringify({AZIENDE:AZIENDE, DIP:DIP}, null, 2)], {type:"application/json"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");
+  a.href=url; a.download="formazione_dati_"+Fond.oggiIT().replace(/\//g,"-")+".json";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function importaDati(input){
+  var file=input.files && input.files[0];
+  if(!file) return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{
+      var d=JSON.parse(r.result);
+      if(!d || !d.AZIENDE){ alert("File non valido: manca l'elenco aziende."); return; }
+      if(!confirm("Importare i dati dal file? I dati attuali verranno sostituiti.")) return;
+      AZIENDE=d.AZIENDE; DIP=d.DIP||{};
+      aziId=AZIENDE[0].id;
+      salva(); initSelAzi(); renderAll();
+      alert("Dati importati.");
+    }catch(e){ alert("File non leggibile: "+e.message); }
+    input.value="";
+  };
+  r.readAsText(file);
+}
+
+/* Avvio: carica dati salvati; se assenti restano i dati seed dimostrativi già in memoria */
+carica().then(function(){
+  if(!AZIENDE.length){ mostraNessunAzienda(); return; }
+  initSelAzi(); renderAll();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scadenzario Sicurezza - Near Miss e Segnalazioni</title>
+<link rel="stylesheet" href="fondamenta.css">
+<style>
+/* verde, verde-scuro, badge, rosso/arancio/ok e relativi -bg arrivano da fondamenta.css.
+   Qui restano solo i token non presenti nelle fondamenta. */
+:root{--verde-chiaro:#e6f0ef;--grigio:#6b7280;--grigio-bg:#f3f4f6;--blu:#2563a8;--blu-bg:#e8f0f9;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif;}
+body{background:#f0f2f4;color:#1f2937;font-size:14px;}
+header{background:var(--verde);color:#fff;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+header h1{font-size:19px;font-weight:600;}
+header .azienda{font-size:13px;background:var(--verde-scuro);padding:5px 14px;border-radius:4px;}
+.tabs{background:#fff;border-bottom:1px solid var(--bordo);display:flex;padding:0 16px;overflow-x:auto;}
+.tabs button{background:none;border:none;padding:13px 18px;font-size:14px;cursor:pointer;color:#4b5563;border-bottom:3px solid transparent;white-space:nowrap;}
+.tabs button.active{color:var(--verde);border-bottom-color:var(--verde);font-weight:600;}
+main{padding:20px;max-width:1500px;margin:0 auto;}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px;}
+.card{background:#fff;border:1px solid var(--bordo);border-radius:8px;padding:14px 16px;cursor:pointer;}
+.card:hover{border-color:var(--verde);}
+.card .num{font-size:26px;font-weight:700;}
+.card .lbl{font-size:12px;color:var(--grigio);margin-top:2px;}
+.card.rossa .num{color:var(--rosso);} .card.aranc .num{color:var(--arancio);} .card.verde .num{color:var(--ok);} .card.blu .num{color:var(--blu);} .card.neutra .num{color:var(--verde);}
+.panel{background:#fff;border:1px solid var(--bordo);border-radius:8px;padding:18px;margin-bottom:18px;}
+.panel h2{font-size:16px;color:var(--verde);margin-bottom:14px;}
+.filtri{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+.filtri input,.filtri select{padding:8px 10px;border:1px solid var(--bordo);border-radius:6px;font-size:13px;}
+.filtri input[type=text]{flex:1;min-width:200px;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+th{background:var(--verde-chiaro);color:var(--verde-scuro);text-align:left;padding:9px 10px;font-size:12px;white-space:nowrap;}
+td{padding:9px 10px;border-bottom:1px solid #eceff1;vertical-align:top;}
+tr:hover td{background:#fafbfc;}
+.badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:11.5px;font-weight:600;white-space:nowrap;}
+.b-rosso{background:var(--rosso-bg);color:var(--rosso);} .b-aranc{background:var(--arancio-bg);color:var(--arancio);} .b-ok{background:var(--ok-bg);color:var(--ok);} .b-grigio{background:var(--grigio-bg);color:var(--grigio);} .b-blu{background:var(--blu-bg);color:var(--blu);}
+.prio{display:inline-block;width:24px;height:24px;border-radius:50%;text-align:center;line-height:24px;font-weight:700;font-size:12px;color:#fff;}
+.p1{background:var(--rosso);} .p2{background:var(--arancio);} .p3{background:var(--ok);}
+button.btn{background:var(--verde);color:#fff;border:none;padding:9px 18px;border-radius:6px;font-size:13.5px;cursor:pointer;font-weight:600;}
+button.btn:hover{background:var(--verde-scuro);}
+button.btn.sec{background:#fff;color:var(--verde);border:1px solid var(--verde);}
+button.btn.rosso{background:var(--rosso);}
+button.mini{background:none;border:1px solid var(--bordo);border-radius:5px;padding:4px 10px;cursor:pointer;font-size:12px;color:#374151;margin-right:4px;}
+button.mini:hover{border-color:var(--verde);color:var(--verde);}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-start;justify-content:center;padding:30px 12px;overflow-y:auto;z-index:50;}
+.modal-bg.open{display:flex;}
+.modal{background:#fff;border-radius:10px;padding:22px;width:100%;max-width:760px;}
+.modal h3{color:var(--verde);font-size:16px;margin-bottom:16px;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.campo{margin-bottom:12px;}
+.campo label{display:block;font-size:12px;font-weight:600;color:#4b5563;margin-bottom:4px;}
+.campo input,.campo select,.campo textarea{width:100%;padding:8px 10px;border:1px solid var(--bordo);border-radius:6px;font-size:13.5px;}
+.campo textarea{resize:vertical;min-height:60px;}
+.azioni-modal{display:flex;justify-content:flex-end;gap:10px;margin-top:16px;}
+.rank-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #eceff1;}
+.rank-pos{width:34px;height:34px;border-radius:50%;background:var(--verde-chiaro);color:var(--verde);font-weight:700;text-align:center;line-height:34px;flex-shrink:0;}
+.rank-bar{height:10px;background:var(--verde);border-radius:5px;}
+.hint{font-size:12px;color:var(--grigio);margin-top:4px;}
+.switch-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.lista-chip{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+.chip{background:var(--verde-chiaro);color:var(--verde-scuro);padding:5px 12px;border-radius:14px;font-size:12.5px;display:flex;align-items:center;gap:6px;}
+.chip b{cursor:pointer;color:var(--rosso);}
+.toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;}
+.tbl-wrap{overflow-x:auto;}
+@media print{header,.tabs,.filtri,.toolbar button,.azioni-col,button{display:none!important;} .panel{border:none;}}
+.avviso{background:var(--arancio-bg);border:1px solid var(--arancio);border-radius:6px;padding:10px 14px;font-size:13px;margin-bottom:14px;}
+</style>
+</head>
+<body>
+<header>
+  <h1>Near Miss e Segnalazioni</h1>
+  <select id="selAzi" onchange="cambiaAzi()" style="padding:8px 10px;border-radius:8px;border:1px solid #ccc;background:#fff;color:#222;font-size:13px;font-weight:600;min-width:170px"></select>
+  <div class="azienda" id="hdrAzienda" style="display:none"></div>
+</header>
+<div class="tabs">
+  <button class="active" data-tab="dashboard">Dashboard</button>
+  <button data-tab="gestione">Gestione Segnalazioni</button>
+  <button data-tab="nuova">Nuova Segnalazione</button>
+  <button data-tab="classifica">Classifica Segnalatori</button>
+  <button data-tab="email">Configurazione Email</button>
+  <button data-tab="impostazioni">Impostazioni</button>
+</div>
+<main>
+
+<!-- DASHBOARD -->
+<section id="tab-dashboard">
+  <div class="cards" id="kpi"></div>
+  <div class="panel">
+    <h2>Azioni in ritardo e in scadenza (30 giorni)</h2>
+    <div class="tbl-wrap"><table><thead><tr><th>N.</th><th>Tipo</th><th>Area</th><th>Problema</th><th>Prio</th><th>Responsabilita</th><th>Entro il</th><th>Stato</th></tr></thead><tbody id="tbCritiche"></tbody></table></div>
+  </div>
+  <div class="grid2">
+    <div class="panel"><h2>Segnalazioni per area</h2><div id="statArea"></div></div>
+    <div class="panel"><h2>Ripartizione per causa e tipo</h2><div id="statCausa"></div></div>
+  </div>
+</section>
+
+<!-- GESTIONE -->
+<section id="tab-gestione" style="display:none">
+  <div class="panel">
+    <div class="toolbar">
+      <h2 style="margin:0">Registro segnalazioni</h2>
+      <div>
+        <button class="btn sec" onclick="esportaCSV()">Esporta CSV</button>
+        <button class="btn sec" onclick="esportaJSON()" title="Backup completo ripristinabile / trasferimento tra PC">Esporta dati</button>
+        <button class="btn sec" onclick="document.getElementById('impJson').click()" title="Ripristina un backup dati">Importa dati</button>
+        <input type="file" id="impJson" accept=".json" style="display:none" onchange="importaJSON(this)">
+        <button class="btn sec" onclick="window.print()">Stampa registro</button>
+        <button class="btn" onclick="apriModale()">Nuova segnalazione</button>
+      </div>
+    </div>
+    <div class="filtri">
+      <input type="text" id="fTesto" placeholder="Cerca per problema, azione, nome..." oninput="render()">
+      <select id="fTipo" onchange="render()"><option value="">Tutti i tipi</option></select>
+      <select id="fArea" onchange="render()"><option value="">Tutte le aree</option></select>
+      <select id="fStato" onchange="render()"><option value="">Tutti gli stati</option></select>
+      <select id="fPrio" onchange="render()"><option value="">Tutte le priorita</option><option value="1">Priorita 1</option><option value="2">Priorita 2</option><option value="3">Priorita 3</option></select>
+      <select id="fCausa" onchange="render()"><option value="">Tutte le cause</option></select>
+    </div>
+    <div class="hint" id="conteggio" style="margin-bottom:8px"></div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>N.</th><th>Tipo</th><th>Area</th><th>Data</th><th>Segnalato da</th><th>Problema</th><th>Prio</th><th>Causa</th><th>Azione correttiva</th><th>Responsabilita</th><th>Entro il</th><th>Stato</th><th>Chiusa il</th><th class="azioni-col">Azioni</th></tr></thead>
+      <tbody id="tbReg"></tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- NUOVA -->
+<section id="tab-nuova" style="display:none">
+  <div class="panel" style="max-width:820px">
+    <h2>Nuova segnalazione</h2>
+    <p class="hint" style="margin-bottom:14px">Modulo semplificato per la raccolta rapida della segnalazione. La parte gestionale (azione correttiva, responsabilita, scadenza) puo essere completata in seguito dalla scheda Gestione.</p>
+    <div id="formRapido"></div>
+  </div>
+</section>
+
+<!-- CLASSIFICA -->
+<section id="tab-classifica" style="display:none">
+  <div class="panel" style="max-width:760px">
+    <h2>Classifica segnalatori</h2>
+    <p class="hint" style="margin-bottom:14px">Numero di segnalazioni presentate per persona. Utile per la promozione della cultura della sicurezza e per eventuali riconoscimenti interni.</p>
+    <div id="ranking"></div>
+  </div>
+  <div class="panel" style="max-width:760px">
+    <h2>Tempo medio di chiusura</h2>
+    <div id="tempoMedio"></div>
+  </div>
+</section>
+
+<!-- EMAIL -->
+<section id="tab-email" style="display:none">
+  <div class="panel" style="max-width:820px">
+    <h2>Configurazione notifiche email</h2>
+    <div class="avviso">L'invio automatico verra attivato con l'integrazione Firebase / SendGrid. I parametri impostati qui saranno gia pronti. L'azienda di riferimento (<span id="lblAziendaEmail"></span>) e sempre indicata nell'oggetto e nel corpo del messaggio.</div>
+    <div class="switch-row"><input type="checkbox" id="autoSend" checked><label for="autoSend"><b>Invio automatico attivo</b> - promemoria inviati in prossimita della scadenza "Entro il" delle azioni non completate</label></div>
+    <div class="campo"><label>Giorni di preavviso rispetto alla scadenza</label><input type="number" id="giorniPreavviso" value="15" style="max-width:120px"></div>
+    <div class="grid3">
+      <div class="campo"><label>Email amministratore / consulente</label><input type="email" id="emAdmin" placeholder="consulente@..."></div>
+      <div class="campo"><label>Email responsabile interno / manutenzione</label><input type="email" id="emResp" placeholder="manutenzione@..."></div>
+      <div class="campo"><label>Email azienda / datore di lavoro</label><input type="email" id="emAzienda" placeholder="azienda@..."></div>
+    </div>
+    <div class="campo"><label>Testo personalizzato del promemoria</label><textarea id="testoEmail">Con la presente si ricorda che per l'azienda {AZIENDA} l'azione correttiva relativa alla segnalazione n. {N} - "{PROBLEMA}" (area {AREA}) risulta in scadenza il {SCADENZA}. Stato attuale: {STATO}. Si prega di provvedere e aggiornare il registro.</textarea>
+    <div class="hint">Segnaposto disponibili: {AZIENDA} {N} {PROBLEMA} {AREA} {SCADENZA} {STATO}</div></div>
+    <button class="btn" onclick="salvaEmail()">Salva configurazione</button>
+    <span class="hint" id="emailSalvata" style="margin-left:10px"></span>
+  </div>
+</section>
+
+<!-- IMPOSTAZIONI -->
+<section id="tab-impostazioni" style="display:none">
+  <div class="panel" style="max-width:820px">
+    <h2>Anagrafica azienda</h2>
+    <div class="campo"><label>Ragione sociale</label><input type="text" id="setAzienda" style="max-width:340px"></div>
+  </div>
+  <div class="panel" style="max-width:820px">
+    <h2>Aree / reparti</h2>
+    <div class="lista-chip" id="chipAree"></div>
+    <div style="display:flex;gap:8px"><input type="text" id="nuovaArea" placeholder="Nuova area" style="padding:8px;border:1px solid var(--bordo);border-radius:6px"><button class="btn sec" onclick="aggiungi('aree','nuovaArea')">Aggiungi</button></div>
+  </div>
+  <div class="panel" style="max-width:820px">
+    <h2>Responsabilita</h2>
+    <div class="lista-chip" id="chipResp"></div>
+    <div style="display:flex;gap:8px"><input type="text" id="nuovaResp" placeholder="Nuova responsabilita" style="padding:8px;border:1px solid var(--bordo);border-radius:6px"><button class="btn sec" onclick="aggiungi('resp','nuovaResp')">Aggiungi</button></div>
+  </div>
+</section>
+</main>
+
+<!-- MODALE -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3 id="modalTitolo">Segnalazione</h3>
+    <div class="grid3">
+      <div class="campo"><label>Tipo</label><select id="mTipo"></select></div>
+      <div class="campo"><label>Area / reparto</label><select id="mArea"></select></div>
+      <div class="campo"><label>Data segnalazione</label><input type="date" id="mData"></div>
+    </div>
+    <div class="grid2">
+      <div class="campo"><label>Segnalato da</label><input type="text" id="mSegnalato"></div>
+      <div class="campo"><label>Compilato da</label><input type="text" id="mCompilato"></div>
+    </div>
+    <div class="campo"><label>Segnalazione / problema</label><textarea id="mProblema"></textarea></div>
+    <div class="grid2">
+      <div class="campo"><label>Priorita (1 = alta)</label><select id="mPrio"><option value="1">1 - Alta</option><option value="2">2 - Media</option><option value="3">3 - Bassa</option></select></div>
+      <div class="campo"><label>Causa</label><select id="mCausa"><option>Strutturale</option><option>Comportamentale</option></select></div>
+    </div>
+    <div class="campo"><label>Azione correttiva proposta</label><textarea id="mProposta"></textarea></div>
+    <div class="campo"><label>Azione correttiva adottata / aggiornamento</label><textarea id="mAzione"></textarea></div>
+    <div class="grid3">
+      <div class="campo"><label>Responsabilita</label><select id="mResp"></select></div>
+      <div class="campo"><label>Data verifica</label><input type="date" id="mVerifica"></div>
+      <div class="campo"><label>Entro il</label><input type="date" id="mEntro"></div>
+    </div>
+    <div class="grid2">
+      <div class="campo"><label>Stato</label><select id="mStato"><option>Da Programmare</option><option>Programmato</option><option>In Corso</option><option>In Ritardo</option><option>Completato</option></select></div>
+      <div class="campo"><label>Chiusa il</label><input type="date" id="mChiusa"></div>
+    </div>
+    <div class="campo"><label>Commenti / rif. foto</label><textarea id="mCommenti"></textarea></div>
+    <div class="azioni-modal">
+      <button class="btn rosso" id="btnElimina" onclick="elimina()" style="margin-right:auto">Elimina</button>
+      <button class="btn sec" onclick="chiudiModale()">Annulla</button>
+      <button class="btn" onclick="salva()">Salva</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="firebase-init.js"></script>
+<script src="auth-gate.js"></script>
+<script src="fondamenta.js"></script>
+<script>
+const OGGI = new Date().toISOString().slice(0,10);
+/* Multi-azienda: AZIENDE dall'anagrafica condivisa; DATI_BY[aziId] = segnalazioni per azienda,
+   CFG_BY[aziId] = liste tipi/aree/resp per azienda; "dati"/"cfg" sono le VISTE dell'azienda selezionata. */
+var AZIENDE=[], aziId=null, DATI_BY={}, CFG_BY={};
+var dati=[], cfg={};
+var SEED_DATI = [{"id": 1, "tipo": "Near Miss", "area": "Magazzino", "dataSegn": "2025-10-16", "segnalatoDa": "Marzoli V.", "compilatoDa": "Marzoli V.", "problema": "carrello elevatore senza illuminazione", "priorita": 2, "causa": "Strutturale", "azioneProposta": "far installare le luci per una adeguata illuminazione", "dataVerifica": "2026-01-29", "azioneCorrettiva": "installazione fari muletto", "responsabilita": "Step Change", "entroIl": "2025-12-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 2, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2025-10-16", "segnalatoDa": "Marzoli V.", "compilatoDa": "Marzoli V.", "problema": "gradini soppalco scivolosi", "priorita": 1, "causa": "Strutturale", "azioneProposta": "rivestire i gradini con mandorlato alluminio antiscivolo", "dataVerifica": "2026-01-29", "azioneCorrettiva": "inserita strisce antiscivolo", "responsabilita": "Step Change / Maintenance", "entroIl": "2025-12-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 3, "tipo": "Near Miss", "area": "Aree comuni", "dataSegn": "2025-10-16", "segnalatoDa": "Marzoli V.", "compilatoDa": "Marzoli V.", "problema": "porte a ventola ingresso bagni sanificazione senza oblo", "priorita": 3, "causa": "Strutturale", "azioneProposta": "installazione oblò su entrambe le porte", "dataVerifica": "2026-01-29", "azioneCorrettiva": "verifica bloccaggio in doppio senso , inserire oblo in Plexiglass", "responsabilita": "Maintenance", "entroIl": "2026-05-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 4, "tipo": "Near Miss", "area": "Aree comuni", "dataSegn": "2025-10-16", "segnalatoDa": "Marzoli V.", "compilatoDa": "Marzoli V.", "problema": "porte tagliafuoco bagni uomini donne si scontrano", "priorita": 3, "causa": "Strutturale", "azioneProposta": "rovesciare il verso di apertura di entrambe le porte", "dataVerifica": "2026-01-29", "azioneCorrettiva": "verificare senso di apertura e possibilità inversione con Califano - una delle 2 verso l'interno", "responsabilita": "Step Change", "entroIl": "2026-06-30", "status": "In Ritardo", "chiusaIl": "", "commenti": ""}, {"id": 5, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2025-10-16", "segnalatoDa": "Marzoli V.", "compilatoDa": "Paradisi", "problema": "cavi alimentazione pompa terra possibile contatto con liquidi", "priorita": 1, "causa": "Strutturale", "azioneProposta": "far passare i cavi a soffitto", "dataVerifica": "2026-01-29", "azioneCorrettiva": "sistemare a cura Elettroimpianti", "responsabilita": "Maintenance", "entroIl": "2026-12-31", "status": "Da Programmare", "chiusaIl": "spostamento Meloni 1 ", "commenti": ""}, {"id": 6, "tipo": "Near Miss", "area": "Magazzino", "dataSegn": "2025-10-16", "segnalatoDa": "Marzoli V.", "compilatoDa": "Ricci F.", "problema": "traliccio montante scaffalatura porta pallets danneggiato alla base pericolo cedimento intera struttura", "priorita": 1, "causa": "Strutturale", "azioneProposta": "sostituzione parte danneggiata", "dataVerifica": "2026-01-29", "azioneCorrettiva": "sistemazione da parte ditta Califano Carrelli", "responsabilita": "Step Change", "entroIl": "2026-01-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 7, "tipo": "Near Miss", "area": "Senza Latte", "dataSegn": "2025-10-16", "segnalatoDa": "Delogu", "compilatoDa": "Delogu", "problema": "pulsante aria compressa Giordan potrebbe ferire sul viso più volte saltato in aria la sera quando viene staccata aria dall'impianto", "priorita": 1, "causa": "Strutturale", "azioneProposta": "possibilità di coprire con una gabbietta per evitare l'esplosione del pulsante", "dataVerifica": "2026-01-29", "azioneCorrettiva": "gabbietta", "responsabilita": "Maintenance", "entroIl": "2026-05-31", "status": "In Corso", "chiusaIl": "", "commenti": ""}, {"id": 8, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2025-10-16", "segnalatoDa": "Leonini", "compilatoDa": "Leonini", "problema": "agitatore del cono non si ferma quando si solleva il coperchio", "priorita": 2, "causa": "Strutturale", "azioneProposta": "mettere una fotocellula o interruttore che fa fermare l'agitatore nel momento in cui si solleva il coperchio", "dataVerifica": "2026-01-29", "azioneCorrettiva": "verifica installazione", "responsabilita": "Maintenance", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 9, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2025-10-16", "segnalatoDa": "Leonini", "compilatoDa": "Leonini", "problema": "macchina etichettatrice ogni tanto salta il termico ed inoltre salta l'interruttore dell'agitatore", "priorita": 1, "causa": "Strutturale", "azioneProposta": "sistemare", "dataVerifica": "2026-01-29", "azioneCorrettiva": "verifica", "responsabilita": "Maintenance", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 10, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2025-10-16", "segnalatoDa": "Leonini", "compilatoDa": "Leonini", "problema": "sistemare una presa di corrente quando si necessità di pulizia più approfondita quindi lo smontaggio della tramoggia", "priorita": 1, "causa": "Strutturale", "azioneProposta": "sistemare", "dataVerifica": "2026-01-30", "azioneCorrettiva": "verifica", "responsabilita": "Maintenance", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 11, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2025-10-16", "segnalatoDa": "Leonini", "compilatoDa": "Leonini", "problema": "quando apri il coperchio della Cist 6 l'agitatore non sempre si ferma", "priorita": 1, "causa": "Strutturale", "azioneProposta": "sostituzione dello switch a pressione con quello magnetico", "dataVerifica": "2026-05-13", "azioneCorrettiva": "verifica ed esecuzione Elettroimpianti", "responsabilita": "Maintenance", "entroIl": "2026-05-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 12, "tipo": "Near Miss", "area": "Aree comuni", "dataSegn": "2025-10-16", "segnalatoDa": "Leonini", "compilatoDa": "Leonini", "problema": "messa in sicurezza della scala esterna per buttare immondizia", "priorita": 1, "causa": "Strutturale", "azioneProposta": "acquisto o predisposizione idonea scala", "dataVerifica": "2026-01-29", "azioneCorrettiva": "verifica arrivo da parte DG De Angelis", "responsabilita": "Step Change", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 13, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2025-10-17", "segnalatoDa": "Ferramondo M", "compilatoDa": "Ferramondo M", "problema": "mancato switch sicurezza omogeneizzatore molino arachidi", "priorita": 1, "causa": "Strutturale", "azioneProposta": "installazione switch sicurezza", "dataVerifica": "2026-01-29", "azioneCorrettiva": "eseguito", "responsabilita": "Maintenance", "entroIl": "2025-12-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 14, "tipo": "Near Miss", "area": "Senza Latte", "dataSegn": "2025-10-17", "segnalatoDa": "Casini M", "compilatoDa": "Casini M", "problema": "la tubazione di scarico crema da Deca 50 alla cisterna 7 , sporge troppo nella scala che porta al soppalco", "priorita": 1, "causa": "Strutturale", "azioneProposta": "modificare la tubazione in modo tale che o possa passare dietro la cisterna o più alta che non intralci la salita la soppalco", "dataVerifica": "2026-01-29", "azioneCorrettiva": "eseguito", "responsabilita": "Maintenance", "entroIl": "2026-02-28", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 15, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2025-10-20", "segnalatoDa": "Leonini", "compilatoDa": "Leonini", "problema": "scaffalature usate per deposito etichette , non sono ancorate alla parete", "priorita": 1, "causa": "Strutturale", "azioneProposta": "creare ancoraggio della struttura", "dataVerifica": "2026-05-07", "azioneCorrettiva": "verificare senso di apertura - interna alla sala ancorata , l'altra quella al magazzino ancora no , cambio scaffalatura in metallo - SENTIRE PETRILLO", "responsabilita": "Step Change", "entroIl": "2026-05-31", "status": "In Corso", "chiusaIl": "", "commenti": ""}, {"id": 16, "tipo": "Near Miss", "area": "Pure", "dataSegn": "2025-10-29", "segnalatoDa": "Delogu", "compilatoDa": "Delogu", "problema": "mancanza di sicurezza della Goldoni , l'operatore deve arrampicarsi o prendere la scala altissima", "priorita": 1, "causa": "Strutturale", "azioneProposta": "si suggerisce da tempo la creazione del prolungamento del soppalco fino ad arrivare vicina davanti la curva della linea tappi , trovata soluzione tecnica da parte del Responsabile manutenzione Antonaroli affinché i tappi non si incastrino più", "dataVerifica": "2026-01-29", "azioneCorrettiva": "progetto ed esecuzione Metaltecnica", "responsabilita": "Step Change", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 17, "tipo": "Near Miss", "area": "Magazzino", "dataSegn": "2025-10-31", "segnalatoDa": "Mazza", "compilatoDa": "Mazza", "problema": "presa elettrica fuori dalla cassetta di contenimento", "priorita": 1, "causa": "Strutturale", "azioneProposta": "posizionare la presa nella cassetta apposita", "dataVerifica": "2026-01-29", "azioneCorrettiva": "eseguito", "responsabilita": "Maintenance", "entroIl": "2026-02-28", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 18, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2025-11-10", "segnalatoDa": "Ferramondo M", "compilatoDa": "Ferramondo M", "problema": "scala controllo cisterne soppalco Tahin , mancanza nastro antiscivolo e gabbia sicurezza non conforme", "priorita": 1, "causa": "Strutturale", "azioneProposta": "sostituzione nastro antiscivolo sui gradini e modifica gabbia di sicurezza ,", "dataVerifica": "2026-01-29", "azioneCorrettiva": "verifica altezza gabbia protezione italscale contatti con Antonaroli- Cupidi contatto antonaroli", "responsabilita": "Maintenance", "entroIl": "2026-05-31", "status": "In Corso", "chiusaIl": "", "commenti": ""}, {"id": 19, "tipo": "Near Miss", "area": "Aree comuni", "dataSegn": "2025-11-10", "segnalatoDa": "Casini M", "compilatoDa": "Casini M", "problema": "a seguito dell'installazione del tendone bianco dove si caricano i muletti , la zona non risulta correttamente illuminata soprattutto per le fasi di smaltimento immondizia e zone limitrofe", "priorita": 2, "causa": "Strutturale", "azioneProposta": "installazione di una luce che copra l'area frontale ai container dell'immondizia magari posizionata sopra ai tendoni blu ( tra entrata materie prime e zona packaging )", "dataVerifica": "2026-01-29", "azioneCorrettiva": "eseguito", "responsabilita": "Maintenance", "entroIl": "2026-02-28", "status": "Completato", "chiusaIl": "", "commenti": "non necessario"}, {"id": 20, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2025-11-07", "segnalatoDa": "Nasetti M.", "compilatoDa": "Nasetti M.", "problema": "rischio rottura vetro finestra grande ( già rotta )", "priorita": 1, "causa": "Strutturale", "azioneProposta": "cambio del vetro , ordinato", "dataVerifica": "2026-01-29", "azioneCorrettiva": "sostituire - contattare vetreria laziale civita castellana", "responsabilita": "Maintenance", "entroIl": "2026-06-30", "status": "In Corso", "chiusaIl": "", "commenti": ""}, {"id": 21, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2025-11-13", "segnalatoDa": "Ferramondo M", "compilatoDa": "Ferramondo M", "problema": "cavo elettrico etichettatrice Rigoni pericolo inciampo", "priorita": 1, "causa": "Strutturale", "azioneProposta": "installazione canalina passacavo a terra", "dataVerifica": "2026-01-29", "azioneCorrettiva": "eseguito", "responsabilita": "Maintenance", "entroIl": "2026-02-28", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 22, "tipo": "Near Miss", "area": "Senza Latte", "dataSegn": "2025-11-13", "segnalatoDa": "Casini M", "compilatoDa": "Casini M", "problema": "presa di corrente per accendere le resistenze delle cisterne del Bcream sganciata", "priorita": 2, "causa": "Strutturale", "azioneProposta": "controllare che non ci siano fili scoperti e riagganciare la presa di corrente", "dataVerifica": "2026-01-29", "azioneCorrettiva": "RI spostamento prese", "responsabilita": "Maintenance", "entroIl": "2026-02-28", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 23, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2025-11-11", "segnalatoDa": "Marzoli V.", "compilatoDa": "Marzoli V.", "problema": "malfunzionamento o totale assenza lampade emergenza produzione confezionamento latte corridoio magazzino", "priorita": 1, "causa": "Strutturale", "azioneProposta": "sostituzione o posizionamento nuove lampade di emergenza", "dataVerifica": "2026-01-29", "azioneCorrettiva": "da eseguire", "responsabilita": "Maintenance", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": "trovare soluzioni alternative"}, {"id": 24, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2025-11-12", "segnalatoDa": "Marzoli V.", "compilatoDa": "Marzoli V.", "problema": "pedana impastatore Deca 150 troppo piccola", "priorita": 1, "causa": "Strutturale", "azioneProposta": "modifica dimensioni pedana", "dataVerifica": "2026-01-29", "azioneCorrettiva": "verificare", "responsabilita": "Maintenance", "entroIl": "2026-01-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 25, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2025-11-20", "segnalatoDa": "Ferramondo M", "compilatoDa": "Ferramondo M", "problema": "pericolo inciampo su tubo di scarico pompa vibrovaglio Deca 300", "priorita": 2, "causa": "Strutturale", "azioneProposta": "installare segnaletica orizzontale di pericolo", "dataVerifica": "2026-01-29", "azioneCorrettiva": "inserimento segnaletica a terra", "responsabilita": "Step Change", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 26, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2025-11-21", "segnalatoDa": "Marzoli V.", "compilatoDa": "Marzoli V.", "problema": "cartello segnalazione pericolo installato e attaccato male con un lato piegato potrebbe tagliare", "priorita": 2, "causa": "Strutturale", "azioneProposta": "verificare le estremità in lamiera e riattaccare", "dataVerifica": "", "azioneCorrettiva": "eseguito", "responsabilita": "Step Change", "entroIl": "2025-12-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 27, "tipo": "Near Miss", "area": "Senza Latte", "dataSegn": "2025-11-27", "segnalatoDa": "Sberna L.", "compilatoDa": "Sberna L.", "problema": "scaletta per carico materie prime , pedata corta rischio scivolamento nel manovrare sacchi oltre 20 kg . Si richiede ulteriormente un piano di appoggio per lavorare in sicurezza", "priorita": 1, "causa": "Strutturale", "azioneProposta": "aumentare l'area di appoggio piedi più aggiunta di un ripiano al di sopra della scala per appoggio di sacchi pesanti , secchi ecc", "dataVerifica": "2026-01-29", "azioneCorrettiva": "eseguito", "responsabilita": "Maintenance", "entroIl": "2026-02-28", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 28, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2025-12-01", "segnalatoDa": "Leonini", "compilatoDa": "Leonini", "problema": "le pedane dei tappi sono alte e non si riesce a tirare giù le scatole in sicurezza", "priorita": 1, "causa": "Comportamentale", "azioneProposta": "far fare le pedane da 4 file anziché da 5", "dataVerifica": "2026-01-29", "azioneCorrettiva": "predisporre procedura prelievo cartone passaggio da scala operatore a operatore a terra", "responsabilita": "Step Change", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 29, "tipo": "Near Miss", "area": "Aree comuni", "dataSegn": "2025-11-28", "segnalatoDa": "Ferramondo M", "compilatoDa": "Ferramondo M", "problema": "mancanza materiale primo soccorso nelle apposite cassette", "priorita": 2, "causa": "Comportamentale", "azioneProposta": "controlli più frequenti del materiale , fare una lista del materiale utilizzato per facilitare il controllo ed il rimpiazzamento", "dataVerifica": "2026-01-29", "azioneCorrettiva": "eseguito", "responsabilita": "Step Change", "entroIl": "2026-01-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 30, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2025-11-04", "segnalatoDa": "Leonini", "compilatoDa": "Leonini", "problema": "i gradini della scala per accedere al soppalco non hanno antiscivolo e sono senza sicurezza", "priorita": 1, "causa": "Strutturale", "azioneProposta": "applicare rivestimento antiscivolo ed un possibile appiglio per tenersi", "dataVerifica": "2026-01-29", "azioneCorrettiva": "eseguito", "responsabilita": "Maintenance", "entroIl": "2026-02-28", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 31, "tipo": "Near Miss", "area": "Senza Latte", "dataSegn": "2025-11-04", "segnalatoDa": "Santaroni", "compilatoDa": "Santaroni", "problema": "sgabello stanza confezionamento pure non conforme alle normative sulla sicurezza", "priorita": 1, "causa": "Strutturale", "azioneProposta": "sostituzione sgabello", "dataVerifica": "2026-01-29", "azioneCorrettiva": "eseguito", "responsabilita": "Maintenance", "entroIl": "2026-02-28", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 32, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2025-11-05", "segnalatoDa": "Ferramondo M", "compilatoDa": "Ferramondo M", "problema": "scaletta controllo cono mulino arachidi non conforme", "priorita": 1, "causa": "Strutturale", "azioneProposta": "sostituire scaletta con scala in acciaio più robusta , valutare con Mozzicarelli nuove scale sicurezza ergonomiche e a norma CE", "dataVerifica": "2026-01-29", "azioneCorrettiva": "verificare", "responsabilita": "Step Change", "entroIl": "2026-06-30", "status": "In Ritardo", "chiusaIl": "", "commenti": "verifica scale anche altri reparti"}, {"id": 33, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2025-11-07", "segnalatoDa": "Ferramondo M", "compilatoDa": "Ferramondo M", "problema": "scala non conforme per ispezione cisterna 1-2 arachidi", "priorita": 1, "causa": "Strutturale", "azioneProposta": "installazione scala fissa con protezione anticaduta tra le cisterne 1-2 arachidi , ricezione e verifica offerte Italscale", "dataVerifica": "2026-01-29", "azioneCorrettiva": "verifica altezza gabbia protezione italscale contatti con Antonaroli- cupidi contatto antonaroli", "responsabilita": "Maintenance", "entroIl": "2026-06-30", "status": "In Corso", "chiusaIl": "", "commenti": ""}, {"id": 34, "tipo": "Near Miss", "area": "Senza Latte", "dataSegn": "2025-12-04", "segnalatoDa": "Mazza", "compilatoDa": "Mazza", "problema": "la porta non arresta la discesa se una persona si trova in uno spazio non letto dalla fotocellule", "priorita": 1, "causa": "Strutturale", "azioneProposta": "ampliamento spazio fotocellule barra con sensore che riceva corpi estranei sull'estremità bassa della porta", "dataVerifica": "2026-01-29", "azioneCorrettiva": "in corso", "responsabilita": "Maintenance", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 35, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2025-12-03", "segnalatoDa": "Marzoli V.", "compilatoDa": "Marzoli V.", "problema": "strisce antiscivolo scala concatrice rovinate o assenti", "priorita": 1, "causa": "Strutturale", "azioneProposta": "sostituzione con strisce nuove", "dataVerifica": "2026-01-29", "azioneCorrettiva": "eseguito", "responsabilita": "Maintenance", "entroIl": "2026-01-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 36, "tipo": "Near Miss", "area": "Aree comuni", "dataSegn": "2025-10-25", "segnalatoDa": "Marzoli V.", "compilatoDa": "Delogu", "problema": "rischio caduta lavoratori nell'area esterna cassoni rifiuti per poca illuminazione ed errata disposizione utensili carrelli elevatori", "priorita": 1, "causa": "Strutturale", "azioneProposta": "aumento dispositivi illuminazione e giusto posizionamento utensili carrelli elevatori", "dataVerifica": "2026-01-29", "azioneCorrettiva": "verifica su utensili e attrezzature in ordine", "responsabilita": "Step Change", "entroIl": "2025-12-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 37, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2025-12-15", "segnalatoDa": "Leonini", "compilatoDa": "Leonini", "problema": "nella nastratrice spazio insufficiente tra scatola e nastro trasportatore", "priorita": 1, "causa": "Strutturale", "azioneProposta": "inserire invito per inserire scatole nel rullo", "dataVerifica": "2026-01-29", "azioneCorrettiva": "eseguito", "responsabilita": "Maintenance", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 38, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2026-01-07", "segnalatoDa": "Galassi", "compilatoDa": "Galassi", "problema": "pericolo caduta del personale", "priorita": 1, "causa": "Strutturale", "azioneProposta": "installare luce di emergenza", "dataVerifica": "2026-01-29", "azioneCorrettiva": "spostamento interruttore luci corridoio - verificare lay out", "responsabilita": "Maintenance", "entroIl": "2026-02-28", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 39, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2026-01-14", "segnalatoDa": "Ferramondo M", "compilatoDa": "Ferramondo M", "problema": "mobile stoccaggio per ricambi e cambio formato capsulatrice Goldoni posizionato sotto scala cisterne Tahin", "priorita": 1, "causa": "Strutturale", "azioneProposta": "creare apposito armadietto per facilitare il passaggi e la salita / discesa", "dataVerifica": "2026-01-29", "azioneCorrettiva": "predisporre scaffalatura superiore. Verifica post spostamento reaprto Tahin", "responsabilita": "Maintenance", "entroIl": "2026-06-30", "status": "Completato", "chiusaIl": "spostato davanti etichettatrice ", "commenti": ""}, {"id": 40, "tipo": "Near Miss", "area": "Senza Latte", "dataSegn": "2025-12-01", "segnalatoDa": "Delogu", "compilatoDa": "Delogu", "problema": "sganciamento del porta rotolo scotch inferiore , possibile infortunio perchè pesante e difficile da sistemare", "priorita": 1, "causa": "Strutturale", "azioneProposta": "si suggerisce ancoraggio con perno come portarotolo scotch superiore , PREDISPORRE PROCEDURA DISTACCO MODULARE", "dataVerifica": "2026-01-29", "azioneCorrettiva": "verifica inserimento catenella e possibile procedura miglioramento", "responsabilita": "Maintenance", "entroIl": "2026-05-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 41, "tipo": "Near Miss", "area": "Senza Latte", "dataSegn": "2026-01-28", "segnalatoDa": "Giontella", "compilatoDa": "Giontella", "problema": "mancanza sportelli raffinatrice creme bianche manca protezione", "priorita": 1, "causa": "Strutturale", "azioneProposta": "inserire urgentemente lo sportello protettivo contro l'eventuale inserimento mani operatore", "dataVerifica": "2026-01-29", "azioneCorrettiva": "urgente intervento Metaltecnica o interno", "responsabilita": "Maintenance", "entroIl": "2026-02-28", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 42, "tipo": "Near Miss", "area": "Magazzino", "dataSegn": "2026-01-30", "segnalatoDa": "Mazza", "compilatoDa": "Mazza", "problema": "cisterna biocream non attaccata a presa collegata ad interruttore magneto termico", "priorita": 2, "causa": "Strutturale", "azioneProposta": "collegare presa ad un magneto termico etichettare le prese in funzione dei rispettivi interruttori magnetotermici", "dataVerifica": "2026-02-10", "azioneCorrettiva": "", "responsabilita": "Maintenance", "entroIl": "2026-02-28", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 43, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2026-02-06", "segnalatoDa": "Ferramondo M", "compilatoDa": "Ferramondo M", "problema": "mancata pannellatura divisoria tra balloni di arachidi e bancali prodotto finito rischio caduta bancali", "priorita": 1, "causa": "Strutturale", "azioneProposta": "proseguimento pannellatura divisoria ,", "dataVerifica": "2026-02-10", "azioneCorrettiva": "ATTESA spostamento linea Sesamo", "responsabilita": "Maintenance", "entroIl": "2026-06-30", "status": "In Corso", "chiusaIl": "da fare validazione lay out a cura Team tecnico ", "commenti": ""}, {"id": 44, "tipo": "Near Miss", "area": "Magazzino", "dataSegn": "2026-02-09", "segnalatoDa": "Mazza", "compilatoDa": "Mazza", "problema": "pulsante emergenza rotto su transpallet Baoli Kbp 15l matr n. 818159na2379", "priorita": 2, "causa": "Strutturale", "azioneProposta": "segnalare alla ditta di manutenzione Pesci la richiesta ripristino pulsante", "dataVerifica": "2026-02-10", "azioneCorrettiva": "", "responsabilita": "Step Change", "entroIl": "2026-02-28", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 45, "tipo": "Near Miss", "area": "Magazzino", "dataSegn": "2026-02-06", "segnalatoDa": "Delogu", "compilatoDa": "Andreoli", "problema": "caricabatterie muletti esposti sotto i tendoni , ma sotto pioggia abbiamo notato le prese completamente fradicie con pericolo folgorazione", "priorita": 2, "causa": "Strutturale", "azioneProposta": "migliorare la copertura", "dataVerifica": "2026-02-10", "azioneCorrettiva": "", "responsabilita": "Step Change", "entroIl": "2026-02-28", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 46, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2026-02-06", "segnalatoDa": "Ferramondo M", "compilatoDa": "Ferramondo M", "problema": "rischio inciampo su cavo di alimentazione tappatrice Goldoni", "priorita": 2, "causa": "Strutturale", "azioneProposta": "installare canalina di passaggio a terra , creare passaggio aereo per cavo di alimentazione", "dataVerifica": "2026-02-10", "azioneCorrettiva": "urgente intervento", "responsabilita": "Maintenance", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 47, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2026-03-03", "segnalatoDa": "Ferramondo M", "compilatoDa": "Ferramondo M", "problema": "pericolo di scivolamento su nuova scala di ispezione cisterna n. 7 causata da polvere della granellatrice", "priorita": 1, "causa": "Strutturale", "azioneProposta": "allontanare la granellatrice", "dataVerifica": "2026-02-11", "azioneCorrettiva": "urgente intervento", "responsabilita": "Maintenance", "entroIl": "2026-06-30", "status": "Completato", "chiusaIl": "pulire area limitrofa pre e post operatività ", "commenti": ""}, {"id": 48, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2026-03-03", "segnalatoDa": "Leonini", "compilatoDa": "Timoleone", "problema": "mancanza luce di emergenza + porta che rimane chiusa con la mancanza di corrente", "priorita": 1, "causa": "Strutturale", "azioneProposta": "installazione nuova luce di emergenza + sistemazione porta + sistemazione zanzariera altra porta di emergenza", "dataVerifica": "2026-03-04", "azioneCorrettiva": "urgente intervento", "responsabilita": "Maintenance", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": "comunicato a Barchesi il 04/03"}, {"id": 49, "tipo": "Near Miss", "area": "Fudex", "dataSegn": "2025-09-08", "segnalatoDa": "Giontella", "compilatoDa": "Giontella", "problema": "assenza switch magnetici mescolatore Fudex", "priorita": 1, "causa": "Strutturale", "azioneProposta": "sostituzione con switch magnetici nel mescolatore Fudex", "dataVerifica": "2025-09-15", "azioneCorrettiva": "inserire switch magnetici", "responsabilita": "Maintenance", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 50, "tipo": "Near Miss", "area": "Fudex", "dataSegn": "2025-09-08", "segnalatoDa": "Giontella", "compilatoDa": "Giontella", "problema": "assenza carter protettivi pompa a ingranaggi rischio incastro", "priorita": 1, "causa": "Strutturale", "azioneProposta": "inserimento carter protettivi catena", "dataVerifica": "2025-09-15", "azioneCorrettiva": "inserimento griglia o rete", "responsabilita": "Maintenance", "entroIl": "2026-05-31", "status": "Completato", "chiusaIl": "non è presente alcun pericolo - protezioni già inserite ", "commenti": ""}, {"id": 51, "tipo": "Near Miss", "area": "Senza Latte", "dataSegn": "2025-09-08", "segnalatoDa": "Giontella", "compilatoDa": "Giontella", "problema": "assenza switch cisterne 1- 6 soppalco", "priorita": 1, "causa": "Strutturale", "azioneProposta": "inserimento switch magnetici", "dataVerifica": "2026-05-05", "azioneCorrettiva": "manca la cist 6", "responsabilita": "Maintenance", "entroIl": "2026-05-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 52, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2025-09-11", "segnalatoDa": "Giontella", "compilatoDa": "Giontella", "problema": "cisterne palchetto chiare e scure senza contatto blocca agitazione meccanica", "priorita": 1, "causa": "Strutturale", "azioneProposta": "inserimento switch sicurezza", "dataVerifica": "2025-09-15", "azioneCorrettiva": "", "responsabilita": "Maintenance", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 53, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2025-09-08", "segnalatoDa": "Giontella", "compilatoDa": "Giontella", "problema": "assenza switch pannello confezionatrice", "priorita": 1, "causa": "Strutturale", "azioneProposta": "inserimento switch cerniera tappatrice", "dataVerifica": "2025-09-15", "azioneCorrettiva": "", "responsabilita": "Maintenance", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 54, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2025-09-08", "segnalatoDa": "Giontella", "compilatoDa": "Giontella", "problema": "assenza switch magnetici n. 6 cisterne area Latte", "priorita": 1, "causa": "Strutturale", "azioneProposta": "inserimento switch sicurezza", "dataVerifica": "2026-05-13", "azioneCorrettiva": "manca la n. 4", "responsabilita": "Maintenance", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 55, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2025-09-08", "segnalatoDa": "Giontella", "compilatoDa": "Giontella", "problema": "pericolo chiusura porta reparto latte , mancanza lettura prossimità", "priorita": 1, "causa": "Strutturale", "azioneProposta": "inserimento idonea fotocellula di prossimità", "dataVerifica": "2025-09-15", "azioneCorrettiva": "", "responsabilita": "Step Change", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 56, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2025-09-17", "segnalatoDa": "Giontella", "compilatoDa": "Giontella", "problema": "cavo nastratrice", "priorita": 1, "causa": "Strutturale", "azioneProposta": "sostituzione cavo obsoleto", "dataVerifica": "2025-09-17", "azioneCorrettiva": "", "responsabilita": "Maintenance", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 57, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2025-09-17", "segnalatoDa": "Giontella", "compilatoDa": "Giontella", "problema": "pulsante nastratrice", "priorita": 1, "causa": "Strutturale", "azioneProposta": "sostituzione pulsante avvio", "dataVerifica": "2025-09-17", "azioneCorrettiva": "", "responsabilita": "Maintenance", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 58, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2025-09-17", "segnalatoDa": "Antonaroli", "compilatoDa": "Giontella", "problema": "quadro reparto vicino tanks", "priorita": 1, "causa": "Strutturale", "azioneProposta": "sostituire quadro obsoleto", "dataVerifica": "2025-09-17", "azioneCorrettiva": "", "responsabilita": "Maintenance", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 59, "tipo": "Near Miss", "area": "Aree comuni", "dataSegn": "2026-03-04", "segnalatoDa": "Giontella", "compilatoDa": "Giontella", "problema": "mancanza tappo su quadro principale", "priorita": 2, "causa": "Strutturale", "azioneProposta": "inserire tappo", "dataVerifica": "2026-03-15", "azioneCorrettiva": "", "responsabilita": "Maintenance", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 60, "tipo": "Near Miss", "area": "Senza Latte", "dataSegn": "2026-03-04", "segnalatoDa": "Giontella", "compilatoDa": "Giontella", "problema": "mancanza tappi quadro elettrico SL", "priorita": 2, "causa": "Strutturale", "azioneProposta": "inserire tappi", "dataVerifica": "2026-03-16", "azioneCorrettiva": "", "responsabilita": "Maintenance", "entroIl": "2026-04-01", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 61, "tipo": "Near Miss", "area": "Senza Latte", "dataSegn": "2026-03-05", "segnalatoDa": "Giontella", "compilatoDa": "Giontella", "problema": "mancanza tappi quadro elettrico soppalco", "priorita": 2, "causa": "Strutturale", "azioneProposta": "inserire tappi", "dataVerifica": "2026-03-17", "azioneCorrettiva": "", "responsabilita": "Maintenance", "entroIl": "2026-04-02", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 62, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2026-03-06", "segnalatoDa": "Giontella", "compilatoDa": "Giontella", "problema": "mancanza descrizione quadro", "priorita": 3, "causa": "Strutturale", "azioneProposta": "inserire descrizione", "dataVerifica": "2026-03-18", "azioneCorrettiva": "", "responsabilita": "Maintenance", "entroIl": "2026-04-03", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 63, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2026-03-04", "segnalatoDa": "Giontella", "compilatoDa": "Giontella", "problema": "mancanza cerniera maniglia", "priorita": 1, "causa": "Strutturale", "azioneProposta": "inserire cerniera", "dataVerifica": "2026-03-15", "azioneCorrettiva": "", "responsabilita": "Maintenance", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 64, "tipo": "Near Miss", "area": "Senza Latte", "dataSegn": "2026-02-20", "segnalatoDa": "Delogu", "compilatoDa": "Delogu", "problema": "quadro elettrico cist. 1 con inverter da aprire per forzare funzionamento pompa che manda crema nel cono in stanza confez.to", "priorita": 1, "causa": "Strutturale", "azioneProposta": "sostituzione quadro oppure riparazione malfunzionamento , Elettroimpianti verifica e sistema la criticità", "dataVerifica": "2026-05-05", "azioneCorrettiva": "fare procedura plastificata scritta", "responsabilita": "Maintenance", "entroIl": "2026-05-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 65, "tipo": "Near Miss", "area": "Senza Latte", "dataSegn": "2026-02-20", "segnalatoDa": "Santaroni", "compilatoDa": "Santaroni", "problema": "mancanza switch di protezione coperchio cisterne 1 e 3 ( l'agitatore non si ferma )", "priorita": 1, "causa": "Strutturale", "azioneProposta": "aggiungere protezione automatica che farà fermare gli agitatoti delle due cisterne ,", "dataVerifica": "2026-03-15", "azioneCorrettiva": "manca solo la cist 1", "responsabilita": "Maintenance", "entroIl": "2026-04-30", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 66, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2026-03-06", "segnalatoDa": "Brizi", "compilatoDa": "Brizi", "problema": "mancata illuminazione ingresso spogliatoio semi e gruppo elettrogeno", "priorita": 1, "causa": "Strutturale", "azioneProposta": "installazione fari con sensore di movimento", "dataVerifica": "2026-03-15", "azioneCorrettiva": "", "responsabilita": "Maintenance", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 67, "tipo": "Near Miss", "area": "Senza Latte", "dataSegn": "2026-03-11", "segnalatoDa": "Mazza", "compilatoDa": "Mazza", "problema": "transpallet sollevatore fuori controllo alza le forche e procede in avanti senza il consenso dell'operatore", "priorita": 1, "causa": "Strutturale", "azioneProposta": "contattare ditta Pesci per manutenzione assistenza", "dataVerifica": "2026-03-15", "azioneCorrettiva": "", "responsabilita": "Step Change", "entroIl": "2026-03-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 68, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2026-03-16", "segnalatoDa": "Ferramondo M", "compilatoDa": "Ferramondo M", "problema": "big bags arachidi inclinati pericolosamente su pedane", "priorita": 1, "causa": "Strutturale", "azioneProposta": "comunicare maggiore attenzione nel trasporto , sistemare quanto più possibile i big bags sulle pedane al momento dello scarico ,", "dataVerifica": "2026-03-31", "azioneCorrettiva": "verifica Aspp scarico arachidi big bags- sensibilizzare fornitori", "responsabilita": "Step Change", "entroIl": "2026-06-30", "status": "In Corso", "chiusaIl": "", "commenti": ""}, {"id": 69, "tipo": "Near Miss", "area": "Pure", "dataSegn": "2026-03-16", "segnalatoDa": "Mazza", "compilatoDa": "Mazza", "problema": "assenza protezione tra operatore e coclea nella tramoggia", "priorita": 1, "causa": "Strutturale", "azioneProposta": "posizionare griglia tra la aperte a forma di parallelepipeedi e quella trapezoidale", "dataVerifica": "2026-03-31", "azioneCorrettiva": "", "responsabilita": "Step Change", "entroIl": "2026-03-18", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 70, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2026-05-05", "segnalatoDa": "Brizi", "compilatoDa": "Brizi", "problema": "presenza tubi davanti gruppo elettrogeno , difficoltà nell'accedere", "priorita": 1, "causa": "Strutturale", "azioneProposta": "rimozione spostamento tubi", "dataVerifica": "2026-05-07", "azioneCorrettiva": "", "responsabilita": "", "entroIl": "2026-05-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 71, "tipo": "Near Miss", "area": "Senza Latte", "dataSegn": "2026-04-09", "segnalatoDa": "Mazza", "compilatoDa": "Mazza", "problema": "magnete che blocca i vomeri del mixer mazzetti all'apertura dello sportello non funziona", "priorita": 1, "causa": "Strutturale", "azioneProposta": "contattati i manutentori i quali hanno telefonato all'elettricista e quanto prima ripristineranno il corretto funizonamento", "dataVerifica": "2026-04-13", "azioneCorrettiva": "intervento", "responsabilita": "Maintenance", "entroIl": "2026-04-13", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 72, "tipo": "Near Miss", "area": "Manutenzioni", "dataSegn": "2026-04-20", "segnalatoDa": "Lazzerini", "compilatoDa": "Lazzerini", "problema": "inalazioni polveri e gas da saldature", "priorita": 1, "causa": "Strutturale", "azioneProposta": "aspiratore", "dataVerifica": "2026-05-07", "azioneCorrettiva": "richiesta preventivi e soluzioni", "responsabilita": "Engineering", "entroIl": "2026-08-31", "status": "In Corso", "chiusaIl": "raccolta preventivi ", "commenti": ""}, {"id": 73, "tipo": "Near Miss", "area": "Manutenzioni", "dataSegn": "2026-04-20", "segnalatoDa": "Conti", "compilatoDa": "Conti", "problema": "nella stagione estiva l'officina diventa un forno", "priorita": 1, "causa": "Strutturale", "azioneProposta": "prima cosa da fare è coibentare il tetto per poi valutare eventuali soluzioni", "dataVerifica": "2026-05-07", "azioneCorrettiva": "richiesta preventivi e soluzioni", "responsabilita": "Engineering", "entroIl": "2026-06-30", "status": "In Corso", "chiusaIl": "raccolta preventivi ", "commenti": ""}, {"id": 74, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2026-04-17", "segnalatoDa": "Marzoli", "compilatoDa": "Marzoli", "problema": "mancanza totale illuminazione 1° compressore / idropulitrice 2° ingresso principale stabilimento", "priorita": 1, "causa": "Strutturale", "azioneProposta": "installazione lampade esterne nelle zone specificate", "dataVerifica": "2026-05-13", "azioneCorrettiva": "mancanza anche sopra uscita emergenza", "responsabilita": "Maintenance", "entroIl": "2026-05-31", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 75, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2026-04-23", "segnalatoDa": "Ferramondo Mauro", "compilatoDa": "Ferramondo Mauro", "problema": "i sensori della porta automatica di produzione non leggono per intero", "priorita": 1, "causa": "Strutturale", "azioneProposta": "sostituire sensore chiusura porta con sensori uguali a modelli degli altri reparti", "dataVerifica": "2026-05-07", "azioneCorrettiva": "parlare con Califano", "responsabilita": "Step Change", "entroIl": "2026-06-30", "status": "In Corso", "chiusaIl": "", "commenti": ""}, {"id": 76, "tipo": "Near Miss", "area": "Pure", "dataSegn": "2026-04-28", "segnalatoDa": "Galassi Flavia", "compilatoDa": "Antonaroli Matteo", "problema": "pericolo tranciamento dita mano per incauto ionserimento o prelevamento interno al coperchio coclea", "priorita": 1, "causa": "Strutturale", "azioneProposta": "inserimento griglia protettiva in acciaio per evitare il conttto con il fondo della coclea crico frangitore", "dataVerifica": "2026-05-07", "azioneCorrettiva": "si delimita in sicurezza l'area", "responsabilita": "Maintenance", "entroIl": "2026-06-30", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 77, "tipo": "Near Miss", "area": "Latte", "dataSegn": "2026-04-28", "segnalatoDa": "Andreoli Alessandro", "compilatoDa": "Andreoli Alessandro", "problema": "fungo emergenza presenta coperchio rotto dal trasplallet lifter lx 12 matr hl10542491", "priorita": 1, "causa": "Strutturale", "azioneProposta": "sostituzione fungo emergenza", "dataVerifica": "2026-05-07", "azioneCorrettiva": "", "responsabilita": "Step Change", "entroIl": "2026-06-30", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 78, "tipo": "Near Miss", "area": "Senza Latte", "dataSegn": "2026-05-05", "segnalatoDa": "Casini M", "compilatoDa": "Casini M", "problema": "cisterna CB1 non si ferma l'agitatore all'apertura dello sportello superiore", "priorita": 1, "causa": "Strutturale", "azioneProposta": "fotocellula presente da collegare nel quadro", "dataVerifica": "2026-05-07", "azioneCorrettiva": "", "responsabilita": "Maintenance", "entroIl": "2026-06-30", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 79, "tipo": "Near Miss", "area": "Senza Latte", "dataSegn": "2026-05-07", "segnalatoDa": "Casini M", "compilatoDa": "Tedeschi Andrea", "problema": "spigoli vivi nel nuvo quadro che comanda le valcole di apertura delle cisterne", "priorita": 1, "causa": "Strutturale", "azioneProposta": "limare gli spigoli vivi e renderli stondati", "dataVerifica": "2026-05-14", "azioneCorrettiva": "eseguito", "responsabilita": "Maintenance", "entroIl": "2026-06-30", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 80, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2026-05-07", "segnalatoDa": "Ferramondo Mauro", "compilatoDa": "Ferramondo Mauro", "problema": "presenza materiali su soppalco spogliatoio", "priorita": 2, "causa": "Comportamentale", "azioneProposta": "rimuovere materiale", "dataVerifica": "2026-05-07", "azioneCorrettiva": "", "responsabilita": "Step Change", "entroIl": "2026-06-30", "status": "Da Programmare", "chiusaIl": "", "commenti": ""}, {"id": 81, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2026-05-08", "segnalatoDa": "Ferramondo Mauro", "compilatoDa": "Ferramondo Mauro", "problema": "presenza scatole pericolanti etichette su scaffale vicino Robopak", "priorita": 2, "causa": "Comportamentale", "azioneProposta": "installare scaffale idoneo e riordinare le scatole delle etichette", "dataVerifica": "2026-05-07", "azioneCorrettiva": "", "responsabilita": "Step Change", "entroIl": "2026-06-30", "status": "Da Programmare", "chiusaIl": "", "commenti": ""}, {"id": 82, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2026-05-09", "segnalatoDa": "Ferramondo Mauro", "compilatoDa": "Ferramondo Mauro", "problema": "presenza pedane di fronte al quadro generale", "priorita": 2, "causa": "Comportamentale", "azioneProposta": "rimuovere pedane e / o installare barriera protettiva", "dataVerifica": "2026-05-07", "azioneCorrettiva": "", "responsabilita": "Step Change", "entroIl": "2026-06-30", "status": "In Ritardo", "chiusaIl": "", "commenti": ""}, {"id": 83, "tipo": "Near Miss", "area": "Semi", "dataSegn": "2026-05-10", "segnalatoDa": "Ferramondo Mauro", "compilatoDa": "Ferramondo Mauro", "problema": "pedane impilate in modo pericoloso nonostante le ripetute segnalazioni ai magazzinieri", "priorita": 1, "causa": "Comportamentale", "azioneProposta": "formare e sensibilizzare i magazzinieri per evitare spiacevboli situaizoni in futuro", "dataVerifica": "2026-05-07", "azioneCorrettiva": "", "responsabilita": "Step Change", "entroIl": "2026-06-30", "status": "Da Programmare", "chiusaIl": "", "commenti": ""}, {"id": 84, "tipo": "Near Miss", "area": "Aree comuni", "dataSegn": "2026-05-07", "segnalatoDa": "Giontella", "compilatoDa": "Giontella", "problema": "presenza operatori con anelli e orecchini", "priorita": 2, "causa": "Comportamentale", "azioneProposta": "senbilizzazione e maggior controllo", "dataVerifica": "2026-05-07", "azioneCorrettiva": "", "responsabilita": "Step Change", "entroIl": "2026-06-30", "status": "Da Programmare", "chiusaIl": "", "commenti": ""}, {"id": 85, "tipo": "Near Miss", "area": "Magazzino", "dataSegn": "2026-05-07", "segnalatoDa": "Marzoli V.", "compilatoDa": "Marzoli V.", "problema": "cavi con prese appoggiate a terra possibile contatto con liquidi", "priorita": 1, "causa": "Strutturale", "azioneProposta": "inserire nuove colonnine poste in prossimità del carica batterie", "dataVerifica": "2026-05-07", "azioneCorrettiva": "", "responsabilita": "Maintenance", "entroIl": "2026-05-31", "status": "Da Programmare", "chiusaIl": "", "commenti": ""}, {"id": 86, "tipo": "Near Miss", "area": "Magazzino", "dataSegn": "2026-05-07", "segnalatoDa": "Marzoli V.", "compilatoDa": "Calamanti Walter", "problema": "si fuma nell'area di ricarica dei carrelli elevatori periocolo incendio", "priorita": 2, "causa": "Comportamentale", "azioneProposta": "evitare di fumare in questa area", "dataVerifica": "2026-05-07", "azioneCorrettiva": "", "responsabilita": "Step Change", "entroIl": "2026-06-30", "status": "Da Programmare", "chiusaIl": "", "commenti": ""}, {"id": 87, "tipo": "Near Miss", "area": "Magazzino", "dataSegn": "2026-05-08", "segnalatoDa": "Marzoli V.", "compilatoDa": "Marzoli V.", "problema": "scatola comandi valvole pneumatiche con bordi taglienti", "priorita": 1, "causa": "Strutturale", "azioneProposta": "ricoprire i bordi con una guarnizione o levigare", "dataVerifica": "2026-05-07", "azioneCorrettiva": "", "responsabilita": "Maintenance", "entroIl": "2026-06-30", "status": "Completato", "chiusaIl": "", "commenti": ""}, {"id": 88, "tipo": "Near Miss", "area": "Pure", "dataSegn": "2026-05-12", "segnalatoDa": "Mazza", "compilatoDa": "Mazza", "problema": "fungo emergenza su emulsionatore mandorla scura", "priorita": 1, "causa": "Strutturale", "azioneProposta": "sostituzione fungo emergenza", "dataVerifica": "2026-05-12", "azioneCorrettiva": "", "responsabilita": "Maintenance", "entroIl": "2026-05-31", "status": "Da Programmare", "chiusaIl": "", "commenti": ""}, {"id": 89, "tipo": "Near Miss", "area": "Senza Latte", "dataSegn": "2026-04-30", "segnalatoDa": "Delogu", "compilatoDa": "Delogu", "problema": "lama del taglierino non retrattile spesso resta la lama fuori anche se riposto il taglierino in tasca , pericolo tagli lesioni gravi", "priorita": 1, "causa": "Strutturale", "azioneProposta": "adeguare acquisti taglierini di diversa fattura utile sia in produzione che al confez-to anche se con esigenze lavorative diverse", "dataVerifica": "2026-05-19", "azioneCorrettiva": "", "responsabilita": "Step Change", "entroIl": "2026-05-31", "status": "Da Programmare", "chiusaIl": "", "commenti": ""}, {"id": 90, "tipo": "Near Miss", "area": "Senza Latte", "dataSegn": "2026-04-30", "segnalatoDa": "Delogu", "compilatoDa": "Pizzi", "problema": "bordi profili in metallo o plexiglass taglienti conseguenti possibili ferite al corpo", "priorita": 1, "causa": "Strutturale", "azioneProposta": "arrotondare profili", "dataVerifica": "2026-05-19", "azioneCorrettiva": "", "responsabilita": "Maintenance", "entroIl": "2026-05-31", "status": "Programmato", "chiusaIl": "", "commenti": ""}, {"id": 91, "tipo": "Near Miss", "area": "Senza Latte", "dataSegn": "2026-04-30", "segnalatoDa": "Delogu", "compilatoDa": "Delogu", "problema": "stantuffo utile alla pulizia dei tubi entrata in tramoggia si blocca all'interno , si incastra nella valvola per tirarlo fuori ci si fa male o non si riesce affatto", "priorita": 1, "causa": "Strutturale", "azioneProposta": "modificare lo strumento o ripensarlo completamente flessibile", "dataVerifica": "2026-05-19", "azioneCorrettiva": "", "responsabilita": "Maintenance", "entroIl": "2026-05-31", "status": "Da Programmare", "chiusaIl": "", "commenti": ""}, {"id": 92, "tipo": "Near Miss", "area": "Magazzino", "dataSegn": "2026-05-19", "segnalatoDa": "Galassi", "compilatoDa": "Galassi", "problema": "cisaterne ibc da 1000 sovrapposte a 3 file peso totale 3000 kg", "priorita": 1, "causa": "Comportamentale", "azioneProposta": "predisporre solamente a 2 file", "dataVerifica": "2026-05-19", "azioneCorrettiva": "", "responsabilita": "Step Change", "entroIl": "2026-05-31", "status": "Da Programmare", "chiusaIl": "", "commenti": ""}];
+var SEED_CFG = {
+  azienda: "DEA S.R.L.",
+  tipi: ["Near Miss","Infortunio","Mancato Infortunio","Condizione Pericolosa"],
+  aree: ["Aree comuni","Fudex","Latte","Magazzino","Manutenzioni","Pure","Semi","Senza Latte"],
+  resp: ["Maintenance","Step Change","Engineering","Q&A","Step Change / Maintenance","Step Change / Engineering","Engineering / Maintenance"]
+};
+/* --- Selettore azienda / vista per-azienda --- */
+function defaultCfg(){ return { azienda:"", tipi:(SEED_CFG.tipi||["Near Miss","Infortunio","Mancato Infortunio","Condizione Pericolosa"]).slice(), aree:[], resp:(SEED_CFG.resp||["Maintenance","Step Change","Engineering"]).slice() }; }
+function nomeAzi(){ for(var i=0;i<AZIENDE.length;i++){ if(AZIENDE[i].id===aziId) return AZIENDE[i].nome; } return ""; }
+function initSelAzi(){ var s=document.getElementById("selAzi"); if(!s) return; s.innerHTML=""; for(var i=0;i<AZIENDE.length;i++){ var o=document.createElement("option"); o.value=AZIENDE[i].id; o.textContent=AZIENDE[i].nome; if(AZIENDE[i].id===aziId)o.selected=true; s.appendChild(o); } }
+function cambiaAzi(){ aziId=Number(document.getElementById("selAzi").value); if(!DATI_BY[aziId]) DATI_BY[aziId]=[]; if(!CFG_BY[aziId]) CFG_BY[aziId]=defaultCfg(); dati=DATI_BY[aziId]; cfg=CFG_BY[aziId]; cfg.azienda=nomeAzi(); renderImpostazioni(); renderFormRapido(); render(); }
+function mostraNessunAzienda(){ var d=document.createElement("div"); d.style.cssText="margin:20px;padding:16px 18px;background:#fdf3e3;border:1px solid #e6c98a;border-radius:10px;color:#7a5b1e;font-size:14px"; d.innerHTML="<b>Nessuna azienda in anagrafica.</b><br>Apri il modulo <b>Aziende</b>, inserisci almeno un'azienda, poi ricarica questa pagina."; document.body.insertBefore(d, document.body.firstChild); }
+
+let editId = null;
+
+function fd(iso){ return iso ? Fond.fmtData(iso) : ""; }
+function inRitardo(r){ return r.status!=="Completato" && r.entroIl && r.entroIl < OGGI; }
+function statoEffettivo(r){ return inRitardo(r) ? "In Ritardo" : r.status; }
+function badgeStato(st){
+  const map={"Completato":"b-ok","In Ritardo":"b-rosso","In Corso":"b-blu","Programmato":"b-aranc","Da Programmare":"b-grigio"};
+  return '<span class="badge '+(map[st]||"b-grigio")+'">'+st+'</span>';
+}
+function badgePrio(p){ return '<span class="prio p'+p+'">'+p+'</span>'; }
+
+/* ---------- TABS ---------- */
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");
+  document.querySelectorAll("main > section").forEach(s=>s.style.display="none");
+  document.getElementById("tab-"+b.dataset.tab).style.display="";
+});
+
+/* ---------- SELECT POPOLATE ---------- */
+function opz(sel, arr, vuota){
+  const s=document.getElementById(sel); const val=s.value;
+  s.innerHTML=(vuota?'<option value="">'+vuota+'</option>':'')+arr.map(a=>'<option>'+a+'</option>').join("");
+  if(val) s.value=val;
+}
+function refreshSelects(){
+  opz("fTipo",cfg.tipi,"Tutti i tipi"); opz("fArea",cfg.aree,"Tutte le aree");
+  opz("fStato",["Da Programmare","Programmato","In Corso","In Ritardo","Completato"],"Tutti gli stati");
+  opz("fCausa",["Strutturale","Comportamentale"],"Tutte le cause");
+  opz("mTipo",cfg.tipi); opz("mArea",cfg.aree); opz("mResp",cfg.resp,"- nessuna -");
+}
+
+/* ---------- DASHBOARD ---------- */
+function renderDashboard(){
+  const tot=dati.length;
+  const aperte=dati.filter(r=>r.status!=="Completato");
+  const ritardo=dati.filter(inRitardo);
+  const lim=new Date(); lim.setDate(lim.getDate()+30); const lim30=lim.toISOString().slice(0,10);
+  const scadenza=dati.filter(r=>r.status!=="Completato" && r.entroIl && r.entroIl>=OGGI && r.entroIl<=lim30);
+  const chiuse=dati.filter(r=>r.status==="Completato");
+  const kpi=[
+    {n:tot,l:"Segnalazioni totali",c:"neutra",f:""},
+    {n:aperte.length,l:"Aperte",c:"blu",f:"aperte"},
+    {n:ritardo.length,l:"In ritardo",c:"rossa",f:"In Ritardo"},
+    {n:scadenza.length,l:"In scadenza (30 gg)",c:"aranc",f:"scad"},
+    {n:chiuse.length,l:"Completate",c:"verde",f:"Completato"},
+  ];
+  document.getElementById("kpi").innerHTML=kpi.map(k=>'<div class="card '+k.c+'" onclick="vaiGestione(\''+k.f+'\')"><div class="num">'+k.n+'</div><div class="lbl">'+k.l+'</div></div>').join("");
+
+  const critiche=[...ritardo,...scadenza].sort((a,b)=>(a.entroIl||"").localeCompare(b.entroIl||""));
+  document.getElementById("tbCritiche").innerHTML = critiche.length ? critiche.map(r=>
+    '<tr style="cursor:pointer" onclick="apriModale('+r.id+')"><td>'+r.id+'</td><td>'+r.tipo+'</td><td>'+r.area+'</td><td>'+r.problema+'</td><td>'+badgePrio(r.priorita)+'</td><td>'+r.responsabilita+'</td><td>'+fd(r.entroIl)+'</td><td>'+badgeStato(statoEffettivo(r))+'</td></tr>').join("")
+    : '<tr><td colspan="8" class="hint">Nessuna azione in ritardo o in scadenza. Il registro e sotto controllo.</td></tr>';
+
+  const perArea={}; cfg.aree.forEach(a=>perArea[a]={tot:0,ap:0});
+  dati.forEach(r=>{ if(!perArea[r.area]) perArea[r.area]={tot:0,ap:0}; perArea[r.area].tot++; if(r.status!=="Completato") perArea[r.area].ap++; });
+  const maxA=Math.max(...Object.values(perArea).map(v=>v.tot),1);
+  document.getElementById("statArea").innerHTML=Object.entries(perArea).sort((a,b)=>b[1].tot-a[1].tot).map(([a,v])=>
+    '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px"><div style="width:120px;font-size:12.5px">'+a+'</div><div style="flex:1;background:#eceff1;border-radius:5px"><div class="rank-bar" style="width:'+(v.tot/maxA*100)+'%"></div></div><div style="width:90px;font-size:12px;color:var(--grigio)">'+v.tot+' ('+v.ap+' aperte)</div></div>').join("");
+
+  const perCausa={}; dati.forEach(r=>{perCausa[r.causa||"n.d."]=(perCausa[r.causa||"n.d."]||0)+1;});
+  const perTipo={}; dati.forEach(r=>{perTipo[r.tipo]=(perTipo[r.tipo]||0)+1;});
+  document.getElementById("statCausa").innerHTML =
+    Object.entries(perCausa).map(([c,n])=>'<div style="margin-bottom:6px"><b>'+c+'</b>: '+n+' ('+Math.round(n/tot*100)+'%)</div>').join("")+
+    '<hr style="border:none;border-top:1px solid #eceff1;margin:10px 0">'+
+    Object.entries(perTipo).map(([c,n])=>'<div style="margin-bottom:6px">'+c+': '+n+'</div>').join("");
+}
+function vaiGestione(f){
+  document.querySelector('[data-tab="gestione"]').click();
+  document.getElementById("fTesto").value=""; document.getElementById("fStato").value="";
+  if(f==="In Ritardo"||f==="Completato") document.getElementById("fStato").value=f;
+  render();
+  if(f==="aperte"||f==="scad"){ filtroSpeciale=f; render(); } else filtroSpeciale=null;
+}
+let filtroSpeciale=null;
+
+/* ---------- GESTIONE ---------- */
+function render(){
+  refreshSelects();
+  const t=document.getElementById("fTesto").value.toLowerCase();
+  const ft=document.getElementById("fTipo").value, fa=document.getElementById("fArea").value,
+        fs=document.getElementById("fStato").value, fp=document.getElementById("fPrio").value, fc=document.getElementById("fCausa").value;
+  const lim=new Date(); lim.setDate(lim.getDate()+30); const lim30=lim.toISOString().slice(0,10);
+  let rows=dati.filter(r=>{
+    if(ft&&r.tipo!==ft) return false;
+    if(fa&&r.area!==fa) return false;
+    if(fs&&statoEffettivo(r)!==fs) return false;
+    if(fp&&String(r.priorita)!==fp) return false;
+    if(fc&&r.causa!==fc) return false;
+    if(filtroSpeciale==="aperte"&&r.status==="Completato") return false;
+    if(filtroSpeciale==="scad"&&!(r.status!=="Completato"&&r.entroIl&&r.entroIl>=OGGI&&r.entroIl<=lim30)) return false;
+    if(t){ const blob=(r.problema+" "+r.azioneProposta+" "+r.azioneCorrettiva+" "+r.segnalatoDa+" "+r.compilatoDa+" "+r.commenti).toLowerCase(); if(!blob.includes(t)) return false; }
+    return true;
+  }).sort((a,b)=>b.id-a.id);
+  document.getElementById("conteggio").textContent=rows.length+" segnalazioni su "+dati.length;
+  document.getElementById("tbReg").innerHTML=rows.map(r=>
+    '<tr><td>'+r.id+'</td><td>'+r.tipo+'</td><td>'+r.area+'</td><td>'+fd(r.dataSegn)+'</td><td>'+r.segnalatoDa+'</td><td style="max-width:280px">'+r.problema+'</td><td>'+badgePrio(r.priorita)+'</td><td>'+(r.causa||"")+'</td><td style="max-width:260px">'+(r.azioneCorrettiva||r.azioneProposta)+'</td><td>'+r.responsabilita+'</td><td>'+fd(r.entroIl)+'</td><td>'+badgeStato(statoEffettivo(r))+'</td><td>'+fd(r.chiusaIl)+'</td><td class="azioni-col"><button class="mini" onclick="apriModale('+r.id+')">Modifica</button><button class="mini" onclick="chiudiRapido('+r.id+')">Completa</button></td></tr>').join("");
+  renderDashboard(); renderClassifica();
+}
+function chiudiRapido(id){
+  const r=dati.find(x=>x.id===id);
+  r.status="Completato"; if(!r.chiusaIl) r.chiusaIl=OGGI;
+  persisti();
+  render();
+}
+
+/* ---------- MODALE ---------- */
+function apriModale(id){
+  refreshSelects();
+  editId=id||null;
+  document.getElementById("btnElimina").style.display=id?"":"none";
+  document.getElementById("modalTitolo").textContent=id?("Segnalazione n. "+id):"Nuova segnalazione";
+  const r=id?dati.find(x=>x.id===id):{tipo:"Near Miss",area:(cfg.aree[0]||""),dataSegn:OGGI,segnalatoDa:"",compilatoDa:"",problema:"",priorita:1,causa:"Strutturale",azioneProposta:"",dataVerifica:"",azioneCorrettiva:"",responsabilita:"",entroIl:"",status:"Da Programmare",chiusaIl:"",commenti:""};
+  mTipo.value=r.tipo; mArea.value=r.area; mData.value=r.dataSegn; mSegnalato.value=r.segnalatoDa; mCompilato.value=r.compilatoDa;
+  mProblema.value=r.problema; mPrio.value=r.priorita; mCausa.value=r.causa||"Strutturale"; mProposta.value=r.azioneProposta;
+  mAzione.value=r.azioneCorrettiva; mResp.value=r.responsabilita; mVerifica.value=r.dataVerifica; mEntro.value=r.entroIl;
+  mStato.value=r.status; mChiusa.value=r.chiusaIl; mCommenti.value=r.commenti;
+  document.getElementById("modalBg").classList.add("open");
+}
+function chiudiModale(){ document.getElementById("modalBg").classList.remove("open"); }
+function salva(){
+  if(!mProblema.value.trim()){ alert("Inserire la descrizione del problema."); return; }
+  const r=editId?dati.find(x=>x.id===editId):{id:Math.max(0,...dati.map(x=>x.id))+1};
+  Object.assign(r,{tipo:mTipo.value,area:mArea.value,dataSegn:mData.value,segnalatoDa:mSegnalato.value,compilatoDa:mCompilato.value,
+    problema:mProblema.value.trim(),priorita:parseInt(mPrio.value),causa:mCausa.value,azioneProposta:mProposta.value.trim(),
+    dataVerifica:mVerifica.value,azioneCorrettiva:mAzione.value.trim(),responsabilita:mResp.value,entroIl:mEntro.value,
+    status:mStato.value,chiusaIl:mChiusa.value,commenti:mCommenti.value.trim()});
+  if(r.status==="Completato"&&!r.chiusaIl) r.chiusaIl=OGGI;
+  if(!editId) dati.push(r);
+  persisti();
+  chiudiModale(); render();
+}
+function elimina(){
+  if(!confirm("Eliminare definitivamente la segnalazione n. "+editId+"?")) return;
+  dati=DATI_BY[aziId]=dati.filter(x=>x.id!==editId); persisti(); chiudiModale(); render();
+}
+
+/* ---------- FORM RAPIDO ---------- */
+function renderFormRapido(){
+  document.getElementById("formRapido").innerHTML=
+  '<div class="grid3">'
+  +'<div class="campo"><label>Tipo</label><select id="qTipo">'+cfg.tipi.map(t=>'<option>'+t+'</option>').join("")+'</select></div>'
+  +'<div class="campo"><label>Area / reparto</label><select id="qArea">'+cfg.aree.map(a=>'<option>'+a+'</option>').join("")+'</select></div>'
+  +'<div class="campo"><label>Data</label><input type="date" id="qData" value="'+OGGI+'"></div></div>'
+  +'<div class="grid2"><div class="campo"><label>Segnalato da</label><input type="text" id="qNome"></div>'
+  +'<div class="campo"><label>Priorita percepita</label><select id="qPrio"><option value="1">1 - Alta</option><option value="2" selected>2 - Media</option><option value="3">3 - Bassa</option></select></div></div>'
+  +'<div class="campo"><label>Cosa e successo / cosa hai osservato</label><textarea id="qProblema" style="min-height:90px"></textarea></div>'
+  +'<div class="campo"><label>Suggerimento per risolvere (facoltativo)</label><textarea id="qProposta"></textarea></div>'
+  +'<button class="btn" onclick="invioRapido()">Registra segnalazione</button> <span class="hint" id="qEsito"></span>';
+}
+function invioRapido(){
+  if(!document.getElementById("qProblema").value.trim()){ alert("Descrivere la segnalazione."); return; }
+  const id=Math.max(0,...dati.map(x=>x.id))+1;
+  dati.push({id,tipo:qTipo.value,area:qArea.value,dataSegn:qData.value,segnalatoDa:qNome.value.trim(),compilatoDa:qNome.value.trim(),
+    problema:qProblema.value.trim(),priorita:parseInt(qPrio.value),causa:"",azioneProposta:qProposta.value.trim(),
+    dataVerifica:"",azioneCorrettiva:"",responsabilita:"",entroIl:"",status:"Da Programmare",chiusaIl:"",commenti:""});
+  document.getElementById("qEsito").textContent="Segnalazione n. "+id+" registrata.";
+  document.getElementById("qProblema").value=""; document.getElementById("qProposta").value="";
+  persisti();
+  render();
+}
+
+/* ---------- CLASSIFICA ---------- */
+function renderClassifica(){
+  const conteggi={};
+  dati.forEach(r=>{ const n=r.segnalatoDa.trim(); if(!n) return; const chiave=n.split(" ")[0]; conteggi[chiave]=(conteggi[chiave]||0)+1; });
+  const ord=Object.entries(conteggi).sort((a,b)=>b[1]-a[1]);
+  const max=ord.length?ord[0][1]:1;
+  document.getElementById("ranking").innerHTML=ord.map(([n,c],i)=>
+    '<div class="rank-row"><div class="rank-pos">'+(i+1)+'</div><div style="width:150px;font-weight:600">'+n+'</div><div style="flex:1;background:#eceff1;border-radius:5px"><div class="rank-bar" style="width:'+(c/max*100)+'%"></div></div><div style="width:36px;text-align:right;font-weight:700;color:var(--verde)">'+c+'</div></div>').join("");
+  const chiuse=dati.filter(r=>r.status==="Completato"&&r.dataSegn&&r.chiusaIl);
+  let media="";
+  if(chiuse.length){
+    const gg=chiuse.map(r=>(new Date(r.chiusaIl)-new Date(r.dataSegn))/86400000).filter(v=>v>=0);
+    media=Math.round(gg.reduce((a,b)=>a+b,0)/gg.length);
+    document.getElementById("tempoMedio").innerHTML='<div class="card verde" style="max-width:260px;cursor:default"><div class="num">'+media+' giorni</div><div class="lbl">dalla segnalazione alla chiusura ('+gg.length+' azioni con date complete)</div></div>';
+  } else document.getElementById("tempoMedio").innerHTML='<span class="hint">Nessuna azione chiusa con date complete.</span>';
+}
+
+/* ---------- EMAIL / IMPOSTAZIONI ---------- */
+function salvaEmail(){ document.getElementById("emailSalvata").textContent="Configurazione salvata."; setTimeout(()=>document.getElementById("emailSalvata").textContent="",2500); }
+function renderImpostazioni(){
+  var _naz=nomeAzi();
+  var _sa=document.getElementById("setAzienda"); if(_sa){ _sa.value=_naz; _sa.readOnly=true; _sa.oninput=null; _sa.title="L'azienda si sceglie in alto e si gestisce nel Modulo Aziende"; }
+  document.getElementById("hdrAzienda").textContent=_naz;
+  document.getElementById("lblAziendaEmail").textContent=_naz;
+  document.getElementById("chipAree").innerHTML=cfg.aree.map((a,i)=>'<span class="chip">'+a+'<b onclick="rimuovi(\'aree\','+i+')">x</b></span>').join("");
+  document.getElementById("chipResp").innerHTML=cfg.resp.map((a,i)=>'<span class="chip">'+a+'<b onclick="rimuovi(\'resp\','+i+')">x</b></span>').join("");
+}
+function aggiungi(lista,inputId){
+  const v=document.getElementById(inputId).value.trim();
+  if(v&&!cfg[lista].includes(v)){ cfg[lista].push(v); document.getElementById(inputId).value=""; persisti(); renderImpostazioni(); render(); renderFormRapido(); }
+}
+function rimuovi(lista,i){ cfg[lista].splice(i,1); persisti(); renderImpostazioni(); render(); renderFormRapido(); }
+
+/* ---------- EXPORT ---------- */
+function esportaCSV(){
+  const head=["N","Tipo","Area","Data Segnalazione","Segnalato Da","Compilato Da","Problema","Priorita","Causa","Azione Proposta","Data Verifica","Azione Correttiva","Responsabilita","Entro il","Stato","Chiusa il","Commenti"];
+  const righe=dati.map(r=>[r.id,r.tipo,r.area,fd(r.dataSegn),r.segnalatoDa,r.compilatoDa,r.problema,r.priorita,r.causa,r.azioneProposta,fd(r.dataVerifica),r.azioneCorrettiva,r.responsabilita,fd(r.entroIl),statoEffettivo(r),fd(r.chiusaIl),r.commenti]
+    .map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(";"));
+  const blob=new Blob(["\uFEFF"+head.join(";")+"\n"+righe.join("\n")],{type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="registro_near_miss.csv"; a.click();
+}
+
+/* ---------- PERSISTENZA (localStorage; Firebase la sostituirà) ---------- */
+/* Persiste i record (dati) e la configurazione liste (cfg). */
+const LS_KEY="nearmiss_dati_v1";
+function persisti(){
+  Store.save(LS_KEY, {DATI_BY:DATI_BY, CFG_BY:CFG_BY, aziId:aziId})
+    .catch(function(e){ console.warn("Salvataggio non riuscito:", e); });
+}
+/* caricaLS() ASINCRONA: anagrafica condivisa + segnalazioni/config per-azienda (con migrazione dal formato piatto). */
+function caricaLS(){
+  return Promise.all([ Store.aziende(), Store.load(LS_KEY) ]).then(function(res){
+    AZIENDE = res[0] || [];
+    var d = res[1];
+    var firstId = AZIENDE.length ? AZIENDE[0].id : null;
+    if(d && d.DATI_BY){ DATI_BY = d.DATI_BY; CFG_BY = d.CFG_BY || {}; }
+    else if(d && Array.isArray(d.dati)){ DATI_BY={}; CFG_BY={}; if(firstId!==null){ DATI_BY[firstId]=d.dati; CFG_BY[firstId]=d.cfg||defaultCfg(); } }  /* vecchio formato piatto → prima azienda */
+    else { DATI_BY={}; CFG_BY={}; if(firstId!==null){ DATI_BY[firstId]=SEED_DATI.slice(); CFG_BY[firstId]=SEED_CFG; } }                    /* primo avvio: registro seed alla prima azienda */
+    if(d && d.aziId) aziId = d.aziId;
+    if(AZIENDE.length){ var ok=false; for(var i=0;i<AZIENDE.length;i++){ if(AZIENDE[i].id===aziId){ok=true;break;} } if(!ok) aziId=firstId; }
+    else aziId=null;
+    if(aziId!==null){ if(!DATI_BY[aziId]) DATI_BY[aziId]=[]; if(!CFG_BY[aziId]) CFG_BY[aziId]=defaultCfg(); dati=DATI_BY[aziId]; cfg=CFG_BY[aziId]; cfg.azienda=nomeAzi(); }
+    else { dati=[]; cfg=defaultCfg(); }
+    return AZIENDE.length > 0;
+  }).catch(function(e){ console.warn("Caricamento non riuscito:", e); return false; });
+}
+/* Export/import JSON: ponte per lavorare tra più PC finché non c'è Firebase.
+   (l'export CSV resta per Excel; questo è il backup completo ripristinabile) */
+function esportaJSON(){
+  const blob=new Blob([JSON.stringify({dati:dati, cfg:cfg}, null, 2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="near_miss_dati_"+Fond.oggiIT().replace(/\//g,"-")+".json";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}
+function importaJSON(input){
+  const file=input.files && input.files[0];
+  if(!file) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(!d || !Array.isArray(d.dati)){ alert("File non valido: manca l'elenco segnalazioni."); return; }
+      if(!confirm("Importare i dati dal file? I dati attuali verranno sostituiti.")) return;
+      DATI_BY[aziId]=d.dati; dati=DATI_BY[aziId]; if(d.cfg){ CFG_BY[aziId]=d.cfg; cfg=CFG_BY[aziId]; cfg.azienda=nomeAzi(); }
+      persisti(); renderImpostazioni(); renderFormRapido(); render();
+      alert("Dati importati.");
+    }catch(e){ alert("File non leggibile: "+e.message); }
+    input.value="";
+  };
+  r.readAsText(file);
+}
+
+/* Avvio: carica dati salvati; se assenti restano i dati seed già in memoria */
+caricaLS().then(function(){
+  if(!AZIENDE.length){ mostraNessunAzienda(); return; }
+  initSelAzi(); renderImpostazioni(); renderFormRapido(); render();
+});
+</script>
+</body>
+</html>

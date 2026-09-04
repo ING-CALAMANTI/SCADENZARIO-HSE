@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Modulo Adempimenti 1</title>
+<link rel="stylesheet" href="fondamenta.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;font-size:14px;background:var(--grigio);color:var(--verde)}
+input,select,textarea,button{font-family:inherit;font-size:13px}
+input,select,textarea{border:1px solid #ccc;border-radius:6px;padding:6px 10px;background:#fff}
+input[type=checkbox]{width:auto;margin:0;cursor:pointer}
+button{border:1px solid #ccc;border-radius:6px;padding:6px 12px;background:#fff;cursor:pointer}
+button:hover{background:#eee}
+.bp{background:var(--verde);color:#fff;border-color:var(--verde)}.bp:hover{background:var(--verde-scuro)}
+.br{background:var(--rosso);color:#fff;border-color:var(--rosso)}.br:hover{background:#a93226}
+.bg{background:var(--ok);color:#fff;border-color:var(--ok)}.bg:hover{background:#219150}
+.hdr{background:var(--verde);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.hdr h1{font-size:15px;font-weight:600}
+.hdr select{background:var(--verde-scuro);color:#fff;border-color:#555;width:auto}
+.nav{background:#fff;border-bottom:1px solid #ddd;display:flex;padding:0 20px;overflow-x:auto}
+.ntab{padding:11px 18px;font-size:13px;cursor:pointer;border-bottom:3px solid transparent;color:#666;white-space:nowrap;font-weight:500}
+.ntab.on{border-bottom-color:var(--verde);color:var(--verde)}
+.pg{padding:20px;max-width:1300px;margin:0 auto;display:none}.pg.on{display:block}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:20px}
+.card{background:#fff;border-radius:8px;padding:14px;border:1px solid #ddd}
+.card .n{font-size:26px;font-weight:700;margin-top:4px}
+.cr{background:var(--rosso-bg)}.cr .n,.cr .l{color:var(--rosso)}
+.co{background:var(--arancio-bg)}.co .n,.co .l{color:var(--arancio)}
+.cg{background:var(--ok-bg)}.cg .n,.cg .l{color:var(--ok)}
+.badge{font-size:11px;padding:2px 7px;border-radius:4px;white-space:nowrap;display:inline-block;font-weight:500}
+.bs{background:var(--rosso-bg);color:var(--rosso)}.bi{background:var(--arancio-bg);color:var(--arancio)}.bo{background:var(--ok-bg);color:var(--ok)}.bn{background:#f0f0ee;color:#888}
+.be{background:#eef2fb;color:#3d5a99}
+.tb{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+.tb input.search{flex:1;min-width:160px}
+.tw{overflow-x:auto;border-radius:8px;border:1px solid #ddd}
+table{width:100%;border-collapse:collapse;background:#fff;min-width:900px}
+th{background:#f5f5f3;padding:8px 10px;text-align:left;font-weight:600;font-size:11px;border-bottom:1px solid #ddd;white-space:nowrap;text-transform:uppercase;letter-spacing:.4px;color:#555}
+td{padding:8px 10px;border-bottom:1px solid #f0f0ee;font-size:12px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafaf8}
+.info-box{background:#e8f4fd;border:1px solid #b3d7f5;border-radius:8px;padding:12px;font-size:13px;color:#1a5276;margin-bottom:16px}
+.mbg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;align-items:center;justify-content:center}
+.mbg.on{display:flex}
+.mdl{background:#fff;border-radius:12px;padding:22px;width:94%;max-width:580px;max-height:88vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+.mdl h3{font-size:15px;font-weight:600;margin-bottom:14px}
+.fld{margin-bottom:10px}
+.fld label{display:block;font-size:12px;color:#666;margin-bottom:3px;font-weight:500}
+.fld input,.fld select,.fld textarea{width:100%}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.cat-item{background:#fff;border:1px solid #ddd;border-radius:8px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.azione-item{border:1px solid #eee;border-left:3px solid var(--verde);border-radius:6px;padding:8px 12px;margin-bottom:6px;background:#fafaf8;font-size:12px}
+.azione-data{font-weight:600;color:var(--grigio-neutro);margin-bottom:2px}
+.sub-box{background:#f9f9f7;border-radius:8px;padding:12px;margin-bottom:12px;border:1px solid #eee}
+.doc-chip{display:inline-flex;align-items:center;gap:4px;background:#eef2fb;color:#3d5a99;border-radius:4px;padding:2px 6px;font-size:11px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <h1>Modulo Adempimenti 1</h1>
+  <div style="display:flex;gap:8px;align-items:center">
+    <select id="selAzi" onchange="cambiaAzi()" style="min-width:170px"></select>
+    <button class="bp" onclick="openNuovaAzi()">+ Azienda</button>
+    <button class="bp" onclick="esportaDati()" title="Scarica i dati in un file per portarli su un altro PC">Esporta</button>
+    <button class="bp" onclick="document.getElementById('impFile').click()" title="Carica un file di dati esportato">Importa</button>
+    <input type="file" id="impFile" accept=".json" style="display:none" onchange="importaDati(this)">
+  </div>
+</div>
+
+<div class="nav">
+  <div class="ntab on" onclick="showTab(0)">Dashboard</div>
+  <div class="ntab" onclick="showTab(1)">Scadenzario</div>
+  <div class="ntab" onclick="showTab(2)">Catalogo</div>
+  <div class="ntab" onclick="showTab(5)">Storico invii</div>
+  <div class="ntab" onclick="showTab(4)">Email</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="pg on" id="p0">
+  <div id="scopeBar" style="display:none;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+    <span style="font-size:12px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.4px">Vista</span>
+    <select id="dashScope" onchange="renderDash()" style="width:auto">
+      <option value="azienda">Azienda corrente</option>
+      <option value="tutte">Tutte le aziende (consulente)</option>
+    </select>
+  </div>
+  <div class="cards">
+    <div class="card cr" onclick="vaiAStato('scaduta')" style="cursor:pointer"><div class="l">Scadute</div><div class="n" id="cS">0</div></div>
+    <div class="card co" onclick="vaiAStato('in_scadenza')" style="cursor:pointer"><div class="l">In scadenza</div><div class="n" id="cI">0</div></div>
+    <div class="card cg" onclick="vaiAStato('ok')" style="cursor:pointer"><div class="l">Regolari</div><div class="n" id="cO">0</div></div>
+    <div class="card" onclick="vaiAStato('evento')" style="cursor:pointer"><div class="l">Ad evento</div><div class="n" id="cE">0</div></div>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap">
+    <p style="font-size:13px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.4px;margin:0">Scadenze</p>
+    <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#666">
+      <label for="dashFinestra" style="font-weight:500">Mostra fino a</label>
+      <select id="dashFinestra" onchange="renderDash()" style="width:auto">
+        <option value="30">30 giorni</option>
+        <option value="60">60 giorni</option>
+        <option value="90" selected>90 giorni</option>
+        <option value="180">180 giorni</option>
+        <option value="9999">Tutte</option>
+      </select>
+    </div>
+  </div>
+  <div id="urgenti"></div>
+</div>
+
+<!-- SCADENZARIO -->
+<div class="pg" id="p1">
+  <div class="tb">
+    <select id="scadScope" onchange="renderScad()" style="width:auto;display:none">
+      <option value="azienda">Azienda corrente</option>
+      <option value="tutte">Tutte le aziende</option>
+    </select>
+    <input type="text" class="search" id="cerca" placeholder="Cerca adempimento, aspetto, riferimento..." oninput="renderScad()">
+    <select id="filtroTipo" onchange="renderScad()" style="width:auto">
+      <option value="tutti">Periodiche + Ad evento</option>
+      <option value="periodica">Solo periodiche</option>
+      <option value="evento">Solo ad evento</option>
+    </select>
+    <select id="filtroAspetto" onchange="renderScad()" style="width:auto"><option value="__tutti__">Tutti gli aspetti</option></select>
+    <select id="filtroStato" onchange="renderScad()" style="width:auto">
+      <option value="tutti">Tutti gli stati</option>
+      <option value="scaduta">Scadute</option>
+      <option value="in_scadenza">In scadenza</option>
+      <option value="ok">Regolari</option>
+    </select>
+    <button class="bp" onclick="openFormAdemp(null)">+ Nuovo</button>
+  </div>
+  <div class="tw">
+    <table>
+      <thead><tr>
+        <th class="colAzienda" style="display:none">Azienda</th><th>Aspetto</th><th>Adempimento</th><th>Rif. Legislativo</th><th>Freq.</th>
+        <th>Ultima esec.</th><th>Scadenza</th><th>Giorni</th><th>Stato</th><th>Doc</th><th>Note</th><th></th>
+      </tr></thead>
+      <tbody id="tbodyScad"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- CATALOGO -->
+<div class="pg" id="p2">
+  <div class="info-box">Cerca e seleziona gli adempimenti da aggiungere a <strong id="catNome"></strong>. Usa la ricerca per trovarli velocemente.</div>
+  <div class="tb">
+    <input type="text" class="search" id="cercaCat" placeholder="Cerca nel catalogo (es. DVR, amianto, formazione)..." oninput="renderCatalogo()">
+    <button onclick="selTuttiCat(true)">Sel. visibili</button>
+    <button onclick="selTuttiCat(false)">Deseleziona</button>
+    <button class="bp" onclick="importaCatalogo()">Importa selezionati</button>
+  </div>
+  <div id="catList"></div>
+</div>
+
+<!-- STORICO INVII (globale) -->
+<div class="pg" id="p5">
+  <div class="info-box">Registro di tutti gli invii effettuati. Il testo di ogni comunicazione è congelato com'era al momento dell'invio, così può essere riprodotto tale e quale come prova documentale.</div>
+  <div class="tb">
+    <select id="storScope" onchange="renderStorico()" style="width:auto;display:none">
+      <option value="azienda">Azienda corrente</option>
+      <option value="tutte">Tutte le aziende</option>
+    </select>
+    <input type="text" class="search" id="storCerca" placeholder="Cerca per adempimento, destinatario, email..." oninput="renderStorico()">
+    <select id="storPeriodo" onchange="renderStorico()" style="width:auto">
+      <option value="12" selected>Ultimi 12 mesi</option>
+      <option value="18">Ultimi 18 mesi</option>
+      <option value="24">Ultimi 24 mesi</option>
+      <option value="9999">Tutto lo storico</option>
+    </select>
+    <button onclick="exportStoricoCSV()" style="font-size:13px">Esporta CSV</button>
+  </div>
+  <div id="storList"></div>
+</div>
+
+<!-- CONFIGURAZIONE EMAIL (globale) -->
+<div class="pg" id="p4">
+  <div class="info-box">L'invio automatico verra attivato con l'integrazione Firebase / Brevo. I parametri impostati qui valgono come modello predefinito per tutti gli adempimenti dell'azienda selezionata (<span id="lblAziendaEmail"></span>), sempre indicata nell'oggetto e nel corpo. Il testo del singolo adempimento, se compilato nel suo modale, ha la precedenza su questo (override).</div>
+  <div style="background:#fff;border:1px solid #ddd;border-radius:8px;padding:16px;max-width:820px">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><input type="checkbox" id="gAuto" checked><label for="gAuto" style="margin:0;font-weight:600;cursor:pointer">Invio automatico attivo — promemoria inviati in prossimita della scadenza</label></div>
+    <div class="fld" style="max-width:200px"><label>Giorni di preavviso (default)</label><input type="number" id="gPreavviso" value="60"></div>
+    <div class="g2">
+      <div class="fld"><label>Email amministratore / consulente</label><input type="email" id="gEmailAdmin" placeholder="consulente@..."></div>
+      <div class="fld"><label>Email azienda / referente</label><input type="email" id="gEmailAzi" placeholder="azienda@..."></div>
+    </div>
+    <p style="font-size:12px;color:#8a6d3b;background:#fdf3e3;border:1px solid #e6c98a;border-radius:6px;padding:8px 10px;margin:4px 0 10px">Il <b>fornitore è diverso per ogni adempimento</b>: non si imposta qui, ma nella scheda del singolo adempimento (campo "Email fornitore").</p>
+    <div class="fld"><label>Testo predefinito — a te (admin)</label><textarea id="gTestoAdmin" rows="2">Promemoria: l'adempimento "{ADEMPIMENTO}" per {AZIENDA} risulta in scadenza il {SCADENZA}. Rif. {RIFERIMENTO}.</textarea></div>
+    <div class="fld"><label>Testo predefinito — al fornitore</label><textarea id="gTestoForn" rows="2">Si richiede la verifica relativa a: "{ADEMPIMENTO}" per l'azienda {AZIENDA}, in scadenza il {SCADENZA}. Rif. {RIFERIMENTO}.</textarea></div>
+    <div class="fld"><label>Testo predefinito — all'azienda</label><textarea id="gTestoAzi" rows="2">Si comunica che per {AZIENDA} e in scadenza l'adempimento "{ADEMPIMENTO}" (previsto entro il {SCADENZA}). La pratica e in gestione.</textarea></div>
+    <p style="font-size:12px;color:#666;margin:4px 0 14px">Segnaposto disponibili: {AZIENDA} {ADEMPIMENTO} {RIFERIMENTO} {ASPETTO} {SCADENZA}</p>
+    <button class="bp" onclick="salvaEmailGlobale()">Salva configurazione</button>
+    <span class="hint" id="gEmailSalvata" style="margin-left:10px;font-size:12px;color:#27ae60"></span>
+  </div>
+</div>
+
+<!-- MODAL ADEMPIMENTO -->
+<div class="mbg" id="mAdemp">
+  <div class="mdl">
+    <h3 id="mAdempTit">Nuovo adempimento</h3>
+    <div class="g2">
+      <div class="fld"><label>Aspetto / Fattore di rischio</label><input type="text" id="fA"></div>
+      <div class="fld"><label>Adempimento</label><input type="text" id="fAd"></div>
+    </div>
+    <div class="fld"><label>Riferimento legislativo</label><input type="text" id="fR"></div>
+    <div class="g2">
+      <div class="fld"><label>Tipo scadenza</label><select id="fTipo" onchange="toggleTipoScad()"><option value="periodica">Periodica (giorni)</option><option value="evento">Ad evento</option></select></div>
+      <div class="fld" id="fEventoWrap" style="display:none"><label>Evento scatenante</label><input type="text" id="fEvento" placeholder="Es: Ad ogni modifica"></div>
+    </div>
+    <div class="g2" id="fPeriodicaWrap">
+      <div class="fld"><label>Frequenza (giorni)</label><input type="number" id="fF" value="365"></div>
+      <div class="fld"><label>Data ultima esecuzione</label><input type="date" id="fD"></div>
+    </div>
+    <div class="fld"><label>Giorni preavviso admin</label><input type="number" id="fPA" value="60"></div>
+    <div class="sub-box">
+      <p style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px">DOCUMENTO ALLEGATO</p>
+      <input type="file" id="fDoc" onchange="onDocSelected()">
+      <div id="docCurrent" style="margin-top:6px"></div>
+    </div>
+    <div class="sub-box">
+      <p style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px">DESTINATARI EMAIL DI QUESTO ADEMPIMENTO</p>
+      <div class="g2">
+        <div class="fld"><label>Email fornitore (chi fa la verifica)</label><input type="email" id="fEF" placeholder="fornitore@example.com"></div>
+        <div class="fld"><label>Giorni preavviso fornitore</label><input type="number" id="fPF" value="60"></div>
+      </div>
+      <div class="fld"><label>Email 2° referente aziendale (facoltativa)</label><input type="email" id="fEA2" placeholder="secondo.referente@azienda.it"></div>
+      <p style="font-size:11px;color:#888;margin:8px 0 0">Il referente aziendale principale e il consulente si impostano nel tab <b>Email</b>. Qui indichi il <b>fornitore</b> (diverso per ogni adempimento) ed eventualmente un 2° referente.</p>
+    </div>
+    <div class="sub-box">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <input type="checkbox" id="fHasEmail" onchange="toggleEmailFields()">
+        <label for="fHasEmail" style="margin:0;font-size:13px;font-weight:600;cursor:pointer">Testo email personalizzato (override) — solo per questo adempimento</label>
+      </div>
+      <p style="font-size:11px;color:#888;margin:0 0 8px">Se lasci vuoto, vale il testo predefinito impostato nel tab <b>Email</b>, coi segnaposto sostituiti automaticamente.</p>
+      <div id="emailFields" style="display:none">
+        <div class="fld"><label>Override testo — a te (admin)</label><textarea id="fTA" rows="2" placeholder="Vuoto = usa il testo predefinito del tab Email"></textarea></div>
+        <div class="fld"><label>Override testo — al fornitore</label><textarea id="fTF" rows="2" placeholder="Vuoto = usa il testo predefinito del tab Email"></textarea></div>
+        <div class="fld"><label>Override testo — all'azienda</label><textarea id="fTAz" rows="2" placeholder="Vuoto = usa il testo predefinito del tab Email"></textarea></div>
+        <div style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="fAuto"><label for="fAuto" style="margin:0;font-size:13px;cursor:pointer">Invio automatico senza conferma</label></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="bp" onclick="salvaAdemp()">Salva</button>
+      <button onclick="chiudiModal('mAdemp')">Annulla</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AZIONI -->
+<div class="mbg" id="mAzioni">
+  <div class="mdl">
+    <h3>Registro azioni</h3>
+    <p style="font-size:12px;color:#888;margin-bottom:14px" id="mAzioniSub"></p>
+    <div class="sub-box">
+      <div class="g2">
+        <div class="fld"><label>Data</label><input type="date" id="azData"></div>
+        <div class="fld"><label>&nbsp;</label><button class="bp" style="width:100%" onclick="aggiungiAzione()">+ Aggiungi</button></div>
+      </div>
+      <div class="fld" style="margin-bottom:0"><label>Descrizione azione</label><textarea id="azTesto" rows="2" placeholder="Es: Inviata richiesta preventivo a Rossi Srl"></textarea></div>
+    </div>
+    <p style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px">STORICO</p>
+    <div id="azioniList"></div>
+    <div style="display:flex;gap:8px;margin-top:14px"><button onclick="chiudiModal('mAzioni')">Chiudi</button></div>
+  </div>
+</div>
+
+<!-- MODAL EMAIL -->
+<div class="mbg" id="mEmail">
+  <div class="mdl">
+    <h3>Anteprima email</h3>
+    <div id="mEmailAzienda" style="background:var(--verde);color:#fff;border-radius:6px;padding:8px 12px;font-size:13px;margin-bottom:6px;font-weight:600"></div>
+    <p style="font-size:12px;color:#888;margin-bottom:14px" id="mEmailSub"></p>
+    <div id="mEmailCorpo"></div>
+    <div id="mEmailStorico" style="margin-top:14px"></div>
+    <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">
+      <button class="bp" onclick="inviaEmail()">Invia ora e registra</button>
+      <button onclick="aggiungiInvioManuale()" style="font-size:13px">+ Registra invio già fatto</button>
+      <button onclick="chiudiModal('mEmail')">Chiudi</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AZIENDA -->
+<div class="mbg" id="mAzi">
+  <div class="mdl">
+    <h3>Nuova azienda</h3>
+    <div class="fld" style="margin-top:10px"><label>Nome azienda</label><input type="text" id="nomeAzi"></div>
+    <div class="fld"><label>Email referente</label><input type="email" id="emailAzi"></div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="bp" onclick="creaAzienda()">Crea</button>
+      <button onclick="chiudiModal('mAzi')">Annulla</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="firebase-init.js"></script>
+<script src="auth-gate.js"></script>
+<script src="fondamenta.js"></script>
+<script>
+var oggi=new Date();oggi.setHours(0,0,0,0);
+
+/* La lista aziende NON è più locale: arriva dall'ANAGRAFICA CONDIVISA
+   (Modulo Aziende) tramite Store.aziende(), popolata dentro carica(). */
+var AZIENDE=[];
+
+// tipo: "periodica" (con frequenza+data) oppure "evento" (con campo evento)
+function A(id,aspetto,adempimento,riferimento,tipo,frequenza,ultimaEsecuzione,evento,note){
+  return {id:id,aspetto:aspetto,adempimento:adempimento,riferimento:riferimento,tipo:tipo,frequenza:frequenza,ultimaEsecuzione:ultimaEsecuzione,evento:evento,note:note,preavvisoAdmin:60,preavvisoFornitore:60,emailFornitore:"",emailAzienda2:"",testoAdmin:"",testoFornitore:"",testoAzienda:"",invioAuto:false,azioni:[],docNome:"",inEvidenza:false,storicoInvii:[]};
+}
+
+var ADEMP={};
+ADEMP[1]=[
+  A(1,"Luoghi di Lavoro","Certificato di Agibilita","DPR 380/2001","evento",0,"","Ad ogni modifica",""),
+  A(2,"Luoghi di Lavoro","Notifica nuove attivita/ampliamenti/ristrutturazioni - Comunicazione SUAP/ASL","Art.67 D.Lgs.81/08; Decreto 18/04/2014","evento",0,"","Ad ogni modifica",""),
+  A(3,"Luoghi di Lavoro","Autorizzazione in deroga lavori locali sotterranei - Comunicazione SUAP/ASL","Art.65 D.Lgs.81/08","evento",0,"","Ad ogni modifica",""),
+  A(4,"Luoghi di Lavoro","Comunicazione al Comune aziende insalubri","T.U.LL.SS., DM 5/09/1994","evento",0,"","Ad ogni modifica",""),
+  A(5,"Luoghi di Lavoro","Ambienti confinati: qualificazione imprese e lavoratori","DPR 177/2011","evento",0,"","Ad ogni modifica",""),
+  A(6,"Luoghi di Lavoro","Classificazione Azienda (Gruppo A/B/C) Pronto Soccorso","DM 388/2003","evento",0,"","Ad ogni modifica",""),
+  A(7,"Luoghi di Lavoro","Comunicazione ASL - Classificazione Azienda gruppo A","Art.1 DM 388/03","evento",0,"","Ad ogni modifica",""),
+  A(8,"Luoghi di Lavoro","Segnaletica di Sicurezza","Art.163 D.Lgs.81/08","evento",0,"","Ad ogni modifica","MIGLIORARE SEGNALETICA DI SICUREZZA"),
+  A(9,"Rischio Elettrico","Dichiarazione di Conformita Impianto Elettrico","DM 37/2008 Art.7","evento",0,"","Ad ogni modifica","Documentazione riportata nella SCIA antincendio"),
+  A(10,"Rischio Fulminazione","Valutazione del rischio fulminazione e adeguatezza protezioni","CEI EN 62305-2, Art.84 D.Lgs.81/08","evento",0,"","Ad ogni modifica",""),
+  A(11,"Rischio Fulminazione","Verifica impianto protezione scariche atmosferiche","CEI EN 62305-2","periodica",730,"2025-12-04","",""),
+  A(12,"Rischio Elettrico","Verifica periodica impianti di terra","DPR 462/01","periodica",730,"2025-12-04","",""),
+  A(13,"Impianti di Climatizzazione","Libretti impianto climatizzazione - manutenzione ed efficienza","L.10/91, DPR 412/93, DPR 74/2013","periodica",365,"","",""),
+  A(14,"Impianti Termici","Verifiche periodiche generatori di calore >35kW","DM 1/12/1975","periodica",730,"2026-03-31","",""),
+  A(15,"Prevenzione Incendi","Rilascio/Rinnovo CPI","Art.4 c.1 DPR 151/2011","periodica",1825,"2026-03-05","","SCIA antincendio per modifica"),
+  A(16,"Rischio Incendio","Controllo estintori, idranti, porte REI e emergenza, rilevatori gas","Art.6 DPR 151/2011, DM 09/2021, UNI 9994","periodica",180,"2026-03-01","",""),
+  A(17,"Rischio Incendio","Controllo rilevatori fumo, segnali allarme, evacuatore fumi","DM 09/2021, UNI 9795, UNI 9994","periodica",180,"2026-03-01","",""),
+  A(18,"Rischio Incendio","Controllo illuminazione di emergenza","D.Lgs.81/08, DM 09/2021, UNI 11222","periodica",180,"2025-09-01","","Chiedere a Danilo"),
+  A(19,"Rischio Incendio","Controllo acquedotto antincendio","D.Lgs.81/08, DM 09/2021, UNI 12845","periodica",90,"","",""),
+  A(20,"Sorveglianza Antincendio","Registro sorveglianza antincendio","DM 02/09/2021","periodica",30,"","","DA FARE"),
+  A(21,"Primo Soccorso","Controllo cassette di pronto soccorso","DM 388/2003","periodica",30,"2026-03-30","","Nomina 18/12/2025: Roberto Malandruccolo"),
+  A(22,"Macchine ed Attrezzature","Elenco aggiornato macchine con/senza marcatura CE","Art.70 D.Lgs.81/08, Dir.2006/42/CE","periodica",180,"","","Elaborare o richiedere elenco aggiornato e planimetria"),
+  A(23,"Macchine ed Attrezzature","Attestazione noleggiatore stato conservazione macchine a noleggio","D.Lgs.81/08","evento",0,"","Ad ogni acquisto","Richiedere se presenti macchine a noleggio"),
+  A(24,"Macchine ed Attrezzature","Aggiornamento registro manutenzione macchine e attrezzature","D.Lgs.81/08","evento",0,"","Ad ogni intervento","Manutenzione annotata su schede macchina"),
+  A(25,"Macchine ed Attrezzature","Verifica periodica cabina elettrica","D.Lgs.81/08","periodica",365,"2026-05-23","",""),
+  A(26,"Macchine ed Attrezzature","Consegna istruzioni operative uso macchine","D.Lgs.81/08","evento",0,"","Ad ogni acquisto","Verbale consegna manuale, elenco operatori"),
+  A(27,"Apparecchi di sollevamento","Verifica trimestrale funi e catene carrelli elevatori","All.VII D.Lgs.81/08","periodica",90,"2026-04-29","",""),
+  A(28,"Apparecchi di sollevamento","Libretti di omologazione apparecchi di sollevamento","D.Lgs.81/08","evento",0,"","Ad ogni acquisto","N/A"),
+  A(29,"Apparecchi di sollevamento","Verifiche periodiche apparecchi di sollevamento","All.VII D.Lgs.81/08, DM 11/04/2011","evento",0,"","Ad ogni acquisto","N/A"),
+  A(30,"Impianti a pressione","Dichiarazione CE costruttore recipienti a pressione","D.Lgs.81/08","evento",0,"","Verifica","Verificare eventuali recipienti (serbatoio azoto?)"),
+  A(31,"Impianti a pressione","Verbali messa in servizio apparecchiature in pressione","D.Lgs.81/08","evento",0,"","Verifica","Verificare eventuali recipienti (serbatoio azoto?)"),
+  A(32,"Impianti a pressione","Verifiche periodiche attrezzature/insiemi a pressione","DM 11/04/2011, DM 329/2004, All.VII D.Lgs.81/08","periodica",365,"","","Verificare eventuali recipienti (serbatoio azoto?)"),
+  A(33,"Valutazione dei Rischi","DVR - Documento Valutazione dei Rischi","Art.28 c.2 D.Lgs.81/08","periodica",1460,"2019-01-01","","AGGIORNARE IL DVR"),
+  A(34,"Valutazione dei Rischi","DVR Incendio","Art.17 D.Lgs.81/08, Art.2 DM 09/2021","periodica",1460,"2022-11-14","","Contenuto nel progetto antincendio (segue SCIA)"),
+  A(35,"Piano di Emergenza","Piano d'emergenza","DM 02/09/2021","periodica",1460,"2024-12-20","",""),
+  A(36,"Piano di Emergenza","Procedure d'emergenza","DM 02/09/2021","periodica",1460,"2024-12-20","","Contenute nel piano di emergenza"),
+  A(37,"Piano di Emergenza","Layout Percorsi di Esodo","DM 02/09/2021","periodica",1460,"2026-06-30","","Planimetrie appese - verificare rispondenza UNI"),
+  A(38,"Simulazione Emergenze","Verbali simulazioni di emergenza ed esercitazioni antincendio","Art.6 DPR 151/11","periodica",365,"2025-12-18","",""),
+  A(39,"Valutazione Rischio Rumore","DVR Rumore","Art.190 D.Lgs.81/08","periodica",1460,"2025-03-17","",""),
+  A(40,"Valutazione Rischio Vibrazioni","DVR Vibrazioni Mano Braccio","Art.202 D.Lgs.81/08","periodica",1460,"2026-07-07","","In corso di valutazione"),
+  A(41,"Valutazione Rischio Vibrazioni","DVR Vibrazioni Corpo Intero","Art.202 D.Lgs.81/08","periodica",1460,"2026-07-07","","In corso di valutazione"),
+  A(42,"Valutazione Rischio CEM","Campi Elettromagnetici","Art.209 D.Lgs.81/08","periodica",1460,"2025-06-16","",""),
+  A(43,"Valutazione Rischio ROA","Radiazioni Ottiche Artificiali (ROA)","Art.216 D.Lgs.81/08","periodica",1460,"2024-06-25","",""),
+  A(44,"Valutazione Rischio Microclima","Microclima","Art.181 D.Lgs.81/08","periodica",1460,"2023-10-02","",""),
+  A(45,"Valutazione Rischio Chimico","DVR Chimico","Art.223 D.Lgs.81/08","periodica",1095,"2014-05-01","","Definire elenco agenti chimici e rifare valutazione"),
+  A(46,"Valutazione Rischio Chimico","Elenco sostanze chimiche utilizzate","Art.223 D.Lgs.81/08","periodica",365,"","","Elenco sostanze per reparto/mansione"),
+  A(47,"Valutazione Rischio Cancerogeni","Valutazione rischio cancerogeno","Art.236 D.Lgs.81/08","periodica",365,"2023-06-25","","Verificare con nuovo elenco agenti chimici"),
+  A(48,"Valutazione Rischio Cancerogeni","Registro degli esposti","Art.236 D.Lgs.81/08","evento",0,"","Se presente","N/A"),
+  A(49,"Valutazione Rischio Biologico","Rischio Biologico","Art.271 D.Lgs.81/08","periodica",1095,"2023-06-25","",""),
+  A(50,"Valutazione Rischio Biologico","Analisi del rischio legionellosi","Art.271 D.Lgs.81/08","periodica",365,"2026-04-08","",""),
+  A(51,"Valutazione Rischio MMC","DVR MMC - Movimentazione Manuale Carichi","Art.168 D.Lgs.81/08","periodica",1460,"2025-07-01","","MMC confezionamento pedane mercato USA"),
+  A(52,"Valutazione Rischio Traino/Spinta","DVR Traino e Spinta","Art.168 D.Lgs.81/08","periodica",1460,"","","VERIFICARE"),
+  A(53,"Valutazione Rischio Mov.Ripetitivi","DVR Movimenti Ripetitivi","Art.168 D.Lgs.81/08","periodica",1460,"","","VERIFICARE"),
+  A(54,"Valutazione Rischio ATEX","ATEX - Atmosfere Esplosive","Art.290 D.Lgs.81/08","periodica",1460,"2016-05-02","","VERIFICARE"),
+  A(55,"Valutazione Rischio Radiazioni Ionizzanti","Radiazioni Ionizzanti","D.Lgs.230/95, 241/2000, 257/2001","evento",0,"","Se presente","VERIFICARE"),
+  A(56,"Valutazione Stress","DVR Stress lavoro-correlato","Accordo europeo 08/10/2004","periodica",730,"2026-04-01","","Inviata mail consulente lavoro 26/01/2026"),
+  A(57,"Amianto","Analisi Fibre Aerodisperse Amianto","Art.29 D.Lgs.81/08","periodica",365,"2025-10-24","",""),
+  A(58,"Amianto","Piano di Manutenzione e Controllo","Art.29 D.Lgs.81/08","periodica",365,"2025-11-05","",""),
+  A(59,"Lavoratrici Madri","DVR Lavoratrici Madri","Art.11 D.Lgs.151/01","periodica",1460,"2015-10-05","",""),
+  A(60,"DPI","Registro e schede di consegna DPI","D.Lgs.81/08","periodica",365,"2025-12-18","","Predisposto nuovo modello registrazione"),
+  A(61,"DPI","Verifica DPI di terza categoria","D.Lgs.81/08","periodica",365,"2025-12-01","","Imbragatura e assorbitore acquistati 01/12/2025"),
+  A(62,"Rischio Lavoro Notturno","Presenza lavoro notturno","D.Lgs.66/03","evento",0,"","Se presente","N/A"),
+  A(63,"Nomine","Individuazione Datore di Lavoro","D.Lgs.81/08","periodica",365,"2025-12-18","","Riferimento catena gerarchica (da confermare)"),
+  A(64,"Nomine","Nomina RSPP","D.Lgs.81/08","periodica",365,"2025-10-01","","Ing. Walter Calamanti"),
+  A(65,"Nomine","Nomina Addetti alle emergenze","D.Lgs.81/08","periodica",365,"2025-12-18","","Carminati, Di Ruscio, Filippi, Malandruccolo, Nugnes, Sigismondi"),
+  A(66,"Nomine","Nomina Addetti Primo Soccorso","D.Lgs.81/08","periodica",365,"2025-12-18","","Adornato, Carminati, Di Ruscio, Malandruccolo, Nugnes"),
+  A(67,"Nomine","Nomina Preposti","D.Lgs.81/08","periodica",365,"2025-12-18","","Magnoni, Di Ruscio"),
+  A(68,"Comunicazioni INAIL","Comunicazione INAIL nominativo RLS","Art.18 c.1 lett.aa) D.Lgs.81/08","evento",0,"","Ad ogni nomina","Effettuata con nomina di Roberto Malandruccolo"),
+  A(69,"Formazione","Formazione Dirigente","Art.37 c.7 D.Lgs.81/08, ASR 21/12/2011","periodica",1825,"","","N/A"),
+  A(70,"Formazione","Formazione Preposto","Art.37 c.1 D.Lgs.81/08, ASR 21/12/2011","periodica",730,"2025-12-17","",""),
+  A(71,"Formazione","Formazione RSPP","Art.32 D.Lgs.81/08, ASR 7/07/2016","periodica",1825,"2023-03-20","",""),
+  A(72,"Formazione","Formazione Addetti Antincendio","Art.37 c.9 D.Lgs.81/08, DM 10/03/1998","periodica",1825,"2026-02-18","",""),
+  A(73,"Formazione","Formazione Addetti Primo Soccorso","Art.37 c.9 D.Lgs.81/08, DM 388/2003","periodica",1095,"2023-09-22","","Corso settembre per Di Ruscio e Adornato"),
+  A(74,"Formazione","Formazione Defibrillatore","D.Lgs.81/08","periodica",365,"","","N/A"),
+  A(75,"Formazione","Formazione RLS","Art.37 c.1 D.Lgs.81/08, ASR 21/12/2011","periodica",365,"2026-01-23","",""),
+  A(76,"Formazione","Formazione Lavoratori","Art.37 c.1 D.Lgs.81/08, ASR 21/12/2011 + ASR 24/05/2025","periodica",1825,"2022-06-16","",""),
+  A(77,"Formazione","Formazione Lavoratori uso Carrello Elevatore","Art.37 c.5 D.Lgs.81/08, ASR 22/02/2012","periodica",1825,"2024-10-10","",""),
+  A(78,"Riunione Periodica","Verbali riunioni periodiche prevenzione e protezione","Art.35 D.Lgs.81/08","periodica",365,"2025-12-18","",""),
+  A(79,"Sorveglianza Sanitaria","Protocollo sanitario / programmi visite mediche","Art.25 c.1 lett.a,b D.Lgs.81/08","periodica",365,"2025-12-18","",""),
+  A(80,"Sorveglianza Sanitaria","Gestione cartelle sanitarie e di rischio","Art.25 c.1 lett.c,d,e,f D.Lgs.81/08","periodica",365,"2025-12-18","","Detenute in azienda ufficio Fabio Adornato"),
+  A(81,"Sorveglianza Sanitaria","Visita agli ambienti di lavoro","Art.25 c.1 lett.l D.Lgs.81/08","periodica",365,"2025-12-18","",""),
+  A(82,"Sorveglianza Sanitaria","Dati statistici sanitari per riunione periodica","Art.25 c.1 lett.i D.Lgs.81/08","periodica",365,"2025-12-18","",""),
+  A(83,"Sorveglianza Sanitaria","Evidenze dichiarazioni idoneita/non idoneita","Art.41 D.Lgs.81/08","periodica",365,"2026-01-23","","Verificare le idoneita parziali"),
+  A(84,"Emissioni in atmosfera","Misure annuali emissioni in atmosfera","D.Lgs.152/2006","periodica",365,"2025-06-19","",""),
+  A(85,"Verifica SGI","Verifica scadenzario SGI","SGI","periodica",30,"2026-06-29","","")
+];
+ADEMP[2]=[];
+
+var CATALOGO=[
+  // --- LUOGHI DI LAVORO / AUTORIZZAZIONI ---
+  {aspetto:"Luoghi di Lavoro",adempimento:"Certificato di Agibilita",riferimento:"DPR 380/2001",tipo:"evento",frequenza:0,evento:"Ad ogni modifica"},
+  {aspetto:"Luoghi di Lavoro",adempimento:"Notifica nuove attivita/ampliamenti - SUAP/ASL",riferimento:"Art.67 D.Lgs.81/08",tipo:"evento",frequenza:0,evento:"Ad ogni modifica"},
+  {aspetto:"Luoghi di Lavoro",adempimento:"Autorizzazione in deroga locali sotterranei",riferimento:"Art.65 D.Lgs.81/08",tipo:"evento",frequenza:0,evento:"Ad ogni modifica"},
+  {aspetto:"Luoghi di Lavoro",adempimento:"Comunicazione al Comune aziende insalubri",riferimento:"T.U.LL.SS., DM 5/09/1994",tipo:"evento",frequenza:0,evento:"Ad ogni modifica"},
+  {aspetto:"Luoghi di Lavoro",adempimento:"Ambienti confinati: qualificazione imprese e lavoratori",riferimento:"DPR 177/2011",tipo:"evento",frequenza:0,evento:"Ad ogni modifica"},
+  {aspetto:"Luoghi di Lavoro",adempimento:"Classificazione Azienda Pronto Soccorso (Gruppo A/B/C)",riferimento:"DM 388/2003",tipo:"evento",frequenza:0,evento:"Ad ogni modifica"},
+  {aspetto:"Luoghi di Lavoro",adempimento:"Comunicazione ASL - Azienda gruppo A",riferimento:"Art.1 DM 388/03",tipo:"evento",frequenza:0,evento:"Ad ogni modifica"},
+  {aspetto:"Luoghi di Lavoro",adempimento:"Segnaletica di Sicurezza",riferimento:"Art.163 D.Lgs.81/08",tipo:"evento",frequenza:0,evento:"Ad ogni modifica"},
+  {aspetto:"Luoghi di Lavoro",adempimento:"Verifica idoneita locali (altezza, superficie, cubatura, aerazione)",riferimento:"All.IV D.Lgs.81/08",tipo:"evento",frequenza:0,evento:"Ad ogni modifica"},
+  // --- IMPIANTI ELETTRICI / TERRA / FULMINAZIONE ---
+  {aspetto:"Rischio Elettrico",adempimento:"Dichiarazione di Conformita Impianto Elettrico",riferimento:"DM 37/2008 Art.7",tipo:"evento",frequenza:0,evento:"Ad ogni modifica"},
+  {aspetto:"Rischio Elettrico",adempimento:"Verifica periodica impianti di terra",riferimento:"DPR 462/01",tipo:"periodica",frequenza:730,evento:""},
+  {aspetto:"Rischio Elettrico",adempimento:"Verifica impianti di terra in luoghi con pericolo esplosione",riferimento:"DPR 462/01",tipo:"periodica",frequenza:730,evento:""},
+  {aspetto:"Rischio Fulminazione",adempimento:"Valutazione del rischio fulminazione",riferimento:"CEI EN 62305-2, Art.84 D.Lgs.81/08",tipo:"evento",frequenza:0,evento:"Ad ogni modifica"},
+  {aspetto:"Rischio Fulminazione",adempimento:"Verifica impianto protezione scariche atmosferiche (LPS)",riferimento:"DPR 462/01, CEI EN 62305",tipo:"periodica",frequenza:730,evento:""},
+  // --- IMPIANTI TERMICI / CLIMATIZZAZIONE / F-GAS ---
+  {aspetto:"Impianti di Climatizzazione",adempimento:"Libretti impianto climatizzazione - manutenzione ed efficienza",riferimento:"L.10/91, DPR 74/2013",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Impianti Termici",adempimento:"Verifiche periodiche generatori di calore >35kW",riferimento:"DM 1/12/1975",tipo:"periodica",frequenza:730,evento:""},
+  {aspetto:"Impianti Termici",adempimento:"Controllo efficienza energetica impianto termico",riferimento:"DPR 74/2013",tipo:"periodica",frequenza:730,evento:""},
+  {aspetto:"F-Gas",adempimento:"Controllo perdite apparecchiature con gas fluorurati",riferimento:"Reg. UE 517/2014",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"F-Gas",adempimento:"Registro apparecchiature F-Gas e comunicazione annuale",riferimento:"DPR 146/2018",tipo:"periodica",frequenza:365,evento:""},
+  // --- PREVENZIONE INCENDI ---
+  {aspetto:"Prevenzione Incendi",adempimento:"Rilascio/Rinnovo CPI",riferimento:"Art.4 DPR 151/2011",tipo:"periodica",frequenza:1825,evento:""},
+  {aspetto:"Prevenzione Incendi",adempimento:"Attestazione di Rinnovo Periodico Conformita Antincendio",riferimento:"Art.5 DPR 151/2011",tipo:"periodica",frequenza:1825,evento:""},
+  {aspetto:"Rischio Incendio",adempimento:"Controllo estintori",riferimento:"DM 09/2021, UNI 9994-1",tipo:"periodica",frequenza:180,evento:""},
+  {aspetto:"Rischio Incendio",adempimento:"Controllo idranti e naspi",riferimento:"DM 09/2021, UNI 671-3",tipo:"periodica",frequenza:180,evento:""},
+  {aspetto:"Rischio Incendio",adempimento:"Controllo porte REI e uscite di emergenza",riferimento:"DM 09/2021",tipo:"periodica",frequenza:180,evento:""},
+  {aspetto:"Rischio Incendio",adempimento:"Controllo rilevatori fumo e allarme incendio",riferimento:"DM 09/2021, UNI 9795",tipo:"periodica",frequenza:180,evento:""},
+  {aspetto:"Rischio Incendio",adempimento:"Controllo rilevatori gas",riferimento:"DM 09/2021",tipo:"periodica",frequenza:180,evento:""},
+  {aspetto:"Rischio Incendio",adempimento:"Controllo illuminazione di emergenza",riferimento:"D.Lgs.81/08, UNI 11222",tipo:"periodica",frequenza:180,evento:""},
+  {aspetto:"Rischio Incendio",adempimento:"Controllo evacuatori di fumo e calore (EFC)",riferimento:"UNI 9494",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Rischio Incendio",adempimento:"Controllo impianto sprinkler",riferimento:"UNI EN 12845",tipo:"periodica",frequenza:180,evento:""},
+  {aspetto:"Rischio Incendio",adempimento:"Verifica gruppo di pompaggio antincendio",riferimento:"UNI EN 12845, UNI 11292",tipo:"periodica",frequenza:180,evento:""},
+  {aspetto:"Rischio Incendio",adempimento:"Controllo acquedotto/riserva idrica antincendio",riferimento:"UNI EN 12845",tipo:"periodica",frequenza:90,evento:""},
+  {aspetto:"Rischio Incendio",adempimento:"Verifica serrande tagliafuoco",riferimento:"UNI 11473",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Sorveglianza Antincendio",adempimento:"Registro sorveglianza antincendio",riferimento:"DM 02/09/2021",tipo:"periodica",frequenza:30,evento:""},
+  // --- PRIMO SOCCORSO ---
+  {aspetto:"Primo Soccorso",adempimento:"Controllo cassette di pronto soccorso",riferimento:"DM 388/2003",tipo:"periodica",frequenza:90,evento:""},
+  {aspetto:"Primo Soccorso",adempimento:"Verifica presidi e scadenze materiale sanitario",riferimento:"DM 388/2003",tipo:"periodica",frequenza:180,evento:""},
+  {aspetto:"Primo Soccorso",adempimento:"Manutenzione defibrillatore DAE",riferimento:"DM 388/2003",tipo:"periodica",frequenza:365,evento:""},
+  // --- MACCHINE E ATTREZZATURE ---
+  {aspetto:"Macchine ed Attrezzature",adempimento:"Elenco aggiornato macchine con/senza marcatura CE",riferimento:"Art.70 D.Lgs.81/08",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Macchine ed Attrezzature",adempimento:"Registro manutenzione macchine e attrezzature",riferimento:"Art.71 D.Lgs.81/08",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Macchine ed Attrezzature",adempimento:"Verifica periodica cabina elettrica MT/BT",riferimento:"D.Lgs.81/08",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Macchine ed Attrezzature",adempimento:"Attestazione stato macchine a noleggio",riferimento:"D.Lgs.81/08",tipo:"evento",frequenza:0,evento:"Ad ogni acquisto"},
+  {aspetto:"Macchine ed Attrezzature",adempimento:"Consegna istruzioni operative uso macchine",riferimento:"D.Lgs.81/08",tipo:"evento",frequenza:0,evento:"Ad ogni acquisto"},
+  {aspetto:"Apparecchi di sollevamento",adempimento:"Verifica trimestrale funi e catene",riferimento:"All.VII D.Lgs.81/08",tipo:"periodica",frequenza:90,evento:""},
+  {aspetto:"Apparecchi di sollevamento",adempimento:"Verifica periodica apparecchi di sollevamento (INAIL/ASL)",riferimento:"All.VII D.Lgs.81/08, DM 11/04/2011",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Apparecchi di sollevamento",adempimento:"Libretti di omologazione apparecchi di sollevamento",riferimento:"D.Lgs.81/08",tipo:"evento",frequenza:0,evento:"Ad ogni acquisto"},
+  // --- ATTREZZATURE A PRESSIONE ---
+  {aspetto:"Impianti a pressione",adempimento:"Dichiarazione CE recipienti a pressione",riferimento:"D.Lgs.81/08",tipo:"evento",frequenza:0,evento:"Verifica iniziale"},
+  {aspetto:"Impianti a pressione",adempimento:"Denuncia messa in servizio attrezzature a pressione",riferimento:"DM 329/2004",tipo:"evento",frequenza:0,evento:"Messa in servizio"},
+  {aspetto:"Impianti a pressione",adempimento:"Verifica periodica attrezzature/insiemi a pressione",riferimento:"DM 11/04/2011, DM 329/2004",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Impianti a pressione",adempimento:"Verifica integrita recipienti a pressione",riferimento:"DM 329/2004",tipo:"periodica",frequenza:3650,evento:""},
+  // --- VALUTAZIONI DEI RISCHI (DVR) ---
+  {aspetto:"Valutazione dei Rischi",adempimento:"DVR - Documento Valutazione dei Rischi",riferimento:"Art.28 D.Lgs.81/08",tipo:"periodica",frequenza:1460,evento:""},
+  {aspetto:"Valutazione dei Rischi",adempimento:"DVR Incendio",riferimento:"Art.17 D.Lgs.81/08, DM 09/2021",tipo:"periodica",frequenza:1460,evento:""},
+  {aspetto:"Valutazione dei Rischi",adempimento:"DVR Rumore",riferimento:"Art.190 D.Lgs.81/08",tipo:"periodica",frequenza:1460,evento:""},
+  {aspetto:"Valutazione dei Rischi",adempimento:"DVR Vibrazioni Mano-Braccio",riferimento:"Art.202 D.Lgs.81/08",tipo:"periodica",frequenza:1460,evento:""},
+  {aspetto:"Valutazione dei Rischi",adempimento:"DVR Vibrazioni Corpo Intero",riferimento:"Art.202 D.Lgs.81/08",tipo:"periodica",frequenza:1460,evento:""},
+  {aspetto:"Valutazione dei Rischi",adempimento:"DVR Campi Elettromagnetici (CEM)",riferimento:"Art.209 D.Lgs.81/08",tipo:"periodica",frequenza:1460,evento:""},
+  {aspetto:"Valutazione dei Rischi",adempimento:"DVR Radiazioni Ottiche Artificiali (ROA)",riferimento:"Art.216 D.Lgs.81/08",tipo:"periodica",frequenza:1460,evento:""},
+  {aspetto:"Valutazione dei Rischi",adempimento:"DVR Microclima",riferimento:"Art.181 D.Lgs.81/08",tipo:"periodica",frequenza:1460,evento:""},
+  {aspetto:"Valutazione dei Rischi",adempimento:"DVR Chimico",riferimento:"Art.223 D.Lgs.81/08",tipo:"periodica",frequenza:1095,evento:""},
+  {aspetto:"Valutazione dei Rischi",adempimento:"Elenco sostanze chimiche utilizzate",riferimento:"Art.223 D.Lgs.81/08",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Valutazione dei Rischi",adempimento:"Valutazione rischio cancerogeno/mutageno",riferimento:"Art.236 D.Lgs.81/08",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Valutazione dei Rischi",adempimento:"Registro degli esposti a cancerogeni",riferimento:"Art.243 D.Lgs.81/08",tipo:"evento",frequenza:0,evento:"Se presente"},
+  {aspetto:"Valutazione dei Rischi",adempimento:"DVR Rischio Biologico",riferimento:"Art.271 D.Lgs.81/08",tipo:"periodica",frequenza:1095,evento:""},
+  {aspetto:"Valutazione dei Rischi",adempimento:"Analisi del rischio legionellosi",riferimento:"Linee Guida Legionella 2015",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Valutazione dei Rischi",adempimento:"DVR MMC - Movimentazione Manuale Carichi",riferimento:"Art.168 D.Lgs.81/08, ISO 11228",tipo:"periodica",frequenza:1460,evento:""},
+  {aspetto:"Valutazione dei Rischi",adempimento:"DVR Traino e Spinta",riferimento:"Art.168 D.Lgs.81/08",tipo:"periodica",frequenza:1460,evento:""},
+  {aspetto:"Valutazione dei Rischi",adempimento:"DVR Movimenti Ripetitivi",riferimento:"Art.168 D.Lgs.81/08, ISO 11228-3",tipo:"periodica",frequenza:1460,evento:""},
+  {aspetto:"Valutazione dei Rischi",adempimento:"DVR ATEX - Atmosfere Esplosive",riferimento:"Art.290 D.Lgs.81/08",tipo:"periodica",frequenza:1460,evento:""},
+  {aspetto:"Valutazione dei Rischi",adempimento:"DVR Radiazioni Ionizzanti",riferimento:"D.Lgs.101/2020",tipo:"evento",frequenza:0,evento:"Se presente"},
+  {aspetto:"Valutazione dei Rischi",adempimento:"DVR Stress lavoro-correlato",riferimento:"Accordo europeo 08/10/2004",tipo:"periodica",frequenza:730,evento:""},
+  {aspetto:"Valutazione dei Rischi",adempimento:"DVR Lavoratrici Madri",riferimento:"Art.11 D.Lgs.151/01",tipo:"periodica",frequenza:1460,evento:""},
+  {aspetto:"Valutazione dei Rischi",adempimento:"DVR Videoterminali (VDT)",riferimento:"Art.174 D.Lgs.81/08",tipo:"periodica",frequenza:1460,evento:""},
+  {aspetto:"Valutazione dei Rischi",adempimento:"DVR Lavori in quota",riferimento:"Art.111 D.Lgs.81/08",tipo:"periodica",frequenza:1460,evento:""},
+  {aspetto:"Valutazione dei Rischi",adempimento:"DUVRI - Documento Unico Valutazione Rischi Interferenze",riferimento:"Art.26 D.Lgs.81/08",tipo:"evento",frequenza:0,evento:"Ad ogni appalto"},
+  // --- AMIANTO ---
+  {aspetto:"Amianto",adempimento:"Analisi Fibre Aerodisperse Amianto",riferimento:"Art.29 D.Lgs.81/08, D.Lgs.257/06",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Amianto",adempimento:"Piano di Manutenzione e Controllo materiali contenenti amianto",riferimento:"DM 6/09/1994",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Amianto",adempimento:"Programma di controllo e manutenzione (PCM) amianto",riferimento:"DM 6/09/1994",tipo:"periodica",frequenza:365,evento:""},
+  // --- DPI ---
+  {aspetto:"DPI",adempimento:"Registro e schede di consegna DPI",riferimento:"Art.77 D.Lgs.81/08",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"DPI",adempimento:"Verifica periodica DPI di terza categoria (anticaduta)",riferimento:"Art.77 D.Lgs.81/08",tipo:"periodica",frequenza:365,evento:""},
+  // --- NOMINE ---
+  {aspetto:"Nomine",adempimento:"Individuazione e nomina Datore di Lavoro",riferimento:"D.Lgs.81/08",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Nomine",adempimento:"Nomina RSPP",riferimento:"Art.17 D.Lgs.81/08",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Nomine",adempimento:"Nomina Medico Competente",riferimento:"Art.18 D.Lgs.81/08",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Nomine",adempimento:"Nomina Addetti Antincendio",riferimento:"Art.18 D.Lgs.81/08",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Nomine",adempimento:"Nomina Addetti Primo Soccorso",riferimento:"Art.18 D.Lgs.81/08",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Nomine",adempimento:"Nomina Preposti",riferimento:"Art.19 D.Lgs.81/08",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Nomine",adempimento:"Nomina Dirigenti",riferimento:"Art.18 D.Lgs.81/08",tipo:"evento",frequenza:0,evento:"Ad ogni nomina"},
+  {aspetto:"Nomine",adempimento:"Comunicazione INAIL nominativo RLS",riferimento:"Art.18 c.1 lett.aa) D.Lgs.81/08",tipo:"evento",frequenza:0,evento:"Ad ogni nomina"},
+  // --- FORMAZIONE ---
+  {aspetto:"Formazione",adempimento:"Formazione Datore di Lavoro RSPP",riferimento:"Art.34 D.Lgs.81/08",tipo:"periodica",frequenza:1825,evento:""},
+  {aspetto:"Formazione",adempimento:"Formazione Dirigente",riferimento:"Art.37 D.Lgs.81/08, ASR 21/12/2011",tipo:"periodica",frequenza:1825,evento:""},
+  {aspetto:"Formazione",adempimento:"Formazione Preposto",riferimento:"Art.37 D.Lgs.81/08, ASR 2011",tipo:"periodica",frequenza:730,evento:""},
+  {aspetto:"Formazione",adempimento:"Formazione RSPP (moduli A/B/C)",riferimento:"Art.32 D.Lgs.81/08",tipo:"periodica",frequenza:1825,evento:""},
+  {aspetto:"Formazione",adempimento:"Formazione Addetti Antincendio",riferimento:"Art.37 D.Lgs.81/08, DM 02/09/2021",tipo:"periodica",frequenza:1825,evento:""},
+  {aspetto:"Formazione",adempimento:"Formazione Addetti Primo Soccorso",riferimento:"Art.37 D.Lgs.81/08, DM 388/2003",tipo:"periodica",frequenza:1095,evento:""},
+  {aspetto:"Formazione",adempimento:"Formazione/Retraining Defibrillatore (BLSD)",riferimento:"Linee guida IRC",tipo:"periodica",frequenza:730,evento:""},
+  {aspetto:"Formazione",adempimento:"Formazione RLS",riferimento:"Art.37 D.Lgs.81/08",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Formazione",adempimento:"Formazione Generale e Specifica Lavoratori",riferimento:"Art.37 D.Lgs.81/08, ASR 2011/2025",tipo:"periodica",frequenza:1825,evento:""},
+  {aspetto:"Formazione",adempimento:"Formazione Carrello Elevatore",riferimento:"ASR 22/02/2012",tipo:"periodica",frequenza:1825,evento:""},
+  {aspetto:"Formazione",adempimento:"Formazione PLE (piattaforme elevabili)",riferimento:"ASR 22/02/2012",tipo:"periodica",frequenza:1825,evento:""},
+  {aspetto:"Formazione",adempimento:"Formazione Gru e apparecchi di sollevamento",riferimento:"ASR 22/02/2012",tipo:"periodica",frequenza:1825,evento:""},
+  {aspetto:"Formazione",adempimento:"Formazione Lavori in quota e DPI anticaduta",riferimento:"Art.77 D.Lgs.81/08",tipo:"periodica",frequenza:1825,evento:""},
+  {aspetto:"Formazione",adempimento:"Formazione Ambienti Confinati",riferimento:"DPR 177/2011",tipo:"periodica",frequenza:1825,evento:""},
+  {aspetto:"Formazione",adempimento:"Formazione Rischio Chimico specifica",riferimento:"Art.36-37 D.Lgs.81/08",tipo:"periodica",frequenza:1825,evento:""},
+  // --- RIUNIONE / SORVEGLIANZA SANITARIA ---
+  {aspetto:"Riunione Periodica",adempimento:"Verbali riunione periodica prevenzione e protezione",riferimento:"Art.35 D.Lgs.81/08",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Sorveglianza Sanitaria",adempimento:"Protocollo sanitario e programma visite mediche",riferimento:"Art.25 D.Lgs.81/08",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Sorveglianza Sanitaria",adempimento:"Gestione cartelle sanitarie e di rischio",riferimento:"Art.25 D.Lgs.81/08",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Sorveglianza Sanitaria",adempimento:"Visita del Medico Competente agli ambienti di lavoro",riferimento:"Art.25 c.1 lett.l D.Lgs.81/08",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Sorveglianza Sanitaria",adempimento:"Comunicazione dati sanitari per riunione periodica",riferimento:"Art.25 c.1 lett.i D.Lgs.81/08",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Sorveglianza Sanitaria",adempimento:"Evidenze giudizi idoneita/non idoneita",riferimento:"Art.41 D.Lgs.81/08",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Sorveglianza Sanitaria",adempimento:"Trasmissione dati sanitari INAIL (allegato 3B)",riferimento:"Art.40 D.Lgs.81/08",tipo:"periodica",frequenza:365,evento:""},
+  // --- AMBIENTE (spesso gestiti dal consulente sicurezza) ---
+  {aspetto:"Emissioni in atmosfera",adempimento:"Misure periodiche emissioni in atmosfera",riferimento:"D.Lgs.152/2006",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Rifiuti",adempimento:"Tenuta registro carico/scarico rifiuti",riferimento:"D.Lgs.152/2006",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Rifiuti",adempimento:"Presentazione MUD - Modello Unico Dichiarazione",riferimento:"L.70/94",tipo:"periodica",frequenza:365,evento:""},
+  {aspetto:"Scarichi idrici",adempimento:"Rinnovo autorizzazione scarichi idrici",riferimento:"D.Lgs.152/2006",tipo:"periodica",frequenza:1460,evento:""},
+  // --- SGSL / ORGANIZZAZIONE ---
+  {aspetto:"Rischio Lavoro Notturno",adempimento:"Verifica presenza e gestione lavoro notturno",riferimento:"D.Lgs.66/03",tipo:"evento",frequenza:0,evento:"Se presente"},
+  {aspetto:"Verifica SGI",adempimento:"Verifica periodica scadenzario SGI/SGSL",riferimento:"UNI ISO 45001",tipo:"periodica",frequenza:30,evento:""},
+  {aspetto:"Audit",adempimento:"Audit interno Sistema di Gestione Sicurezza",riferimento:"UNI ISO 45001",tipo:"periodica",frequenza:365,evento:""}
+];
+
+var aziId=1,editAdempId=null,mailId=null,azioniId=null,catSel={},pendingDoc="";
+var mailVoci=[],mailOggetto="",mailAziId=1;
+
+function addDays(s,d){return Fond.addGiorni(s,d);}
+function fmtDate(d){return Fond.fmtData(d);}
+function getStato(r){if(r.tipo==="evento")return "evento";var sc=addDays(r.ultimaEsecuzione,r.frequenza);if(!sc||!r.frequenza)return "na";return Fond.statoScad(sc,r.preavvisoAdmin);}
+function getDiff(r){if(r.tipo==="evento")return null;var sc=addDays(r.ultimaEsecuzione,r.frequenza);if(!sc)return null;return Fond.giorniA(sc);}
+var LBL={scaduta:"Scaduta",in_scadenza:"In scadenza",ok:"Ok",na:"Da compilare",evento:"Ad evento"};
+var BCL={scaduta:"bs",in_scadenza:"bi",ok:"bo",na:"bn",evento:"be"};
+
+function getAzi(){for(var i=0;i<AZIENDE.length;i++){if(AZIENDE[i].id===aziId)return AZIENDE[i];}return AZIENDE[0];}
+function getAdemp(){return ADEMP[aziId]||[];}
+
+function initSelAzi(){
+  var s=document.getElementById("selAzi");s.innerHTML="";
+  for(var i=0;i<AZIENDE.length;i++){var o=document.createElement("option");o.value=AZIENDE[i].id;o.textContent=AZIENDE[i].nome;if(AZIENDE[i].id===aziId)o.selected=true;s.appendChild(o);}
+}
+function cambiaAzi(){aziId=Number(document.getElementById("selAzi").value);renderAll();}
+function renderAll(){renderDash();renderScad();renderCatalogo();}
+
+function vaiAStato(stato){
+  showTab(1);
+  // se la dashboard e in vista "tutte le aziende", apri lo scadenzario nello stesso scope
+  if(AZIENDE.length>1){
+    var dScope=document.getElementById("dashScope");
+    var sScope=document.getElementById("scadScope");
+    if(dScope&&sScope)sScope.value=dScope.value;
+  }
+  if(stato==="evento"){
+    document.getElementById("filtroTipo").value="evento";
+    document.getElementById("filtroStato").value="tutti";
+  }else{
+    document.getElementById("filtroTipo").value="tutti";
+    document.getElementById("filtroStato").value=stato;
+  }
+  document.getElementById("filtroAspetto").value="__tutti__";
+  document.getElementById("cerca").value="";
+  renderScad();
+}
+
+// mappa indice pagina -> indice tab visibile (il tab consulente e stato rimosso)
+var TAB_ORDER=[0,1,2,5,4];
+function showTab(i){
+  for(var j=0;j<6;j++){var pg=document.getElementById("p"+j);if(pg)pg.classList.toggle("on",j===i);}
+  var tabs=document.querySelectorAll(".ntab");
+  for(var t=0;t<tabs.length;t++){tabs[t].classList.toggle("on",TAB_ORDER[t]===i);}
+  if(i===0)renderDash();
+  if(i===1)renderScad();
+  if(i===2)renderCatalogo();
+  if(i===5)renderStorico();
+  if(i===4)renderEmailGlobale();
+}
+
+// determina lo scope corrente: "azienda" (solo azienda selezionata) o "tutte" (multi-azienda / consulente)
+function getDashScope(){
+  var multi=AZIENDE.length>1;
+  document.getElementById("scopeBar").style.display=multi?"flex":"none";
+  if(!multi)return "azienda";
+  return document.getElementById("dashScope").value;
+}
+
+// raccoglie tutte le righe in scope, ognuna annotata con la propria azienda
+function raccogliRighe(scope){
+  var out=[];
+  if(scope==="tutte"){
+    for(var a=0;a<AZIENDE.length;a++){
+      var rs=ADEMP[AZIENDE[a].id]||[];
+      for(var i=0;i<rs.length;i++)out.push({r:rs[i],aziId:AZIENDE[a].id,aziNome:AZIENDE[a].nome});
+    }
+  }else{
+    var rs=getAdemp();var az=getAzi();
+    for(var i=0;i<rs.length;i++)out.push({r:rs[i],aziId:az.id,aziNome:az.nome});
+  }
+  return out;
+}
+
+function renderDash(){
+  var scope=getDashScope();
+  var mostraAzienda=(scope==="tutte");
+  var finestra=Number(document.getElementById("dashFinestra").value);
+  var all=raccogliRighe(scope);
+
+  // contatori card
+  var sc=0,ins=0,ok=0,ev=0;
+  for(var i=0;i<all.length;i++){var s=getStato(all[i].r);if(s==="scaduta")sc++;else if(s==="in_scadenza")ins++;else if(s==="ok")ok++;else if(s==="evento")ev++;}
+  document.getElementById("cS").textContent=sc;
+  document.getElementById("cI").textContent=ins;
+  document.getElementById("cO").textContent=ok;
+  document.getElementById("cE").textContent=ev;
+
+  // ordine stati per la parte automatica
+  var STORD={scaduta:0,in_scadenza:1,ok:2,na:3,evento:4};
+
+  // 1) PINNATE — sempre in cima, qualunque stato, ordinate per urgenza
+  var pin=all.filter(function(x){return x.r.inEvidenza;});
+  // 2) NON pinnate entro finestra: scadute e in scadenza sempre; ok/altre solo se rientrano nella finestra giorni
+  var resto=all.filter(function(x){
+    if(x.r.inEvidenza)return false;
+    var st=getStato(x.r);
+    if(st==="scaduta"||st==="in_scadenza")return true;
+    var d=getDiff(x.r);
+    if(d===null)return false;          // ad evento / da compilare: fuori dal flusso automatico
+    return d<=finestra;
+  });
+  function ordUrg(a,b){var da=getDiff(a.r),db=getDiff(b.r);if(da===null)da=999999;if(db===null)db=999999;return da-db;}
+  function ordStato(a,b){var sa=STORD[getStato(a.r)],sb=STORD[getStato(b.r)];if(sa!==sb)return sa-sb;return ordUrg(a,b);}
+  pin.sort(ordUrg);
+  resto.sort(ordStato);
+
+  var el=document.getElementById("urgenti");
+  if(!pin.length&&!resto.length){el.innerHTML='<p style="color:#888;font-size:13px">Nessuna scadenza da mostrare in questa finestra.</p>';return;}
+
+  var h="";
+  if(pin.length){
+    h+='<p style="font-size:11px;font-weight:600;color:#3d5a99;text-transform:uppercase;letter-spacing:.4px;margin:0 0 8px">In evidenza</p>';
+    for(var i=0;i<pin.length;i++)h+=vociDash(pin[i],mostraAzienda,true);
+    if(resto.length)h+='<p style="font-size:11px;font-weight:600;color:#999;text-transform:uppercase;letter-spacing:.4px;margin:16px 0 8px">Altre scadenze</p>';
+  }
+  for(var i=0;i<resto.length;i++)h+=vociDash(resto[i],mostraAzienda,false);
+  el.innerHTML=h;
+}
+
+// costruisce una singola voce cliccabile della dashboard
+function vociDash(x,mostraAzienda,pinned){
+  var r=x.r;var d=getDiff(r);var st=getStato(r);
+  var col=st==="scaduta"?"#c0392b":(st==="in_scadenza"?"#e67e22":(st==="ok"?"#27ae60":"#bbb"));
+  var dTxt=d===null?LBL[st]:(d<0?(Math.abs(d)+"gg fa"):("tra "+d+"gg"));
+  // click sull'intera voce -> apre il record in modifica diretta (nell'azienda giusta)
+  var s='<div onclick="apriDaDash('+x.aziId+','+r.id+')" style="cursor:pointer;background:#fff;border-radius:8px;border:1px solid #ddd;border-left:3px solid '+col+';padding:11px 14px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap">';
+  s+='<div><div style="font-size:14px;font-weight:600">'+r.adempimento+'</div>';
+  s+='<div style="font-size:12px;color:#888;margin-top:2px">'+(mostraAzienda?('<b>'+x.aziNome+'</b> &middot; '):'')+r.aspetto+'</div></div>';
+  s+='<div style="display:flex;gap:6px;align-items:center">';
+  s+='<span class="badge '+BCL[st]+'">'+dTxt+'</span>';
+  s+='<button onclick="event.stopPropagation();togglePin('+x.aziId+','+r.id+')" title="'+(pinned?"Togli dalle evidenze":"Metti in evidenza")+'" style="font-size:14px;padding:3px 8px;'+(pinned?"background:#eef2fb;border-color:#3d5a99;color:#3d5a99":"")+'">'+(pinned?"\u2605":"\u2606")+'</button>';
+  s+='<button onclick="event.stopPropagation();apriEmailDaDash('+x.aziId+','+r.id+')" style="font-size:12px;padding:4px 8px">Email</button>';
+  s+='</div></div>';
+  return s;
+}
+
+// azioni dalla dashboard che rispettano l'azienda della voce (necessario in vista consulente)
+function apriDaDash(aid,id){if(aziId!==aid){aziId=aid;initSelAzi();renderScad();renderCatalogo();}openFormAdemp(id);}
+function apriEmailDaDash(aid,id){if(aziId!==aid){aziId=aid;initSelAzi();renderScad();renderCatalogo();}apriEmail(id);}
+function togglePin(aid,id){
+  var rows=ADEMP[aid]||[];
+  for(var i=0;i<rows.length;i++){if(rows[i].id===id){rows[i].inEvidenza=!rows[i].inEvidenza;break;}}
+  salva();
+  renderDash();
+}
+
+function fillFiltroAspetto(){
+  var rows=getAdemp();var aspetti=[];
+  for(var i=0;i<rows.length;i++){if(aspetti.indexOf(rows[i].aspetto)===-1)aspetti.push(rows[i].aspetto);}
+  aspetti.sort();
+  var sel=document.getElementById("filtroAspetto");var cur=sel.value||"__tutti__";
+  sel.innerHTML='<option value="__tutti__">Tutti gli aspetti</option>';
+  for(var i=0;i<aspetti.length;i++){var o=document.createElement("option");o.value=aspetti[i];o.textContent=aspetti[i];sel.appendChild(o);}
+  var ok=false;var opts=sel.options;for(var i=0;i<opts.length;i++){if(opts[i].value===cur)ok=true;}
+  sel.value=ok?cur:"__tutti__";
+}
+
+function renderScad(){
+  fillFiltroAspetto();
+  var multi=AZIENDE.length>1;
+  var scopeSel=document.getElementById("scadScope");
+  scopeSel.style.display=multi?"inline-block":"none";
+  var scope=multi?scopeSel.value:"azienda";
+  var mostraAzienda=(scope==="tutte");
+
+  // mostra/nascondi la colonna Azienda (header)
+  var thAz=document.querySelector("#p1 .colAzienda");
+  if(thAz)thAz.style.display=mostraAzienda?"table-cell":"none";
+
+  var cerca=document.getElementById("cerca").value.toLowerCase();
+  var fTipo=document.getElementById("filtroTipo").value;
+  var fAspetto=document.getElementById("filtroAspetto").value;
+  var fStato=document.getElementById("filtroStato").value;
+
+  // raccolta righe: singola azienda o tutte, ognuna annotata con la sua azienda
+  var base=[];
+  if(mostraAzienda){
+    for(var a=0;a<AZIENDE.length;a++){var rs=ADEMP[AZIENDE[a].id]||[];for(var k=0;k<rs.length;k++)base.push({r:rs[k],aziId:AZIENDE[a].id,aziNome:AZIENDE[a].nome});}
+  }else{
+    var az=getAzi();var rs=getAdemp();for(var k=0;k<rs.length;k++)base.push({r:rs[k],aziId:az.id,aziNome:az.nome});
+  }
+
+  var rows=base.filter(function(x){
+    var r=x.r;
+    if(fTipo!=="tutti"&&r.tipo!==fTipo)return false;
+    if(fStato!=="tutti"&&getStato(r)!==fStato)return false;
+    if(fAspetto!=="__tutti__"&&r.aspetto!==fAspetto)return false;
+    if(cerca){var blob=(r.adempimento+" "+r.aspetto+" "+r.riferimento+" "+x.aziNome).toLowerCase();if(blob.indexOf(cerca)===-1)return false;}
+    return true;
+  });
+
+  // in vista globale raggruppo per adempimento (stesso testo) mettendo insieme le aziende: ordino per adempimento poi azienda
+  if(mostraAzienda)rows.sort(function(a,b){var c=a.r.adempimento.localeCompare(b.r.adempimento);return c!==0?c:a.aziNome.localeCompare(b.aziNome);});
+
+  var h="";
+  for(var i=0;i<rows.length;i++){
+    var x=rows[i];var r=x.r;var d=getDiff(r);var s=getStato(r);
+    var dTxt=d===null?"—":(d<0?Math.abs(d)+"gg fa":d+"gg");
+    var dCol=(d!==null&&d<0)?"color:#c0392b":(d!==null&&d<30?"color:#e67e22":"");
+    var freqTxt=r.tipo==="evento"?(r.evento||"Ad evento"):r.frequenza+"gg";
+    var nAz=r.azioni?r.azioni.length:0;
+    h+='<tr>';
+    if(mostraAzienda)h+='<td style="font-weight:600;font-size:11px;color:#3d5a99;white-space:nowrap">'+x.aziNome+'</td>';
+    h+='<td style="color:#777;font-size:11px">'+r.aspetto+'</td>';
+    h+='<td style="font-weight:600">'+r.adempimento+'</td>';
+    h+='<td style="color:#888;font-size:11px">'+r.riferimento+'</td>';
+    h+='<td style="font-size:11px">'+freqTxt+'</td>';
+    h+='<td>'+(r.tipo==="evento"?"—":fmtDate(r.ultimaEsecuzione))+'</td>';
+    h+='<td style="font-weight:500">'+(r.tipo==="evento"?"—":fmtDate(addDays(r.ultimaEsecuzione,r.frequenza)))+'</td>';
+    h+='<td style="'+dCol+';font-weight:600">'+dTxt+'</td>';
+    h+='<td><span class="badge '+BCL[s]+'">'+LBL[s]+'</span></td>';
+    h+='<td>'+(r.docNome?'<span class="doc-chip" title="'+r.docNome+'">Doc</span>':'—')+'</td>';
+    h+='<td><button onclick="openAzioniAz('+x.aziId+','+r.id+')" style="font-size:11px;padding:3px 8px">Azioni ('+nAz+')</button></td>';
+    h+='<td style="white-space:nowrap">';
+    h+='<button onclick="openFormAdempAz('+x.aziId+','+r.id+')" style="margin-right:4px;font-size:11px;padding:3px 7px">Modifica</button>';
+    h+='<button onclick="apriEmailAz('+x.aziId+','+r.id+')" style="margin-right:4px;font-size:11px;padding:3px 7px">Email</button>';
+    h+='<button onclick="eliminaAdempAz('+x.aziId+','+r.id+')" style="color:#c0392b;font-size:11px;padding:3px 7px">Elimina</button>';
+    h+='</td></tr>';
+  }
+  var ncol=mostraAzienda?12:11;
+  if(!h)h='<tr><td colspan="'+ncol+'" style="text-align:center;padding:2rem;color:#888">Nessun risultato</td></tr>';
+  document.getElementById("tbodyScad").innerHTML=h;
+}
+
+// wrapper azioni scadenzario: selezionano l'azienda giusta prima di agire (vista globale)
+function selAziSeDiversa(aid){if(aziId!==aid){aziId=aid;initSelAzi();renderDash();renderCatalogo();}}
+function openFormAdempAz(aid,id){selAziSeDiversa(aid);openFormAdemp(id);}
+function apriEmailAz(aid,id){selAziSeDiversa(aid);apriEmail(id);}
+function openAzioniAz(aid,id){selAziSeDiversa(aid);openAzioni(id);}
+function eliminaAdempAz(aid,id){selAziSeDiversa(aid);eliminaAdemp(id);}
+
+function toggleTipoScad(){
+  var ev=document.getElementById("fTipo").value==="evento";
+  document.getElementById("fEventoWrap").style.display=ev?"block":"none";
+  document.getElementById("fPeriodicaWrap").style.display=ev?"none":"grid";
+}
+function toggleEmailFields(){document.getElementById("emailFields").style.display=document.getElementById("fHasEmail").checked?"block":"none";}
+function onDocSelected(){var f=document.getElementById("fDoc").files[0];if(f){pendingDoc=f.name;document.getElementById("docCurrent").innerHTML='<span class="doc-chip">Documento: '+f.name+'</span> <span style="font-size:11px;color:#888">(salvato con Firebase nella versione finale)</span>';}}
+
+function openFormAdemp(id){
+  editAdempId=id;pendingDoc="";
+  document.getElementById("mAdempTit").textContent=id?"Modifica adempimento":"Nuovo adempimento";
+  var ids=["fA","fAd","fR","fEF","fTA","fTF","fTAz","fEvento"];
+  for(var i=0;i<ids.length;i++)document.getElementById(ids[i]).value="";
+  document.getElementById("fTipo").value="periodica";
+  document.getElementById("fF").value=365;document.getElementById("fD").value="";
+  document.getElementById("fPA").value=60;document.getElementById("fPF").value=60;
+  document.getElementById("fAuto").checked=false;
+  document.getElementById("fHasEmail").checked=false;
+  document.getElementById("emailFields").style.display="none";
+  document.getElementById("fDoc").value="";document.getElementById("docCurrent").innerHTML="";
+  toggleTipoScad();
+  if(id){
+    var rows=getAdemp();var r=null;
+    for(var i=0;i<rows.length;i++){if(rows[i].id===id){r=rows[i];break;}}
+    if(r){
+      document.getElementById("fA").value=r.aspetto;
+      document.getElementById("fAd").value=r.adempimento;
+      document.getElementById("fR").value=r.riferimento;
+      document.getElementById("fTipo").value=r.tipo;
+      document.getElementById("fEvento").value=r.evento||"";
+      document.getElementById("fF").value=r.frequenza||365;
+      document.getElementById("fD").value=r.ultimaEsecuzione;
+      document.getElementById("fPA").value=r.preavvisoAdmin;
+      document.getElementById("fPF").value=r.preavvisoFornitore;
+      document.getElementById("fEF").value=r.emailFornitore;
+      document.getElementById("fEA2").value=r.emailAzienda2||"";
+      document.getElementById("fTA").value=r.testoAdmin;
+      document.getElementById("fTF").value=r.testoFornitore;
+      document.getElementById("fTAz").value=r.testoAzienda;
+      document.getElementById("fAuto").checked=r.invioAuto;
+      pendingDoc=r.docNome||"";
+      if(r.docNome)document.getElementById("docCurrent").innerHTML='<span class="doc-chip">Documento: '+r.docNome+'</span>';
+      if(r.testoAdmin||r.testoFornitore||r.testoAzienda||r.invioAuto){document.getElementById("fHasEmail").checked=true;document.getElementById("emailFields").style.display="block";}
+      toggleTipoScad();
+    }
+  }
+  document.getElementById("mAdemp").classList.add("on");
+}
+
+function salvaAdemp(){
+  var tipo=document.getElementById("fTipo").value;
+  var obj={
+    id:editAdempId||Date.now(),
+    aspetto:document.getElementById("fA").value,
+    adempimento:document.getElementById("fAd").value,
+    riferimento:document.getElementById("fR").value,
+    tipo:tipo,
+    evento:tipo==="evento"?document.getElementById("fEvento").value:"",
+    frequenza:tipo==="evento"?0:Number(document.getElementById("fF").value),
+    ultimaEsecuzione:tipo==="evento"?"":document.getElementById("fD").value,
+    preavvisoAdmin:Number(document.getElementById("fPA").value),
+    preavvisoFornitore:Number(document.getElementById("fPF").value),
+    emailFornitore:document.getElementById("fEF").value,
+    emailAzienda2:document.getElementById("fEA2").value,
+    testoAdmin:document.getElementById("fTA").value,
+    testoFornitore:document.getElementById("fTF").value,
+    testoAzienda:document.getElementById("fTAz").value,
+    invioAuto:document.getElementById("fAuto").checked,
+    azioni:[],docNome:pendingDoc,inEvidenza:false,storicoInvii:[]
+  };
+  if(!ADEMP[aziId])ADEMP[aziId]=[];
+  if(editAdempId){for(var i=0;i<ADEMP[aziId].length;i++){if(ADEMP[aziId][i].id===editAdempId){obj.azioni=ADEMP[aziId][i].azioni||[];obj.inEvidenza=ADEMP[aziId][i].inEvidenza||false;obj.storicoInvii=ADEMP[aziId][i].storicoInvii||[];ADEMP[aziId][i]=obj;break;}}}
+  else ADEMP[aziId].push(obj);
+  salva();
+  chiudiModal("mAdemp");renderAll();
+}
+
+function eliminaAdemp(id){
+  if(!confirm("Eliminare questo adempimento?"))return;
+  ADEMP[aziId]=ADEMP[aziId].filter(function(r){return r.id!==id;});
+  salva();
+  renderScad();renderDash();
+}
+
+function openAzioni(id){
+  azioniId=id;
+  var rows=getAdemp();var r=null;
+  for(var i=0;i<rows.length;i++){if(rows[i].id===id){r=rows[i];break;}}
+  if(!r)return;
+  document.getElementById("mAzioniSub").textContent=r.adempimento;
+  document.getElementById("azData").value=new Date().toISOString().slice(0,10);
+  document.getElementById("azTesto").value="";
+  renderAzioni();
+  document.getElementById("mAzioni").classList.add("on");
+}
+function renderAzioni(){
+  var rows=getAdemp();var r=null;
+  for(var i=0;i<rows.length;i++){if(rows[i].id===azioniId){r=rows[i];break;}}
+  if(!r)return;if(!r.azioni)r.azioni=[];
+  var h="";
+  if(!r.azioni.length)h='<p style="color:#888;font-size:13px;font-style:italic">Nessuna azione registrata</p>';
+  else{var s=r.azioni.slice().sort(function(a,b){return new Date(b.data)-new Date(a.data);});for(var i=0;i<s.length;i++){h+='<div class="azione-item"><div class="azione-data">'+fmtDate(s[i].data)+'</div><div>'+s[i].testo+'</div></div>';}}
+  document.getElementById("azioniList").innerHTML=h;
+}
+function aggiungiAzione(){
+  var data=document.getElementById("azData").value;var testo=document.getElementById("azTesto").value.trim();
+  if(!data||!testo){alert("Inserisci data e descrizione");return;}
+  var rows=getAdemp();
+  for(var i=0;i<rows.length;i++){if(rows[i].id===azioniId){if(!rows[i].azioni)rows[i].azioni=[];rows[i].azioni.push({data:data,testo:testo});break;}}
+  salva();
+  document.getElementById("azTesto").value="";renderAzioni();renderScad();
+}
+
+function apriEmail(id){
+  mailId=id;
+  var rows=getAdemp();var r=null;
+  for(var i=0;i<rows.length;i++){if(rows[i].id===id){r=rows[i];break;}}
+  if(!r)return;
+  var azi=getAzi();
+  var scad=r.tipo==="evento"?(r.evento||"ad evento"):fmtDate(addDays(r.ultimaEsecuzione,r.frequenza));
+  document.getElementById("mEmailAzienda").textContent="Azienda: "+azi.nome;
+  var oggetto=r.adempimento+" — Scadenza: "+scad;
+  document.getElementById("mEmailSub").textContent=oggetto;
+  var cfg=getCfg();
+  // IBRIDO: se la voce ha un testo override lo usa; altrimenti il testo globale coi segnaposto sostituiti
+  var voci=[
+    {key:"admin",dest:"Admin (te)",em:cfg.emailAdmin||"(email consulente non impostata)",
+     testo:r.testoAdmin?r.testoAdmin:applicaSegnaposto(cfg.testoAdmin,r,azi,scad),
+     override:!!r.testoAdmin},
+    {key:"fornitore",dest:"Fornitore",em:r.emailFornitore||"(fornitore non impostato per questo adempimento)",
+     testo:r.testoFornitore?r.testoFornitore:applicaSegnaposto(cfg.testoForn,r,azi,scad),
+     override:!!r.testoFornitore},
+    {key:"azienda",dest:"Azienda cliente",em:cfg.emailAzi||azi.emailRef||"(email referente non impostata)",
+     testo:r.testoAzienda?r.testoAzienda:applicaSegnaposto(cfg.testoAzi,r,azi,scad),
+     override:!!r.testoAzienda}
+  ];
+  // 2° referente aziendale, se impostato sul singolo adempimento
+  if(r.emailAzienda2){
+    voci.push({key:"azienda2",dest:"Azienda — 2° referente",em:r.emailAzienda2,
+      testo:r.testoAzienda?r.testoAzienda:applicaSegnaposto(cfg.testoAzi,r,azi,scad),
+      override:!!r.testoAzienda});
+  }
+  // conservo per inviaEmail: destinatari + oggetto congelato del momento
+  mailVoci=voci;mailOggetto=oggetto;mailAziId=aziId;
+  var h="";
+  for(var i=0;i<voci.length;i++){
+    h+='<div style="background:#f9f9f7;border-radius:8px;padding:12px;margin-bottom:10px;border:1px solid #eee">';
+    h+='<label style="display:flex;align-items:center;gap:8px;font-size:11px;color:#888;margin-bottom:2px;font-weight:600;text-transform:uppercase;cursor:pointer">';
+    h+='<input type="checkbox" class="mEmailChk" data-i="'+i+'" checked style="width:auto;margin:0"> A: '+voci[i].dest+(voci[i].em?' &lt;'+voci[i].em+'&gt;':'')+(voci[i].override?' <span style="color:var(--verde)">• testo personalizzato</span>':'')+'</label>';
+    h+='<div style="font-size:13px;margin-top:4px">'+voci[i].testo+'</div></div>';
+  }
+  document.getElementById("mEmailCorpo").innerHTML=h;
+  renderStoricoInvii(r);
+  document.getElementById("mEmail").classList.add("on");
+}
+
+// mostra lo storico invii della scadenza nella finestra email
+function renderStoricoInvii(r){
+  document.getElementById("mEmailStorico").innerHTML=Fond.htmlStoricoRecord(r);
+}
+// ---------- CONFIG EMAIL GLOBALE (per azienda) ----------
+var EMAILCFG={};
+function defaultCfg(){return {auto:true,preavviso:60,emailAdmin:"",emailAzi:"",
+  testoAdmin:'Promemoria: l\'adempimento "{ADEMPIMENTO}" per {AZIENDA} risulta in scadenza il {SCADENZA}. Rif. {RIFERIMENTO}.',
+  testoForn:'Si richiede la verifica relativa a: "{ADEMPIMENTO}" per l\'azienda {AZIENDA}, in scadenza il {SCADENZA}. Rif. {RIFERIMENTO}.',
+  testoAzi:'Si comunica che per {AZIENDA} e in scadenza l\'adempimento "{ADEMPIMENTO}" (previsto entro il {SCADENZA}). La pratica e in gestione.'};}
+function getCfg(){if(!EMAILCFG[aziId])EMAILCFG[aziId]=defaultCfg();return EMAILCFG[aziId];}
+function renderEmailGlobale(){
+  var c=getCfg();var azi=getAzi();
+  document.getElementById("lblAziendaEmail").textContent=azi.nome;
+  document.getElementById("gAuto").checked=c.auto;
+  document.getElementById("gPreavviso").value=c.preavviso;
+  document.getElementById("gEmailAdmin").value=c.emailAdmin;
+  document.getElementById("gEmailAzi").value=c.emailAzi||azi.emailRef||"";
+  document.getElementById("gTestoAdmin").value=c.testoAdmin;
+  document.getElementById("gTestoForn").value=c.testoForn;
+  document.getElementById("gTestoAzi").value=c.testoAzi;
+  document.getElementById("gEmailSalvata").textContent="";
+}
+function salvaEmailGlobale(){
+  var c=getCfg();
+  c.auto=document.getElementById("gAuto").checked;
+  c.preavviso=Number(document.getElementById("gPreavviso").value)||60;
+  c.emailAdmin=document.getElementById("gEmailAdmin").value;
+  c.emailAzi=document.getElementById("gEmailAzi").value;
+  c.testoAdmin=document.getElementById("gTestoAdmin").value;
+  c.testoForn=document.getElementById("gTestoForn").value;
+  c.testoAzi=document.getElementById("gTestoAzi").value;
+  salva();
+  document.getElementById("gEmailSalvata").textContent="Configurazione salvata.";
+  setTimeout(function(){document.getElementById("gEmailSalvata").textContent="";},2500);
+}
+// sostituisce i segnaposto con i dati della voce
+function applicaSegnaposto(tpl,r,azi,scad){
+  return Fond.applicaSegnaposto(tpl,{
+    AZIENDA:azi.nome||"",
+    ADEMPIMENTO:r.adempimento||"",
+    RIFERIMENTO:r.riferimento||"",
+    ASPETTO:r.aspetto||"",
+    SCADENZA:scad||""
+  });
+}
+function inviaEmail(){
+  var r=trovaAdemp(mailAziId,mailId);
+  if(!r){chiudiModal("mEmail");return;}
+  var chks=document.querySelectorAll(".mEmailChk");
+  var invii=[];
+  for(var i=0;i<chks.length;i++){
+    if(chks[i].checked){
+      var v=mailVoci[Number(chks[i].getAttribute("data-i"))];
+      invii.push({dest:v.dest,email:v.em,oggetto:mailOggetto,testo:v.testo}); // testo congelato
+    }
+  }
+  if(!invii.length){alert("Seleziona almeno un destinatario da registrare.");return;}
+  var n=Fond.registraInvii(r,invii,{esito:"inviata"});
+  salva();
+  if(window.Fond&&Fond.inviaEmail)Fond.inviaEmail(); // hook backend (per ora simulato)
+  renderStoricoInvii(r);renderScad();renderDash();
+  alert("Invio registrato per "+n+" destinatario/i.");
+}
+
+// aggiunge a mano un invio fatto fuori dall'app (es. PEC dal gestionale)
+function aggiungiInvioManuale(){
+  var r=trovaAdemp(mailAziId,mailId);
+  if(!r)return;
+  var dest=prompt("Destinatario (es. Azienda cliente, Fornitore, RSPP):","Azienda cliente");
+  if(dest===null)return;
+  var email=prompt("Indirizzo email / PEC:","");
+  if(email===null)return;
+  var data=prompt("Data invio (gg/mm/aaaa):",Fond.oggiIT());
+  if(data===null)return;
+  var rif=prompt("Riferimento ricevuta/PEC (facoltativo):","");
+  Fond.registraInvii(r,[{dest:dest,email:email,oggetto:mailOggetto||r.adempimento,testo:"(invio registrato manualmente)"}],
+    {esito:"manuale",manuale:true,data:data+" (annotato "+Fond.oggiIT()+")",ricevutaPEC:rif||""});
+  salva();
+  renderStoricoInvii(r);renderScad();renderDash();
+}
+
+function trovaAdemp(aid,id){var rows=ADEMP[aid]||[];for(var i=0;i<rows.length;i++){if(rows[i].id===id)return rows[i];}return null;}
+
+function renderCatalogo(){
+  document.getElementById("catNome").textContent=getAzi().nome;
+  var cerca=(document.getElementById("cercaCat").value||"").toLowerCase();
+  var h="";
+  for(var i=0;i<CATALOGO.length;i++){
+    var c=CATALOGO[i];
+    if(cerca){var blob=(c.adempimento+" "+c.aspetto+" "+c.riferimento).toLowerCase();if(blob.indexOf(cerca)===-1)continue;}
+    var chk=catSel[i]?"checked":"";
+    var freqTxt=c.tipo==="evento"?(c.evento||"Ad evento"):"ogni "+c.frequenza+" giorni";
+    h+='<div class="cat-item"><input type="checkbox" '+chk+' onchange="catSel['+i+']=this.checked">';
+    h+='<div><div style="font-size:13px;font-weight:600">'+c.adempimento+'</div><div style="font-size:12px;color:#888">'+c.aspetto+' — '+freqTxt+'</div></div></div>';
+  }
+  if(!h)h='<p style="color:#888;font-size:13px">Nessun adempimento trovato.</p>';
+  document.getElementById("catList").innerHTML=h;
+}
+function selTuttiCat(v){
+  var cerca=(document.getElementById("cercaCat").value||"").toLowerCase();
+  for(var i=0;i<CATALOGO.length;i++){
+    var c=CATALOGO[i];
+    if(cerca){var blob=(c.adempimento+" "+c.aspetto+" "+c.riferimento).toLowerCase();if(blob.indexOf(cerca)===-1)continue;}
+    catSel[i]=v;
+  }
+  renderCatalogo();
+}
+function importaCatalogo(){
+  if(!ADEMP[aziId])ADEMP[aziId]=[];
+  var count=0;
+  for(var i=0;i<CATALOGO.length;i++){
+    if(!catSel[i])continue;var c=CATALOGO[i];
+    var gia=false;
+    for(var j=0;j<ADEMP[aziId].length;j++){if(ADEMP[aziId][j].adempimento===c.adempimento){gia=true;break;}}
+    if(gia)continue;
+    ADEMP[aziId].push(A(Date.now()+i,c.aspetto,c.adempimento,c.riferimento,c.tipo,c.frequenza,"",c.evento,""));
+    count++;
+  }
+  catSel={};
+  salva();
+  alert("Importati "+count+" adempimenti in "+getAzi().nome);
+  showTab(1);
+}
+
+// raccoglie tutti gli invii annotati con azienda (una entry per azienda, per il badge consulente)
+function inviiStorico(scope){
+  var multi=AZIENDE.length>1;
+  var lista=scope==="tutte"?AZIENDE:[getAzi()];
+  var items=[];
+  for(var a=0;a<lista.length;a++){
+    var recs=[];
+    var rows=ADEMP[lista[a].id]||[];
+    for(var i=0;i<rows.length;i++)recs.push({record:rows[i],etichetta:rows[i].adempimento});
+    items=items.concat(Fond.raccogliInvii(recs,lista[a].nome));
+  }
+  items.sort(function(x,y){return Fond.parseDataIT(y.e.data)-Fond.parseDataIT(x.e.data);});
+  return items;
+}
+
+function renderStorico(){
+  var multi=AZIENDE.length>1;
+  var scopeSel=document.getElementById("storScope");
+  scopeSel.style.display=multi?"inline-block":"none";
+  var scope=multi?scopeSel.value:"azienda";
+  var cerca=document.getElementById("storCerca").value.toLowerCase();
+
+  var items=inviiStorico(scope);
+  if(cerca)items=items.filter(function(it){var b=(it.azi+" "+it.et+" "+it.e.dest+" "+it.e.email+" "+it.e.oggetto).toLowerCase();return b.indexOf(cerca)!==-1;});
+
+  var mesi=Number(document.getElementById("storPeriodo").value);
+  var f=Fond.filtraPeriodo(items,mesi);
+  document.getElementById("storList").innerHTML=Fond.htmlStoricoGlobale(f.items,f.nascosti,mesi,multi);
+}
+
+function exportStoricoCSV(){
+  var multi=AZIENDE.length>1;
+  var scope=multi?document.getElementById("storScope").value:"azienda";
+  // export SEMPRE completo (ignora il filtro periodo della vista)
+  Fond.esportaInviiCSV(inviiStorico(scope),"storico_invii.csv");
+}
+
+/* Le aziende ora si gestiscono SOLO nel Modulo Aziende (anagrafica condivisa). */
+function openNuovaAzi(){
+  alert("Le aziende si aggiungono nel modulo \"Aziende\".\n\nApri il Modulo Aziende, inserisci l'azienda, poi ricarica questo modulo: comparirà nell'elenco.");
+}
+function creaAzienda(){ openNuovaAzi(); }
+function mostraNessunAzienda(){
+  var cont=document.querySelector("main")||document.body;
+  var d=document.createElement("div");
+  d.style.cssText="margin:20px;padding:16px 18px;background:#fdf3e3;border:1px solid #e6c98a;border-radius:10px;color:#7a5b1e;font-size:14px";
+  d.innerHTML="<b>Nessuna azienda in anagrafica.</b><br>Apri il modulo <b>Aziende</b>, inserisci almeno un'azienda, poi ricarica questa pagina: comparirà qui nell'elenco.";
+  cont.insertBefore(d, cont.firstChild);
+}
+
+function chiudiModal(id){document.getElementById(id).classList.remove("on");}
+var mbgs=document.getElementsByClassName("mbg");
+for(var mi=0;mi<mbgs.length;mi++){mbgs[mi].addEventListener("click",function(e){if(e.target===this)this.classList.remove("on");});}
+
+/* ============ PERSISTENZA (localStorage; Firebase la sostituirà) ============ */
+/* Si persistono AZIENDE, ADEMP, EMAILCFG e l'azienda selezionata. Il CATALOGO no: è libreria statica. */
+var LS_KEY="adempimenti_dati_v1";
+function salva(){
+  /* NON si salva più AZIENDE: la lista aziende appartiene all'anagrafica condivisa. */
+  Store.save(LS_KEY, {ADEMP:ADEMP, EMAILCFG:EMAILCFG, aziId:aziId})
+    .catch(function(e){ console.warn("Salvataggio non riuscito:", e); });
+}
+/* carica() ASINCRONA: in parallelo carica l'ANAGRAFICA CONDIVISA (lista aziende)
+   e i DATI DEL MODULO (adempimenti, config, azienda selezionata). Promise<boolean>. */
+function carica(){
+  return Promise.all([ Store.aziende(), Store.load(LS_KEY) ]).then(function(res){
+    AZIENDE = res[0] || [];
+    var d = res[1];
+    ADEMP = (d && d.ADEMP) || {};
+    EMAILCFG = (d && d.EMAILCFG) || {};
+    if(d && d.aziId) aziId = d.aziId;
+    /* se l'azienda selezionata non è (più) nell'anagrafica, ripiega sulla prima */
+    if(AZIENDE.length){
+      var ok=false; for(var i=0;i<AZIENDE.length;i++){ if(AZIENDE[i].id===aziId){ ok=true; break; } }
+      if(!ok) aziId = AZIENDE[0].id;
+    }
+    return AZIENDE.length > 0;
+  }).catch(function(e){ console.warn("Caricamento non riuscito:", e); return false; });
+}
+/* Export/import JSON: ponte per lavorare tra più PC finché non c'è Firebase */
+function esportaDati(){
+  var blob=new Blob([JSON.stringify({AZIENDE:AZIENDE, ADEMP:ADEMP, EMAILCFG:EMAILCFG}, null, 2)], {type:"application/json"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");
+  a.href=url; a.download="adempimenti_dati_"+Fond.oggiIT().replace(/\//g,"-")+".json";
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function importaDati(input){
+  var file=input.files && input.files[0];
+  if(!file) return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{
+      var d=JSON.parse(r.result);
+      if(!d || !d.AZIENDE){ alert("File non valido: manca l'elenco aziende."); return; }
+      if(!confirm("Importare i dati dal file? I dati attuali verranno sostituiti.")) return;
+      AZIENDE=d.AZIENDE; ADEMP=d.ADEMP||{}; EMAILCFG=d.EMAILCFG||{};
+      aziId=AZIENDE[0].id;
+      salva(); initSelAzi(); renderAll();
+      alert("Dati importati.");
+    }catch(e){ alert("File non leggibile: "+e.message); }
+    input.value="";
+  };
+  r.readAsText(file);
+}
+
+/* Avvio: carica dati salvati; se assenti restano i dati seed dimostrativi già in memoria */
+carica().then(function(){
+  if(!AZIENDE.length){ mostraNessunAzienda(); return; }
+  initSelAzi(); renderAll();
+});
+</script>
+</body>
+</html>
