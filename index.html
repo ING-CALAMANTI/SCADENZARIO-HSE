@@ -134,32 +134,34 @@
        niente anagrafica Aziende, niente moduli non abilitati. */
   (function(){
     if(typeof Store==="undefined" || !Store.profile) return;
+    /* Mappa modulo → chiave, indicizzata su un nome NORMALIZZATO (senza "/",
+       senza ".html", spazi decodificati, minuscolo) così è robusta anche se
+       Netlify accorcia gli indirizzi ("Pretty URLs"). */
     var MAP = {
-      "Modulo%20aziende.html":"__base",
-      "adempimenti_scadenzario_v5.html":"adempimenti",
-      "formazione%20rev.2.html":"formazione",
-      "Registro%20Antincendio.html":"antincendio",
-      "Modulo%20DUVRI.html":"duvri",
-      "MODULO%20NEAR%20MISS.html":"nearmiss",
-      "modulo_audit_diario.html":"audit",
-      "recipienti%20in%20pressione.html":"recipienti"
+      "modulo aziende":"__base",
+      "adempimenti_scadenzario_v5":"adempimenti",
+      "formazione rev.2":"formazione",
+      "registro antincendio":"antincendio",
+      "modulo duvri":"duvri",
+      "modulo near miss":"nearmiss",
+      "modulo_audit_diario":"audit",
+      "recipienti in pressione":"recipienti"
     };
+    function normKey(href){
+      var s = (href||"").split("?")[0].split("#")[0];
+      s = s.replace(/^\.?\//,"").replace(/\.html?$/i,"");
+      try{ s = decodeURIComponent(s); }catch(e){}
+      return s.toLowerCase();
+    }
     Store.profile().then(function(prof){
-      try{ var dbg=document.createElement("div"); dbg.id="__dbg";
-        dbg.style.cssText="position:fixed;top:0;left:0;right:0;z-index:99999;background:#111;color:#0f0;font:11px/1.4 monospace;padding:5px 10px;white-space:pre-wrap;word-break:break-all";
-        dbg.textContent="DEBUG profilo → "+JSON.stringify(prof); document.body.appendChild(dbg); }catch(e){}
       if(prof.role==="studio"){ aggiungiCardAccessi(); return; }
       var liv = prof.livelli || {};
       var cards = document.querySelectorAll(".card");
-      var _diag=[];
       for(var i=0;i<cards.length;i++){
-        var href = cards[i].getAttribute("href") || "";
-        var key = MAP[href];
+        var key = MAP[normKey(cards[i].getAttribute("href"))];
         var permesso = key && key!=="__base" && (Number(liv[key]||0) >= 1);
-        _diag.push(href+" | key="+key+" | liv="+(key?liv[key]:"-")+" | "+(permesso?"MOSTRA":"nascondi"));
         if(!permesso) cards[i].style.display="none";
       }
-      try{ var d2=document.getElementById("__dbg"); if(d2) d2.textContent+="\n"+_diag.join("\n"); }catch(e){}
       nascondiSezioniVuote();
       /* la nota "dati condivisi tra gli utenti dello studio" non riguarda i clienti */
       var ft=document.querySelector("footer"); if(ft) ft.style.display="none";
