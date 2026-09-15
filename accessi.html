@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Accessi clienti — Scadenzario Sicurezza</title>
+<link rel="stylesheet" href="fondamenta.css">
+<style>
+  :root{ --verde:#0f5e5a; --verde-scuro:#0a4340; --verde-chiaro:#e6f0ef; --bordo:#d8dedd;
+         --testo:#1f2a29; --testo-soft:#5b6b69; --grigio:#f4f6f6; }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--grigio);color:var(--testo);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;}
+  .hero{background:linear-gradient(135deg,var(--verde) 0%,var(--verde-scuro) 100%);
+    color:#fff;padding:26px 30px 30px;}
+  .hero-in{max-width:1000px;margin:0 auto;}
+  .hero h1{margin:0;font-size:22px;font-weight:800;}
+  .hero .sub{margin-top:5px;font-size:13px;opacity:.92;}
+  main{max-width:1000px;margin:22px auto 60px;padding:0 22px;}
+  .box{background:#fff;border:1px solid var(--bordo);border-radius:14px;padding:20px 20px;margin-bottom:18px;}
+  .box h2{margin:0 0 10px;font-size:16px;color:var(--verde-scuro);}
+  .steps{margin:0;padding-left:20px;font-size:13.5px;color:var(--testo-soft);line-height:1.7;}
+  .steps b{color:var(--testo);}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th,td{text-align:left;padding:10px 8px;border-bottom:1px solid #eef1f1;vertical-align:middle;}
+  th{font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--testo-soft);}
+  select{padding:7px 8px;border:1px solid #ccc;border-radius:8px;font-size:13.5px;background:#fff;}
+  .bp{background:var(--verde);color:#fff;border:0;border-radius:8px;padding:8px 14px;
+    font-size:13px;font-weight:600;cursor:pointer;}
+  .bp:disabled{opacity:.5;cursor:default;}
+  .bp.ghost{background:#eef0f0;color:#333;}
+  .email{font-weight:600;color:var(--verde-scuro);}
+  .pend{display:inline-block;background:#fdf3e3;color:#8a6d3b;border-radius:12px;padding:2px 8px;font-size:11px;font-weight:700;}
+  .oka{display:inline-block;background:var(--verde-chiaro);color:var(--verde);border-radius:12px;padding:2px 8px;font-size:11px;font-weight:700;}
+  .msg{margin:10px 0 0;font-size:13px;}
+  .vuoto{color:var(--testo-soft);font-size:14px;padding:8px 2px;}
+  .avviso{background:#fdf3e3;border:1px solid #e6c98a;color:#7a5b1e;border-radius:10px;padding:14px 16px;font-size:13.5px;}
+  #listaWrap{overflow-x:auto;}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-in">
+    <h1>Accessi clienti</h1>
+    <div class="sub">Collega ogni account cliente alla sua azienda e scegli cosa può fare.</div>
+  </div>
+</header>
+
+<main>
+  <div id="soloStudio" class="box" style="display:none">
+    <div class="avviso"><b>Area riservata allo studio.</b><br>Questa pagina serve a gestire gli accessi dei clienti e non è disponibile per gli account cliente.</div>
+  </div>
+
+  <div id="contenuto" style="display:none">
+    <div class="box">
+      <h2>Come si abilita un cliente</h2>
+      <ol class="steps">
+        <li>Crei l'account nella <b>console Firebase</b> (Authentication → Users → Add user): email + password del cliente.</li>
+        <li>Il cliente fa un <b>primo accesso</b> alla piattaforma (comparirà qui sotto come "in attesa").</li>
+        <li>Qui gli assegni la <b>sua azienda</b> e il <b>livello</b> per ogni modulo, poi premi <b>Salva</b>.</li>
+      </ol>
+    </div>
+
+    <div class="box">
+      <h2>Clienti registrati</h2>
+      <div id="listaWrap">
+        <div class="vuoto">Caricamento…</div>
+      </div>
+      <div style="margin-top:14px">
+        <button class="bp ghost" onclick="carica()">Aggiorna elenco</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Firebase + login condiviso -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+<script src="firebase-init.js"></script>
+<script src="auth-gate.js"></script>
+<script>
+  var AZIENDE=[], USERS=[];
+
+  /* Livelli disponibili per modulo. Per ora è attivo solo Adempimenti;
+     gli altri moduli compariranno man mano che li abilitiamo. */
+  var LIVELLI = [
+    {v:0, t:"0 · Nessun accesso"},
+    {v:1, t:"1 · Solo consulta"},
+    {v:2, t:"2 · Compila date"},
+    {v:3, t:"3 · Inserimento pieno"}
+  ];
+  var MODULI = [ {key:"adempimenti", nome:"Adempimenti"} ];
+
+  function nomeAzi(id){
+    for(var i=0;i<AZIENDE.length;i++){ if(AZIENDE[i].id===id) return AZIENDE[i].nome; }
+    return "";
+  }
+
+  function optAziende(sel){
+    var h='<option value="">— non assegnata —</option>';
+    for(var i=0;i<AZIENDE.length;i++){
+      h+='<option value="'+AZIENDE[i].id+'"'+(String(AZIENDE[i].id)===String(sel)?' selected':'')+'>'+AZIENDE[i].nome+'</option>';
+    }
+    return h;
+  }
+  function optLivelli(sel){
+    var h='';
+    for(var i=0;i<LIVELLI.length;i++){
+      h+='<option value="'+LIVELLI[i].v+'"'+(Number(LIVELLI[i].v)===Number(sel)?' selected':'')+'>'+LIVELLI[i].t+'</option>';
+    }
+    return h;
+  }
+
+  function render(){
+    var wrap=document.getElementById("listaWrap");
+    if(!USERS.length){
+      wrap.innerHTML='<div class="vuoto">Nessun cliente ha ancora effettuato il primo accesso. Segui i passi qui sopra.</div>';
+      return;
+    }
+    var h='<table><thead><tr><th>Cliente</th><th>Stato</th><th>Azienda</th>';
+    for(var m=0;m<MODULI.length;m++) h+='<th>'+MODULI[m].nome+'</th>';
+    h+='<th></th></tr></thead><tbody>';
+    for(var i=0;i<USERS.length;i++){
+      var u=USERS[i];
+      var liv=u.livelli||{};
+      h+='<tr>';
+      h+='<td class="email">'+(u.email||u.uid)+'</td>';
+      h+='<td>'+(u.aziId?'<span class="oka">abilitato</span>':'<span class="pend">in attesa</span>')+'</td>';
+      h+='<td><select id="azi_'+u.uid+'">'+optAziende(u.aziId||"")+'</select></td>';
+      for(var m=0;m<MODULI.length;m++){
+        var k=MODULI[m].key;
+        h+='<td><select id="liv_'+u.uid+'_'+k+'">'+optLivelli(liv[k]||0)+'</select></td>';
+      }
+      h+='<td><button class="bp" onclick="salvaUtente(\''+u.uid+'\')">Salva</button></td>';
+      h+='</tr>';
+    }
+    h+='</tbody></table><div id="msg" class="msg"></div>';
+    wrap.innerHTML=h;
+  }
+
+  function salvaUtente(uid){
+    var aziSel=document.getElementById("azi_"+uid).value;
+    var aziId = aziSel==="" ? null : Number(aziSel);
+    var livelli={};
+    for(var m=0;m<MODULI.length;m++){
+      var k=MODULI[m].key;
+      livelli[k]=Number(document.getElementById("liv_"+uid+"_"+k).value);
+    }
+    var msg=document.getElementById("msg");
+    if(msg) msg.textContent="Salvataggio…";
+    Store.setAssegnazione(uid, aziId, aziId?nomeAzi(aziId):"", livelli).then(function(){
+      if(msg){ msg.style.color="#0f5e5a"; msg.textContent="Salvato. L'assegnazione ha effetto al prossimo accesso del cliente."; }
+      carica();
+    }).catch(function(e){
+      if(msg){ msg.style.color="#c0392b"; msg.textContent="Errore nel salvataggio: "+(e&&e.message||e); }
+    });
+  }
+
+  function carica(){
+    return Promise.all([ Store.aziende(), Store.listUsers() ]).then(function(res){
+      AZIENDE = res[0] || [];
+      USERS   = (res[1] || []).filter(function(u){ return u.role!=="studio"; });
+      render();
+    });
+  }
+
+  /* Solo lo studio può usare questa pagina. */
+  Store.profile().then(function(prof){
+    if(prof.role!=="studio"){
+      document.getElementById("soloStudio").style.display="block";
+      return;
+    }
+    document.getElementById("contenuto").style.display="block";
+    carica();
+  });
+</script>
+</body>
+</html>

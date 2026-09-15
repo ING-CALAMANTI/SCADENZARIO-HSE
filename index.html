@@ -127,6 +127,57 @@
     var dt=document.getElementById("data-oggi");
     if(dt){ try{ dt.textContent=new Date().toLocaleDateString("it-IT",{weekday:"long",day:"numeric",month:"long",year:"numeric"}); }catch(e){} }
   })();
+
+  /* Home consapevole del ruolo:
+     - STUDIO: vede tutto + una scorciatoia al pannello "Accessi clienti".
+     - CLIENTE: vede SOLO i moduli su cui ha almeno il livello 1 (consulta);
+       niente anagrafica Aziende, niente moduli non abilitati. */
+  (function(){
+    if(typeof Store==="undefined" || !Store.profile) return;
+    var MAP = {
+      "Modulo%20aziende.html":"__base",
+      "adempimenti_scadenzario_v5.html":"adempimenti",
+      "formazione%20rev.2.html":"formazione",
+      "Registro%20Antincendio.html":"antincendio",
+      "Modulo%20DUVRI.html":"duvri",
+      "MODULO%20NEAR%20MISS.html":"nearmiss",
+      "modulo_audit_diario.html":"audit",
+      "recipienti%20in%20pressione.html":"recipienti"
+    };
+    Store.profile().then(function(prof){
+      if(prof.role==="studio"){ aggiungiCardAccessi(); return; }
+      var liv = prof.livelli || {};
+      var cards = document.querySelectorAll(".card");
+      for(var i=0;i<cards.length;i++){
+        var href = cards[i].getAttribute("href") || "";
+        var key = MAP[href];
+        var permesso = key && key!=="__base" && (Number(liv[key]||0) >= 1);
+        if(!permesso) cards[i].style.display="none";
+      }
+      nascondiSezioniVuote();
+    });
+    function nascondiSezioniVuote(){
+      var sezioni=document.querySelectorAll(".sezione");
+      for(var i=0;i<sezioni.length;i++){
+        var g=sezioni[i].nextElementSibling;
+        if(g && g.classList.contains("griglia")){
+          var visibili=0, cc=g.querySelectorAll(".card");
+          for(var j=0;j<cc.length;j++){ if(cc[j].style.display!=="none") visibili++; }
+          if(visibili===0){ sezioni[i].style.display="none"; g.style.display="none"; }
+        }
+      }
+    }
+    function aggiungiCardAccessi(){
+      var griglie=document.querySelectorAll(".griglia");
+      if(!griglie.length) return;
+      var a=document.createElement("a");
+      a.className="card base"; a.href="accessi.html";
+      a.innerHTML='<span class="ico-wrap"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>'
+        +'<span class="txt"><span class="nome">Accessi clienti</span><span class="desc">Abilita i clienti e scegli cosa possono vedere e modificare per ogni modulo.</span></span>'
+        +'<span class="arrow">→</span>';
+      griglie[0].appendChild(a);
+    }
+  })();
 </script>
 </body>
 </html>

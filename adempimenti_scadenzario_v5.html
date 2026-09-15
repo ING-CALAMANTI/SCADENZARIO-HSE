@@ -58,28 +58,45 @@ tr:hover td{background:#fafaf8}
 </head>
 <body>
 
+<style>
+  /* Accesso cliente: nasconde ciò che è riservato allo studio.
+     Le classi vengono attivate su <body> da applicaAccesso(). */
+  body.ruolo-cliente .only-studio{ display:none !important; }
+  body.ruolo-cliente:not(.liv-pieno) .only-struttura{ display:none !important; }
+  #aziClienteLabel{ display:none; }
+  body.ruolo-cliente #aziClienteLabel{ display:inline-block; font-weight:700; color:var(--verde,#0f5e5a);
+    background:var(--verde-chiaro,#e6f0ef); border-radius:16px; padding:6px 14px; font-size:14px; }
+  #bannerCliente{ display:none; }
+  body.ruolo-cliente #bannerCliente{ display:block; }
+</style>
+
 <div class="hdr">
-  <h1>Modulo Adempimenti 1</h1>
+  <h1>Modulo Adempimenti</h1>
   <div style="display:flex;gap:8px;align-items:center">
-    <select id="selAzi" onchange="cambiaAzi()" style="min-width:170px"></select>
-    <button class="bp" onclick="openNuovaAzi()">+ Azienda</button>
-    <button class="bp" onclick="esportaDati()" title="Scarica i dati in un file per portarli su un altro PC">Esporta</button>
-    <button class="bp" onclick="document.getElementById('impFile').click()" title="Carica un file di dati esportato">Importa</button>
+    <span id="aziClienteLabel"></span>
+    <select id="selAzi" class="only-studio" onchange="cambiaAzi()" style="min-width:170px"></select>
+    <button class="bp only-studio" onclick="openNuovaAzi()">+ Azienda</button>
+    <button class="bp only-studio" onclick="esportaDati()" title="Scarica i dati in un file per portarli su un altro PC">Esporta</button>
+    <button class="bp only-studio" onclick="document.getElementById('impFile').click()" title="Carica un file di dati esportato">Importa</button>
     <input type="file" id="impFile" accept=".json" style="display:none" onchange="importaDati(this)">
   </div>
+</div>
+
+<div id="bannerCliente" style="margin:0 0 4px;padding:10px 16px;background:#e6f0ef;border-left:4px solid #0f5e5a;border-radius:8px;color:#0a4340;font-size:13px">
+  Stai visualizzando gli adempimenti della tua azienda. Puoi <b>aggiornare le date di esecuzione</b>; la struttura degli obblighi è gestita dallo studio.
 </div>
 
 <div class="nav">
   <div class="ntab on" onclick="showTab(0)">Dashboard</div>
   <div class="ntab" onclick="showTab(1)">Scadenzario</div>
-  <div class="ntab" onclick="showTab(2)">Catalogo</div>
-  <div class="ntab" onclick="showTab(5)">Storico invii</div>
-  <div class="ntab" onclick="showTab(4)">Email</div>
+  <div class="ntab only-studio" onclick="showTab(2)">Catalogo</div>
+  <div class="ntab only-studio" onclick="showTab(5)">Storico invii</div>
+  <div class="ntab only-studio" onclick="showTab(4)">Email</div>
 </div>
 
 <!-- DASHBOARD -->
 <div class="pg on" id="p0">
-  <div id="scopeBar" style="display:none;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+  <div id="scopeBar" class="only-studio" style="display:none;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
     <span style="font-size:12px;font-weight:600;color:#555;text-transform:uppercase;letter-spacing:.4px">Vista</span>
     <select id="dashScope" onchange="renderDash()" style="width:auto">
       <option value="azienda">Azienda corrente</option>
@@ -128,7 +145,7 @@ tr:hover td{background:#fafaf8}
       <option value="in_scadenza">In scadenza</option>
       <option value="ok">Regolari</option>
     </select>
-    <button class="bp" onclick="openFormAdemp(null)">+ Nuovo</button>
+    <button class="bp only-struttura" onclick="openFormAdemp(null)">+ Nuovo</button>
   </div>
   <div class="tw">
     <table>
@@ -210,13 +227,13 @@ tr:hover td{background:#fafaf8}
       <div class="fld"><label>Frequenza (giorni)</label><input type="number" id="fF" value="365"></div>
       <div class="fld"><label>Data ultima esecuzione</label><input type="date" id="fD"></div>
     </div>
-    <div class="fld"><label>Giorni preavviso admin</label><input type="number" id="fPA" value="60"></div>
-    <div class="sub-box">
+    <div class="fld only-studio"><label>Giorni preavviso admin</label><input type="number" id="fPA" value="60"></div>
+    <div class="sub-box only-studio">
       <p style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px">DOCUMENTO ALLEGATO</p>
       <input type="file" id="fDoc" onchange="onDocSelected()">
       <div id="docCurrent" style="margin-top:6px"></div>
     </div>
-    <div class="sub-box">
+    <div class="sub-box only-studio">
       <p style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px">DESTINATARI EMAIL DI QUESTO ADEMPIMENTO</p>
       <div class="g2">
         <div class="fld"><label>Email fornitore (chi fa la verifica)</label><input type="email" id="fEF" placeholder="fornitore@example.com"></div>
@@ -225,7 +242,7 @@ tr:hover td{background:#fafaf8}
       <div class="fld"><label>Email 2° referente aziendale (facoltativa)</label><input type="email" id="fEA2" placeholder="secondo.referente@azienda.it"></div>
       <p style="font-size:11px;color:#888;margin:8px 0 0">Il referente aziendale principale e il consulente si impostano nel tab <b>Email</b>. Qui indichi il <b>fornitore</b> (diverso per ogni adempimento) ed eventualmente un 2° referente.</p>
     </div>
-    <div class="sub-box">
+    <div class="sub-box only-studio">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
         <input type="checkbox" id="fHasEmail" onchange="toggleEmailFields()">
         <label for="fHasEmail" style="margin:0;font-size:13px;font-weight:600;cursor:pointer">Testo email personalizzato (override) — solo per questo adempimento</label>
@@ -535,6 +552,16 @@ var CATALOGO=[
 var aziId=1,editAdempId=null,mailId=null,azioniId=null,catSel={},pendingDoc="";
 var mailVoci=[],mailOggetto="",mailAziId=1;
 
+/* --- Accesso: ruolo utente e livello su questo modulo ---
+   RUOLO: "studio" (pieno) | "cliente" (solo la sua azienda).
+   LIVELLO cliente: 0 nascosto · 1 consulta · 2 compila date · 3 pieno.
+   Per lo STUDIO non ci sono limiti (livello pieno). */
+var RUOLO="studio", LIVELLO=3, MIO_AZIID=null;
+var MODKEY="adempimenti";          /* chiave del doc per-azienda su Firebase */
+function isCliente(){ return RUOLO==="cliente"; }
+function puoModificare(){ return RUOLO==="studio" || LIVELLO>=2; }   /* >=2: può toccare le date */
+function puoStruttura(){ return RUOLO==="studio" || LIVELLO>=3; }    /* >=3: può aggiungere/togliere */
+
 function addDays(s,d){return Fond.addGiorni(s,d);}
 function fmtDate(d){return Fond.fmtData(d);}
 function getStato(r){if(r.tipo==="evento")return "evento";var sc=addDays(r.ultimaEsecuzione,r.frequenza);if(!sc||!r.frequenza)return "na";return Fond.statoScad(sc,r.preavvisoAdmin);}
@@ -665,8 +692,8 @@ function vociDash(x,mostraAzienda,pinned){
   s+='<div style="font-size:12px;color:#888;margin-top:2px">'+(mostraAzienda?('<b>'+x.aziNome+'</b> &middot; '):'')+r.aspetto+'</div></div>';
   s+='<div style="display:flex;gap:6px;align-items:center">';
   s+='<span class="badge '+BCL[st]+'">'+dTxt+'</span>';
-  s+='<button onclick="event.stopPropagation();togglePin('+x.aziId+','+r.id+')" title="'+(pinned?"Togli dalle evidenze":"Metti in evidenza")+'" style="font-size:14px;padding:3px 8px;'+(pinned?"background:#eef2fb;border-color:#3d5a99;color:#3d5a99":"")+'">'+(pinned?"\u2605":"\u2606")+'</button>';
-  s+='<button onclick="event.stopPropagation();apriEmailDaDash('+x.aziId+','+r.id+')" style="font-size:12px;padding:4px 8px">Email</button>';
+  s+='<button class="only-studio" onclick="event.stopPropagation();togglePin('+x.aziId+','+r.id+')" title="'+(pinned?"Togli dalle evidenze":"Metti in evidenza")+'" style="font-size:14px;padding:3px 8px;'+(pinned?"background:#eef2fb;border-color:#3d5a99;color:#3d5a99":"")+'">'+(pinned?"\u2605":"\u2606")+'</button>';
+  s+='<button class="only-studio" onclick="event.stopPropagation();apriEmailDaDash('+x.aziId+','+r.id+')" style="font-size:12px;padding:4px 8px">Email</button>';
   s+='</div></div>';
   return s;
 }
@@ -747,11 +774,11 @@ function renderScad(){
     h+='<td style="'+dCol+';font-weight:600">'+dTxt+'</td>';
     h+='<td><span class="badge '+BCL[s]+'">'+LBL[s]+'</span></td>';
     h+='<td>'+(r.docNome?'<span class="doc-chip" title="'+r.docNome+'">Doc</span>':'—')+'</td>';
-    h+='<td><button onclick="openAzioniAz('+x.aziId+','+r.id+')" style="font-size:11px;padding:3px 8px">Azioni ('+nAz+')</button></td>';
+    h+='<td><button class="only-studio" onclick="openAzioniAz('+x.aziId+','+r.id+')" style="font-size:11px;padding:3px 8px">Azioni ('+nAz+')</button></td>';
     h+='<td style="white-space:nowrap">';
-    h+='<button onclick="openFormAdempAz('+x.aziId+','+r.id+')" style="margin-right:4px;font-size:11px;padding:3px 7px">Modifica</button>';
-    h+='<button onclick="apriEmailAz('+x.aziId+','+r.id+')" style="margin-right:4px;font-size:11px;padding:3px 7px">Email</button>';
-    h+='<button onclick="eliminaAdempAz('+x.aziId+','+r.id+')" style="color:#c0392b;font-size:11px;padding:3px 7px">Elimina</button>';
+    h+='<button onclick="openFormAdempAz('+x.aziId+','+r.id+')" style="margin-right:4px;font-size:11px;padding:3px 7px">'+(puoStruttura()?"Modifica":"Aggiorna data")+'</button>';
+    h+='<button class="only-studio" onclick="apriEmailAz('+x.aziId+','+r.id+')" style="margin-right:4px;font-size:11px;padding:3px 7px">Email</button>';
+    h+='<button class="only-struttura" onclick="eliminaAdempAz('+x.aziId+','+r.id+')" style="color:#c0392b;font-size:11px;padding:3px 7px">Elimina</button>';
     h+='</td></tr>';
   }
   var ncol=mostraAzienda?12:11;
@@ -812,10 +839,40 @@ function openFormAdemp(id){
       toggleTipoScad();
     }
   }
+  bloccaCampiStruttura();
   document.getElementById("mAdemp").classList.add("on");
 }
 
+/* Cliente livello 2: nel form può toccare SOLO la data ultima esecuzione.
+   Tutti gli altri campi (struttura, preavvisi, email) restano di sola lettura. */
+function bloccaCampiStruttura(){
+  var titolo=document.getElementById("mAdempTit");
+  if(puoStruttura()){
+    /* studio o livello pieno: tutto sbloccato (ripristina in caso fosse stato bloccato) */
+    var tutti=["fA","fAd","fR","fTipo","fEvento","fF","fPA","fPF","fEF","fEA2","fTA","fTF","fTAz","fAuto","fHasEmail","fDoc","fD"];
+    for(var i=0;i<tutti.length;i++){ var el=document.getElementById(tutti[i]); if(el) el.disabled=false; }
+    return;
+  }
+  if(titolo) titolo.textContent="Aggiorna data di esecuzione";
+  var bloccati=["fA","fAd","fR","fTipo","fEvento","fF","fPA","fPF","fEF","fEA2","fTA","fTF","fTAz","fAuto","fHasEmail","fDoc"];
+  for(var j=0;j<bloccati.length;j++){ var e=document.getElementById(bloccati[j]); if(e) e.disabled=true; }
+  var d=document.getElementById("fD"); if(d) d.disabled=false;   /* la data resta modificabile */
+}
+
 function salvaAdemp(){
+  /* Cliente livello 2: percorso ristretto → aggiorna SOLO la data ultima
+     esecuzione dell'adempimento esistente, senza toccare la struttura. */
+  if(!puoStruttura()){
+    if(!editAdempId){ alert("Non hai i permessi per aggiungere adempimenti. Puoi solo aggiornare le date."); return; }
+    var righe=ADEMP[aziId]||[];
+    for(var k=0;k<righe.length;k++){
+      if(righe[k].id===editAdempId){
+        if(righe[k].tipo!=="evento") righe[k].ultimaEsecuzione=document.getElementById("fD").value;
+        break;
+      }
+    }
+    salva(); chiudiModal("mAdemp"); renderAll(); return;
+  }
   var tipo=document.getElementById("fTipo").value;
   var obj={
     id:editAdempId||Date.now(),
@@ -844,6 +901,7 @@ function salvaAdemp(){
 }
 
 function eliminaAdemp(id){
+  if(!puoStruttura()){ alert("Non hai i permessi per eliminare adempimenti."); return; }
   if(!confirm("Eliminare questo adempimento?"))return;
   ADEMP[aziId]=ADEMP[aziId].filter(function(r){return r.id!==id;});
   salva();
@@ -1103,28 +1161,70 @@ for(var mi=0;mi<mbgs.length;mi++){mbgs[mi].addEventListener("click",function(e){
 
 /* ============ PERSISTENZA (localStorage; Firebase la sostituirà) ============ */
 /* Si persistono AZIENDE, ADEMP, EMAILCFG e l'azienda selezionata. Il CATALOGO no: è libreria statica. */
-var LS_KEY="adempimenti_dati_v1";
-function salva(){
-  /* NON si salva più AZIENDE: la lista aziende appartiene all'anagrafica condivisa. */
-  Store.save(LS_KEY, {ADEMP:ADEMP, EMAILCFG:EMAILCFG, aziId:aziId})
+var LS_KEY="adempimenti_dati_v1";   /* vecchio contenitore unico: resta come rete di sicurezza */
+
+/* Salva i dati di UNA azienda nella sua cartella su Firebase. */
+function salvaAzi(id){
+  if(id==null) return;
+  Store.saveAzienda(id, MODKEY, { ADEMP: ADEMP[id]||[], EMAILCFG: EMAILCFG[id]||defaultCfg() })
     .catch(function(e){ console.warn("Salvataggio non riuscito:", e); });
 }
-/* carica() ASINCRONA: in parallelo carica l'ANAGRAFICA CONDIVISA (lista aziende)
-   e i DATI DEL MODULO (adempimenti, config, azienda selezionata). Promise<boolean>. */
+/* salva(): salva l'azienda attualmente selezionata (le operazioni agiscono su di essa). */
+function salva(){ salvaAzi(aziId); }
+
+/* carica() ASINCRONA. Prima capisce CHI sei (studio o cliente), poi carica il giusto. */
 function carica(){
+  return Store.profile().then(function(prof){
+    RUOLO   = prof.role || "studio";
+    MIO_AZIID = prof.aziId || null;
+    LIVELLO = (RUOLO==="studio") ? 3 : (((prof.livelli||{}).adempimenti)||0);
+    return isCliente() ? caricaCliente(prof) : caricaStudio();
+  }).catch(function(e){ console.warn("Caricamento non riuscito:", e); return false; });
+}
+
+/* STUDIO: vede tutte le aziende. Carica la cartella di ognuna; se non esiste
+   ancora, MIGRA i dati dal vecchio contenitore unico (senza cancellarlo). */
+function caricaStudio(){
   return Promise.all([ Store.aziende(), Store.load(LS_KEY) ]).then(function(res){
     AZIENDE = res[0] || [];
-    var d = res[1];
-    ADEMP = (d && d.ADEMP) || {};
-    EMAILCFG = (d && d.EMAILCFG) || {};
-    if(d && d.aziId) aziId = d.aziId;
-    /* se l'azienda selezionata non è (più) nell'anagrafica, ripiega sulla prima */
-    if(AZIENDE.length){
+    var vecchio = res[1] || null;
+    if(!AZIENDE.length) return false;
+    var jobs = AZIENDE.map(function(z){
+      return Store.loadAzienda(z.id, MODKEY).then(function(dc){
+        if(dc){
+          ADEMP[z.id]    = dc.ADEMP || [];
+          EMAILCFG[z.id] = dc.EMAILCFG || defaultCfg();
+        } else if(vecchio && vecchio.ADEMP && vecchio.ADEMP[z.id]){
+          /* migrazione dal vecchio doc unico → nuova cartella-azienda */
+          ADEMP[z.id]    = vecchio.ADEMP[z.id] || [];
+          EMAILCFG[z.id] = (vecchio.EMAILCFG && vecchio.EMAILCFG[z.id]) || defaultCfg();
+          return Store.saveAzienda(z.id, MODKEY, { ADEMP:ADEMP[z.id], EMAILCFG:EMAILCFG[z.id] });
+        } else {
+          if(!ADEMP[z.id])    ADEMP[z.id]    = [];
+          if(!EMAILCFG[z.id]) EMAILCFG[z.id] = defaultCfg();
+        }
+      });
+    });
+    return Promise.all(jobs).then(function(){
+      if(vecchio && vecchio.aziId) aziId = vecchio.aziId;
       var ok=false; for(var i=0;i<AZIENDE.length;i++){ if(AZIENDE[i].id===aziId){ ok=true; break; } }
       if(!ok) aziId = AZIENDE[0].id;
-    }
-    return AZIENDE.length > 0;
-  }).catch(function(e){ console.warn("Caricamento non riuscito:", e); return false; });
+      return true;
+    });
+  });
+}
+
+/* CLIENTE: vede SOLO la sua azienda (nessuna lettura dell'anagrafica condivisa). */
+function caricaCliente(prof){
+  if(!prof.aziId){ AZIENDE=[]; return false; }   /* profilo in attesa di abilitazione */
+  AZIENDE = [{ id:prof.aziId, nome:(prof.aziNome||("Azienda "+prof.aziId)), emailRef:"", ddl:"" }];
+  aziId = prof.aziId;
+  ADEMP = {}; EMAILCFG = {};
+  return Store.loadAzienda(prof.aziId, MODKEY).then(function(dc){
+    ADEMP[prof.aziId]    = (dc && dc.ADEMP) || [];
+    EMAILCFG[prof.aziId] = (dc && dc.EMAILCFG) || defaultCfg();
+    return true;
+  });
 }
 /* Export/import JSON: ponte per lavorare tra più PC finché non c'è Firebase */
 function esportaDati(){
@@ -1146,7 +1246,8 @@ function importaDati(input){
       if(!confirm("Importare i dati dal file? I dati attuali verranno sostituiti.")) return;
       AZIENDE=d.AZIENDE; ADEMP=d.ADEMP||{}; EMAILCFG=d.EMAILCFG||{};
       aziId=AZIENDE[0].id;
-      salva(); initSelAzi(); renderAll();
+      for(var ai=0; ai<AZIENDE.length; ai++){ salvaAzi(AZIENDE[ai].id); }   /* salva ogni cartella-azienda */
+      initSelAzi(); renderAll();
       alert("Dati importati.");
     }catch(e){ alert("File non leggibile: "+e.message); }
     input.value="";
@@ -1154,9 +1255,33 @@ function importaDati(input){
   r.readAsText(file);
 }
 
-/* Avvio: carica dati salvati; se assenti restano i dati seed dimostrativi già in memoria */
+/* Applica i permessi in base al ruolo/livello: attiva le classi su <body>
+   (il CSS nasconde il resto) e mostra il nome azienda al cliente. */
+function applicaAccesso(){
+  if(isCliente()){
+    document.body.classList.add("ruolo-cliente");
+    if(puoStruttura()) document.body.classList.add("liv-pieno");
+    var lbl=document.getElementById("aziClienteLabel");
+    if(lbl && AZIENDE[0]) lbl.textContent=AZIENDE[0].nome;
+  }
+}
+
+/* Cliente autenticato ma non ancora abilitato a un'azienda dallo studio. */
+function mostraClienteInAttesa(){
+  var cont=document.querySelector("main")||document.body;
+  var d=document.createElement("div");
+  d.style.cssText="margin:20px;padding:16px 18px;background:#e6f0ef;border:1px solid #9fc4c0;border-radius:10px;color:#0a4340;font-size:14px";
+  d.innerHTML="<b>Accesso in attesa di abilitazione.</b><br>Il tuo account è attivo ma non è ancora collegato a un'azienda. Contatta lo studio per l'abilitazione.";
+  cont.insertBefore(d, cont.firstChild);
+}
+
+/* Avvio: capisci il ruolo, applica i permessi, carica i dati. */
 carica().then(function(){
-  if(!AZIENDE.length){ mostraNessunAzienda(); return; }
+  applicaAccesso();
+  if(!AZIENDE.length){
+    if(isCliente()) mostraClienteInAttesa(); else mostraNessunAzienda();
+    return;
+  }
   initSelAzi(); renderAll();
 });
 </script>

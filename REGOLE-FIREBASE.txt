@@ -1,0 +1,87 @@
+============================================================
+  REGOLE DI SICUREZZA FIREBASE (Firestore)
+  Isolamento studio / clienti — piattaforma Scadenzario
+============================================================
+
+A COSA SERVONO
+------------------------------------------------------------
+Fanno rispettare DAVVERO (non solo "a schermo") chi vede cosa:
+  • STUDIO (le 3 email qui sotto) → accesso pieno a tutto.
+  • CLIENTE → solo la SUA azienda, e solo per i moduli/livelli
+    che gli assegni dal pannello "Accessi clienti".
+
+⚠️ PRIMA DI INCOLLARLE — CONTROLLO IMPORTANTE
+------------------------------------------------------------
+Le 3 email dello studio qui sotto devono essere IDENTICHE a quelle
+in Firebase → Authentication → Users. Se una è scritta diversa,
+quella persona perderebbe l'accesso. Verifica prima di salvare:
+    ing.calamanti@gmail.com
+    ing.gelangastefano@gmail.com
+    auroraiozzoli@gmail.com
+
+COME APPLICARLE
+------------------------------------------------------------
+1. Vai su  https://console.firebase.google.com
+2. Progetto  scadenzario-hse-13d73
+3. Menu a sinistra:  Firestore Database  →  scheda  "Regole" (Rules)
+4. CANCELLA tutto il contenuto attuale e INCOLLA il blocco qui sotto.
+5. Premi  "Pubblica" (Publish).
+
+Non cambia nulla per lo studio (le 3 email hanno accesso pieno).
+Da questo momento un eventuale account cliente è isolato.
+
+============================================================
+  COPIA DA QUI  (tutto, fino alla fine)
+============================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- Chi è "studio" (accesso pieno): riconosciuto dall'email ---
+    function isStudio() {
+      return request.auth != null && request.auth.token.email in [
+        'ing.calamanti@gmail.com',
+        'ing.gelangastefano@gmail.com',
+        'auroraiozzoli@gmail.com'
+      ];
+    }
+
+    // Profilo dell'utente corrente (per i clienti): azienda + livelli
+    function prof() {
+      return get(/databases/$(database)/documents/workspaces/studio-hse/users/$(request.auth.uid)).data;
+    }
+
+    // --- Documenti condivisi dello studio (anagrafica aziende, ecc.): solo studio ---
+    match /workspaces/studio-hse/moduli/{document=**} {
+      allow read, write: if isStudio();
+    }
+
+    // --- Dati per singola azienda ---
+    // Studio: tutto. Cliente: solo la SUA azienda, e solo col livello adatto
+    // sul modulo (>=1 per leggere, >=2 per modificare le date).
+    match /workspaces/studio-hse/aziende/{aziId}/moduli/{key} {
+      allow read:  if isStudio() ||
+        (request.auth != null && aziId == string(prof().aziId) && prof().livelli.get(key, 0) >= 1);
+      allow write: if isStudio() ||
+        (request.auth != null && aziId == string(prof().aziId) && prof().livelli.get(key, 0) >= 2);
+    }
+    // Qualsiasi altro dato per-azienda: solo studio
+    match /workspaces/studio-hse/aziende/{aziId}/{document=**} {
+      allow read, write: if isStudio();
+    }
+
+    // --- Profili utente ---
+    match /workspaces/studio-hse/users/{uid} {
+      // Studio: legge e assegna tutti
+      allow read, write: if isStudio();
+      // Il cliente legge il proprio profilo
+      allow read: if request.auth != null && request.auth.uid == uid;
+      // Il cliente può creare il proprio profilo "in attesa" (senza azienda) al
+      // primo accesso, ma NON può assegnarsi un'azienda o cambiare i livelli:
+      // quello lo fa solo lo studio dal pannello "Accessi clienti".
+      allow create: if request.auth != null && request.auth.uid == uid
+                    && request.resource.data.aziId == null;
+    }
+  }
+}

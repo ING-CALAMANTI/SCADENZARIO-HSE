@@ -114,6 +114,125 @@ var Store = (function(){
     return db.collection("workspaces").doc(WORKSPACE).collection("moduli").doc(key);
   }
 
+  /* ================================================================
+     ACCESSO CLIENTI — ruoli e dati per-azienda (fondamenta)
+     ----------------------------------------------------------------
+     Due tipi di utente:
+       • STUDIO  → vede e gestisce TUTTE le aziende, TUTTI i moduli.
+                   Riconosciuto dall'email (lista qui sotto): nessun
+                   profilo da creare, accesso pieno.
+       • CLIENTE → vede SOLO la propria azienda, e per ogni modulo con
+                   il "livello" deciso dallo studio (0 nascosto, 1 con-
+                   sulta, 2 compila date, 3 inserimento pieno).
+                   La sua assegnazione (azienda + livelli) sta in
+                   workspaces/studio-hse/users/{uid}.
+
+     I dati "per-azienda" vivono in
+       workspaces/studio-hse/aziende/{aziId}/moduli/{chiave}
+     così le regole di sicurezza Firebase possono isolare davvero un
+     cliente sulla sola cartella della sua azienda. Lo spazio vecchio
+     workspaces/studio-hse/moduli/{chiave} resta per l'anagrafica
+     condivisa e come rete di sicurezza durante la migrazione.
+     ================================================================ */
+
+  /* Email con ruolo STUDIO (accesso pieno). Aggiungere qui i colleghi. */
+  var STUDIO_EMAILS = [
+    "ing.calamanti@gmail.com",
+    "ing.gelangastefano@gmail.com",
+    "auroraiozzoli@gmail.com"
+  ];
+
+  function _emailStudio(email){
+    email = (email || "").toLowerCase();
+    for(var i=0;i<STUDIO_EMAILS.length;i++){
+      if(String(STUDIO_EMAILS[i]).toLowerCase() === email) return true;
+    }
+    return false;
+  }
+
+  /* Documento dati di UNA azienda per UN modulo. */
+  function _docAzi(aziId, key){
+    return db.collection("workspaces").doc(WORKSPACE)
+             .collection("aziende").doc(String(aziId))
+             .collection("moduli").doc(key);
+  }
+
+  /* profile() -> Promise<{role, aziId, aziNome, livelli, email, uid, pending}>
+     - STUDIO: role "studio", accesso pieno (nessuna lettura extra).
+     - CLIENTE: legge la sua assegnazione; al primo accesso crea un
+       profilo "in attesa" (senza azienda) che lo studio abiliterà. */
+  function profile(){
+    if(!useFirebase){
+      return Promise.resolve({role:"studio", aziId:null, aziNome:"", livelli:{}, email:"(locale)", uid:"local", pending:false});
+    }
+    return _awaitUid().then(function(uid){
+      var email = (currentUser && currentUser.email) || "";
+      if(_emailStudio(email)){
+        return {role:"studio", aziId:null, aziNome:"", livelli:{}, email:email, uid:uid, pending:false};
+      }
+      var ref = db.collection("workspaces").doc(WORKSPACE).collection("users").doc(uid);
+      return ref.get().then(function(snap){
+        if(snap.exists){
+          var d = snap.data() || {};
+          return {role:"cliente", aziId:(d.aziId||null), aziNome:(d.aziNome||""),
+                  livelli:(d.livelli||{}), email:email, uid:uid, pending:!d.aziId};
+        }
+        /* primo accesso di un non-studio: profilo in attesa di abilitazione */
+        var nuovo = {role:"cliente", email:email, aziId:null, aziNome:"", livelli:{}, creato:Date.now()};
+        return ref.set(nuovo).then(function(){
+          return {role:"cliente", aziId:null, aziNome:"", livelli:{}, email:email, uid:uid, pending:true};
+        }).catch(function(){
+          return {role:"cliente", aziId:null, aziNome:"", livelli:{}, email:email, uid:uid, pending:true};
+        });
+      });
+    }).catch(function(e){
+      console.warn("[Store] lettura profilo fallita:", e);
+      return {role:"cliente", aziId:null, aziNome:"", livelli:{}, email:"", uid:"", pending:true};
+    });
+  }
+
+  /* loadAzienda(aziId, chiave) -> Promise<oggetto|null> */
+  function loadAzienda(aziId, key){
+    if(!useFirebase) return Promise.resolve(_localLoad("azi_"+aziId+"_"+key));
+    return _awaitUid().then(function(){
+      return _docAzi(aziId, key).get().then(function(snap){
+        return (snap.exists && snap.data()) ? snap.data().payload : null;
+      });
+    }).catch(function(e){ console.warn("[Store] loadAzienda fallito:", e); return null; });
+  }
+
+  /* saveAzienda(aziId, chiave, oggetto) -> Promise<void> */
+  function saveAzienda(aziId, key, obj){
+    if(!useFirebase){ _localSave("azi_"+aziId+"_"+key, obj); return Promise.resolve(); }
+    return _awaitUid().then(function(){
+      return _docAzi(aziId, key).set({ payload: obj, aggiornato: Date.now() });
+    }).catch(function(e){ console.warn("[Store] saveAzienda fallito:", e); });
+  }
+
+  /* --- Amministrazione accessi (uso dello STUDIO) --- */
+
+  /* Elenco degli utenti-cliente registrati (per il pannello accessi). */
+  function listUsers(){
+    if(!useFirebase) return Promise.resolve([]);
+    return _awaitUid().then(function(){
+      return db.collection("workspaces").doc(WORKSPACE).collection("users").get()
+        .then(function(qs){
+          var out=[]; qs.forEach(function(doc){ var d=doc.data()||{}; d.uid=doc.id; out.push(d); });
+          return out;
+        });
+    }).catch(function(e){ console.warn("[Store] listUsers fallito:", e); return []; });
+  }
+
+  /* Assegna un cliente a un'azienda con i livelli per-modulo. */
+  function setAssegnazione(uid, aziId, aziNome, livelli){
+    if(!useFirebase) return Promise.resolve();
+    return _awaitUid().then(function(){
+      return db.collection("workspaces").doc(WORKSPACE).collection("users").doc(uid)
+        .set({ role:"cliente", aziId:(aziId||null), aziNome:(aziNome||""),
+               livelli:(livelli||{}), aggiornato:Date.now() }, { merge:true });
+    }).catch(function(e){ console.warn("[Store] setAssegnazione fallito:", e); });
+  }
+
   /* --- API pubblica: sempre Promise --- */
 
   /* load(chiave) -> Promise<oggetto|null> */
@@ -193,6 +312,12 @@ var Store = (function(){
     save: save,
     aziende: aziende,
     mode: mode,
-    configPresente: configPresente
+    configPresente: configPresente,
+    /* --- accesso clienti (fondamenta) --- */
+    profile: profile,
+    loadAzienda: loadAzienda,
+    saveAzienda: saveAzienda,
+    listUsers: listUsers,
+    setAssegnazione: setAssegnazione
   };
 })();
