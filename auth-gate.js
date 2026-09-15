@@ -105,7 +105,7 @@
     if(!userbar){
       userbar = document.createElement("div");
       userbar.id = "auth-userbar";
-      userbar.style.cssText = "position:fixed;bottom:12px;right:12px;z-index:9998;display:flex;"
+      userbar.style.cssText = "position:fixed;bottom:56px;right:12px;z-index:9998;display:flex;"
         + "align-items:center;gap:8px;background:rgba(255,255,255,.94);border:1px solid var(--bordo,#d8dedd);"
         + "border-radius:20px;padding:4px 6px 4px 12px;box-shadow:0 1px 5px rgba(0,0,0,.15);"
         + "font:600 12px -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif";

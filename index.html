@@ -155,6 +155,8 @@
         if(!permesso) cards[i].style.display="none";
       }
       nascondiSezioniVuote();
+      /* la nota "dati condivisi tra gli utenti dello studio" non riguarda i clienti */
+      var ft=document.querySelector("footer"); if(ft) ft.style.display="none";
     });
     function nascondiSezioniVuote(){
       var sezioni=document.querySelectorAll(".sezione");
