@@ -145,6 +145,9 @@
       "recipienti%20in%20pressione.html":"recipienti"
     };
     Store.profile().then(function(prof){
+      try{ var dbg=document.createElement("div"); dbg.id="__dbg";
+        dbg.style.cssText="position:fixed;top:0;left:0;right:0;z-index:99999;background:#111;color:#0f0;font:11px/1.4 monospace;padding:5px 10px;white-space:pre-wrap;word-break:break-all";
+        dbg.textContent="DEBUG profilo → "+JSON.stringify(prof); document.body.appendChild(dbg); }catch(e){}
       if(prof.role==="studio"){ aggiungiCardAccessi(); return; }
       var liv = prof.livelli || {};
       var cards = document.querySelectorAll(".card");
