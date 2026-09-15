@@ -57,21 +57,37 @@ button:hover{background:#eee}
 </head>
 <body>
 
+<style>
+  /* Accesso cliente: nasconde ciò che è riservato allo studio. */
+  body.ruolo-cliente .only-studio{ display:none !important; }
+  body.ruolo-cliente:not(.liv-pieno) .only-struttura{ display:none !important; }
+  #aziClienteLabel{ display:none; }
+  body.ruolo-cliente #aziClienteLabel{ display:inline-block; font-weight:700; color:var(--verde,#0f5e5a);
+    background:var(--verde-chiaro,#e6f0ef); border-radius:16px; padding:6px 14px; font-size:14px; }
+  #bannerCliente{ display:none; }
+  body.ruolo-cliente #bannerCliente{ display:block; }
+</style>
+
 <div class="hdr">
   <h1>Registro Presidi Antincendio</h1>
   <div style="display:flex;gap:8px;align-items:center">
-    <select id="selAzi" onchange="cambiaAzi()" style="min-width:170px"></select>
-    <button class="bp" onclick="openNuovaAzi()">+ Azienda</button>
-    <button class="bp" onclick="esportaDati()" title="Scarica i dati in un file per portarli su un altro PC">Esporta</button>
-    <button class="bp" onclick="document.getElementById('impFile').click()" title="Carica un file di dati esportato">Importa</button>
+    <span id="aziClienteLabel"></span>
+    <select id="selAzi" class="only-studio" onchange="cambiaAzi()" style="min-width:170px"></select>
+    <button class="bp only-studio" onclick="openNuovaAzi()">+ Azienda</button>
+    <button class="bp only-studio" onclick="esportaDati()" title="Scarica i dati in un file per portarli su un altro PC">Esporta</button>
+    <button class="bp only-studio" onclick="document.getElementById('impFile').click()" title="Carica un file di dati esportato">Importa</button>
     <input type="file" id="impFile" accept=".json" style="display:none" onchange="importaDati(this)">
   </div>
 </div>
 
+<div id="bannerCliente" style="margin:0 0 4px;padding:10px 16px;background:#e6f0ef;border-left:4px solid #0f5e5a;border-radius:8px;color:#0a4340;font-size:13px">
+  Stai visualizzando il registro antincendio della tua azienda. Puoi <b>registrare i controlli effettuati</b> sui presidi; l'elenco dei presidi e delle ditte è gestito dallo studio.
+</div>
+
 <div class="nav">
   <div class="ntab on" onclick="showTab(0)">Registro</div>
-  <div class="ntab" onclick="showTab(1)">Catalogo presidi</div>
-  <div class="ntab" onclick="showTab(2)">Ditte manutenzione</div>
+  <div class="ntab only-studio" onclick="showTab(1)">Catalogo presidi</div>
+  <div class="ntab only-studio" onclick="showTab(2)">Ditte manutenzione</div>
 </div>
 
 <!-- REGISTRO -->
@@ -81,8 +97,8 @@ button:hover{background:#eee}
   </div>
   <div class="tb">
     <select id="filtroTipo" onchange="renderPresidi()" style="min-width:200px"><option value="__tutti__">Tutti i presidi</option></select>
-    <button class="bg" onclick="openManutMassiva()">Manutenzione massiva</button>
-    <button class="br" onclick="esportaPDF()">&#8595; Esporta PDF registro</button>
+    <button class="bg only-studio" onclick="openManutMassiva()">Manutenzione massiva</button>
+    <button class="br only-studio" onclick="esportaPDF()">&#8595; Esporta PDF registro</button>
   </div>
   <div id="presidiList"></div>
 </div>
@@ -281,6 +297,15 @@ PRESIDI[2]=[];
 
 var aziId=1,editPresId=null,intervPresId=null,editDittaId=null;
 
+/* --- Accesso: ruolo utente e livello su questo modulo (vedi Adempimenti) ---
+   Livello 2 = il cliente può REGISTRARE i controlli effettuati (interventi);
+   presidi, ditte e catalogo restano allo studio. */
+var RUOLO="studio", LIVELLO=3, MIO_AZIID=null;
+var MODKEY="antincendio";          /* chiave del doc per-azienda su Firebase */
+function isCliente(){ return RUOLO==="cliente"; }
+function puoModificare(){ return RUOLO==="studio" || LIVELLO>=2; }
+function puoStruttura(){ return RUOLO==="studio" || LIVELLO>=3; }
+
 function addDays(s,d){return Fond.addGiorni(s,d);}
 function getStatoPres(p){if(!p.interventi||!p.interventi.length)return "na";var ult=p.interventi[p.interventi.length-1];var sc=addDays(ult.data,p.frequenza);if(!sc)return "na";return Fond.statoScad(sc,30);}
 function fmtDate(d){return Fond.fmtData(d);}
@@ -343,8 +368,8 @@ function renderPresidi(){
     h+='<div class="tipo-group">';
     h+='<div class="tipo-group-hdr"><div><span class="tg-title">'+tipo+'</span><span class="tg-ditta">'+gruppo.length+' unita'+(dittaTipo?' &middot; '+dittaTipo:'')+'</span></div>';
     h+='<div style="display:flex;gap:6px">';
-    if(gruppo.length)h+='<button class="bg" style="font-size:11px;padding:4px 9px" onclick="openManutMassivaTipo(\''+tipo.replace(/'/g,"")+'\')">Verifica tutti</button>';
-    h+='<button class="bp" style="font-size:11px;padding:4px 9px" onclick="openFormPresidio(null,\''+tipo.replace(/'/g,"")+'\')">+ Aggiungi</button>';
+    if(gruppo.length)h+='<button class="bg only-studio" style="font-size:11px;padding:4px 9px" onclick="openManutMassivaTipo(\''+tipo.replace(/'/g,"")+'\')">Verifica tutti</button>';
+    h+='<button class="bp only-struttura" style="font-size:11px;padding:4px 9px" onclick="openFormPresidio(null,\''+tipo.replace(/'/g,"")+'\')">+ Aggiungi</button>';
     h+='</div></div>';
     if(!gruppo.length){
       h+='<div class="presidio"><div style="padding:12px 14px;color:#888;font-size:13px;font-style:italic">Nessuna unita. Clicca "+ Aggiungi".</div></div>';
@@ -366,8 +391,8 @@ function renderPresidi(){
       h+='</div>';
       h+='<div style="display:flex;gap:8px;margin-bottom:12px">';
       h+='<button class="bp" style="font-size:12px;padding:5px 10px" onclick="openFormIntervento('+p.id+')">+ Registra intervento</button>';
-      h+='<button style="font-size:12px;padding:5px 10px" onclick="openFormPresidio('+p.id+')">Modifica</button>';
-      h+='<button class="br" style="font-size:12px;padding:5px 10px" onclick="eliminaPresidio('+p.id+')">Elimina</button></div>';
+      h+='<button class="only-struttura" style="font-size:12px;padding:5px 10px" onclick="openFormPresidio('+p.id+')">Modifica</button>';
+      h+='<button class="br only-struttura" style="font-size:12px;padding:5px 10px" onclick="eliminaPresidio('+p.id+')">Elimina</button></div>';
       h+='<p style="font-size:12px;font-weight:600;color:#555;margin-bottom:8px">STORICO INTERVENTI</p>';
       if(!p.interventi||!p.interventi.length){h+='<p style="font-size:13px;color:#888;font-style:italic">Nessun intervento registrato</p>';}
       else{
@@ -435,6 +460,7 @@ function openFormPresidio(id,tipoPre){
 }
 
 function salvaPresidio(){
+  if(!puoStruttura()){ alert("Non hai i permessi per gestire i presidi. Puoi solo registrare i controlli."); return; }
   var obj={
     id:editPresId||Date.now(),
     tipo:document.getElementById("pTipo").value,
@@ -454,6 +480,7 @@ function salvaPresidio(){
 }
 
 function eliminaPresidio(id){
+  if(!puoStruttura()){ alert("Non hai i permessi per eliminare i presidi."); return; }
   if(!confirm("Eliminare questo presidio e tutto il suo storico?"))return;
   PRESIDI[aziId]=PRESIDI[aziId].filter(function(p){return p.id!==id;});
   salva();
@@ -618,6 +645,7 @@ function openFormDitta(id){
   document.getElementById("mDitta").classList.add("on");
 }
 function salvaDitta(){
+  if(!puoStruttura()){ alert("Non hai i permessi per gestire le ditte."); return; }
   var nome=document.getElementById("dNome").value.trim();if(!nome){alert("Inserisci il nome");return;}
   var obj={id:editDittaId||Date.now(),nome:nome,referente:document.getElementById("dRef").value,tel:document.getElementById("dTel").value,email:document.getElementById("dEmail").value};
   if(!DITTE[aziId])DITTE[aziId]=[];
@@ -626,7 +654,7 @@ function salvaDitta(){
   salva();
   chiudiModal("mDitta");renderDitte();fillAssegnaSelects();
 }
-function eliminaDitta(id){if(!confirm("Eliminare questa ditta?"))return;DITTE[aziId]=DITTE[aziId].filter(function(d){return d.id!==id;});salva();renderDitte();fillAssegnaSelects();}
+function eliminaDitta(id){if(!puoStruttura()){alert("Non hai i permessi per gestire le ditte.");return;}if(!confirm("Eliminare questa ditta?"))return;DITTE[aziId]=DITTE[aziId].filter(function(d){return d.id!==id;});salva();renderDitte();fillAssegnaSelects();}
 
 function esportaPDF(){
   var azi=getAzi();var pres=getPres();var tipiAttivi=azi.tipiAttivi||[];
@@ -678,27 +706,79 @@ for(var mi=0;mi<mbgs.length;mi++){mbgs[mi].addEventListener("click",function(e){
 
 /* ============ PERSISTENZA (localStorage; Firebase la sostituirà) ============ */
 /* Persiste aziende, presidi (con interventi annidati), ditte e l'azienda selezionata. */
-var LS_KEY="antincendio_dati_v1";
-function salva(){
-  /* NON si salva più AZIENDE (è dell'anagrafica condivisa); si salva CONFIG del modulo. */
-  Store.save(LS_KEY, {CONFIG:CONFIG, PRESIDI:PRESIDI, DITTE:DITTE, aziId:aziId})
-    .catch(function(e){ console.warn("Salvataggio non riuscito:", e); });
+var LS_KEY="antincendio_dati_v1";   /* vecchio contenitore unico: resta come rete di sicurezza */
+
+/* Salva i dati di UNA azienda nella sua cartella su Firebase. */
+function salvaAzi(id){
+  if(id==null) return;
+  Store.saveAzienda(id, MODKEY, {
+    CONFIG: CONFIG[id] || {tipiAttivi:[]},
+    PRESIDI: PRESIDI[id] || [],
+    DITTE: DITTE[id] || []
+  }).catch(function(e){ console.warn("Salvataggio non riuscito:", e); });
 }
-/* carica() ASINCRONA: anagrafica condivisa + dati del modulo (config, presidi, ditte). */
+/* salva(): salva l'azienda attualmente selezionata. */
+function salva(){ salvaAzi(aziId); }
+
+/* carica() ASINCRONA. Prima capisce CHI sei (studio o cliente), poi carica il giusto. */
 function carica(){
+  return Store.profile().then(function(prof){
+    RUOLO   = prof.role || "studio";
+    MIO_AZIID = prof.aziId || null;
+    LIVELLO = (RUOLO==="studio") ? 3 : (((prof.livelli||{}).antincendio)||0);
+    return isCliente() ? caricaCliente(prof) : caricaStudio();
+  }).catch(function(e){ console.warn("Caricamento non riuscito:", e); return false; });
+}
+
+/* STUDIO: tutte le aziende; migra dal vecchio contenitore unico se serve. */
+function caricaStudio(){
   return Promise.all([ Store.aziende(), Store.load(LS_KEY) ]).then(function(res){
     AZIENDE = res[0] || [];
-    var d = res[1];
-    PRESIDI = (d && d.PRESIDI) || {};
-    DITTE = (d && d.DITTE) || {};
-    if(d && d.CONFIG){ CONFIG = d.CONFIG; }
-    else if(d && Array.isArray(d.AZIENDE)){ /* migrazione: tipiAttivi dal vecchio formato */
-      CONFIG={}; for(var i=0;i<d.AZIENDE.length;i++){ var az=d.AZIENDE[i]; CONFIG[az.id]={tipiAttivi:az.tipiAttivi||[]}; }
-    } else { CONFIG={}; }
-    if(d && d.aziId) aziId = d.aziId;
-    if(AZIENDE.length){ var ok=false; for(var i=0;i<AZIENDE.length;i++){ if(AZIENDE[i].id===aziId){ok=true;break;} } if(!ok) aziId=AZIENDE[0].id; }
-    return AZIENDE.length > 0;
-  }).catch(function(e){ console.warn("Caricamento non riuscito:", e); return false; });
+    var vecchio = res[1] || null;
+    if(!AZIENDE.length) return false;
+    /* CONFIG vecchio: mappa {aziId:{tipiAttivi}} oppure vecchissimo AZIENDE[].tipiAttivi */
+    var oldConfig = (vecchio && vecchio.CONFIG) ? vecchio.CONFIG : null;
+    if(!oldConfig && vecchio && Array.isArray(vecchio.AZIENDE)){
+      oldConfig={}; for(var k=0;k<vecchio.AZIENDE.length;k++){ var az=vecchio.AZIENDE[k]; oldConfig[az.id]={tipiAttivi:az.tipiAttivi||[]}; }
+    }
+    var jobs = AZIENDE.map(function(z){
+      return Store.loadAzienda(z.id, MODKEY).then(function(dc){
+        if(dc){
+          CONFIG[z.id]  = dc.CONFIG || {tipiAttivi:[]};
+          PRESIDI[z.id] = dc.PRESIDI || [];
+          DITTE[z.id]   = dc.DITTE || [];
+        } else if(vecchio && ((oldConfig && oldConfig[z.id]) || (vecchio.PRESIDI && vecchio.PRESIDI[z.id]) || (vecchio.DITTE && vecchio.DITTE[z.id]))){
+          CONFIG[z.id]  = (oldConfig && oldConfig[z.id]) || {tipiAttivi:[]};
+          PRESIDI[z.id] = (vecchio.PRESIDI && vecchio.PRESIDI[z.id]) || [];
+          DITTE[z.id]   = (vecchio.DITTE && vecchio.DITTE[z.id]) || [];
+          return Store.saveAzienda(z.id, MODKEY, { CONFIG:CONFIG[z.id], PRESIDI:PRESIDI[z.id], DITTE:DITTE[z.id] });
+        } else {
+          if(!CONFIG[z.id])  CONFIG[z.id]  = {tipiAttivi:[]};
+          if(!PRESIDI[z.id]) PRESIDI[z.id] = [];
+          if(!DITTE[z.id])   DITTE[z.id]   = [];
+        }
+      });
+    });
+    return Promise.all(jobs).then(function(){
+      if(vecchio && vecchio.aziId) aziId = vecchio.aziId;
+      var ok=false; for(var i=0;i<AZIENDE.length;i++){ if(AZIENDE[i].id===aziId){ ok=true; break; } }
+      if(!ok) aziId = AZIENDE[0].id;
+      return true;
+    });
+  });
+}
+
+/* CLIENTE: vede SOLO la sua azienda. */
+function caricaCliente(prof){
+  if(!prof.aziId){ AZIENDE=[]; return false; }
+  AZIENDE = [{ id:prof.aziId, nome:(prof.aziNome||("Azienda "+prof.aziId)), emailRef:"", ddl:"" }];
+  aziId = prof.aziId; CONFIG={}; PRESIDI={}; DITTE={};
+  return Store.loadAzienda(prof.aziId, MODKEY).then(function(dc){
+    CONFIG[prof.aziId]  = (dc && dc.CONFIG) || {tipiAttivi:[]};
+    PRESIDI[prof.aziId] = (dc && dc.PRESIDI) || [];
+    DITTE[prof.aziId]   = (dc && dc.DITTE) || [];
+    return true;
+  });
 }
 /* Export/import JSON: ponte multi-PC finché non c'è Firebase */
 function esportaDati(){
@@ -722,7 +802,8 @@ function importaDati(input){
       if(d.CONFIG){ CONFIG=d.CONFIG; }
       else if(Array.isArray(d.AZIENDE)){ CONFIG={}; for(var i=0;i<d.AZIENDE.length;i++){ var az=d.AZIENDE[i]; CONFIG[az.id]={tipiAttivi:az.tipiAttivi||[]}; } }
       if(AZIENDE.length){ var ok=false; for(var i=0;i<AZIENDE.length;i++){ if(AZIENDE[i].id===aziId){ok=true;break;} } if(!ok) aziId=AZIENDE[0].id; }
-      salva(); initSelAzi(); renderAll();
+      for(var ai=0; ai<AZIENDE.length; ai++){ salvaAzi(AZIENDE[ai].id); }   /* salva ogni cartella-azienda */
+      initSelAzi(); renderAll();
       alert("Dati importati.");
     }catch(e){ alert("File non leggibile: "+e.message); }
     input.value="";
@@ -730,9 +811,31 @@ function importaDati(input){
   r.readAsText(file);
 }
 
-/* Avvio: carica dati salvati; se assenti restano i dati seed dimostrativi già in memoria */
+/* Applica i permessi in base al ruolo/livello (attiva le classi su <body>). */
+function applicaAccesso(){
+  if(isCliente()){
+    document.body.classList.add("ruolo-cliente");
+    if(puoStruttura()) document.body.classList.add("liv-pieno");
+    var lbl=document.getElementById("aziClienteLabel");
+    if(lbl && AZIENDE[0]) lbl.textContent=AZIENDE[0].nome;
+  }
+}
+/* Cliente autenticato ma non ancora abilitato a un'azienda dallo studio. */
+function mostraClienteInAttesa(){
+  var cont=document.querySelector("main")||document.body;
+  var d=document.createElement("div");
+  d.style.cssText="margin:20px;padding:16px 18px;background:#e6f0ef;border:1px solid #9fc4c0;border-radius:10px;color:#0a4340;font-size:14px";
+  d.innerHTML="<b>Accesso in attesa di abilitazione.</b><br>Il tuo account è attivo ma non è ancora collegato a un'azienda. Contatta lo studio per l'abilitazione.";
+  cont.insertBefore(d, cont.firstChild);
+}
+
+/* Avvio: capisci il ruolo, applica i permessi, carica i dati. */
 carica().then(function(){
-  if(!AZIENDE.length){ mostraNessunAzienda(); return; }
+  applicaAccesso();
+  if(!AZIENDE.length){
+    if(isCliente()) mostraClienteInAttesa(); else mostraNessunAzienda();
+    return;
+  }
   initSelAzi(); renderAll();
 });
 </script>
