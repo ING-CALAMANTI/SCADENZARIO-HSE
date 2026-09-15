@@ -151,12 +151,15 @@
       if(prof.role==="studio"){ aggiungiCardAccessi(); return; }
       var liv = prof.livelli || {};
       var cards = document.querySelectorAll(".card");
+      var _diag=[];
       for(var i=0;i<cards.length;i++){
         var href = cards[i].getAttribute("href") || "";
         var key = MAP[href];
         var permesso = key && key!=="__base" && (Number(liv[key]||0) >= 1);
+        _diag.push(href+" | key="+key+" | liv="+(key?liv[key]:"-")+" | "+(permesso?"MOSTRA":"nascondi"));
         if(!permesso) cards[i].style.display="none";
       }
+      try{ var d2=document.getElementById("__dbg"); if(d2) d2.textContent+="\n"+_diag.join("\n"); }catch(e){}
       nascondiSezioniVuote();
       /* la nota "dati condivisi tra gli utenti dello studio" non riguarda i clienti */
       var ft=document.querySelector("footer"); if(ft) ft.style.display="none";
