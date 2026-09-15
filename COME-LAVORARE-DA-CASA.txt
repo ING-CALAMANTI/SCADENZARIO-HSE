@@ -1,0 +1,76 @@
+============================================================
+  SCADENZARIO SICUREZZA — COME LAVORARE DA PIU' COMPUTER
+============================================================
+
+L'IDEA IN UNA RIGA
+------------------------------------------------------------
+GitHub e' la copia UFFICIALE del progetto.
+Ogni computer SCARICA prima di lavorare (pull) e RICARICA
+quando ha finito (push). Cosi' i PC restano sempre allineati.
+
+Progetto su GitHub:
+  https://github.com/ING-CALAMANTI/SCADENZARIO-HSE
+
+
+============================================================
+  1) PRIMA VOLTA SU UN COMPUTER NUOVO  (si fa UNA volta sola)
+============================================================
+
+Controlla che Git sia installato:
+  git --version
+(se dice "comando non trovato" -> installa da git-scm.com)
+
+Scarica il progetto (esempio: dentro il Desktop):
+  cd Desktop
+  git clone https://github.com/ING-CALAMANTI/SCADENZARIO-HSE.git
+
+Entra nella cartella:
+  cd SCADENZARIO-HSE
+
+Poi apri Claude in questa cartella e si lavora.
+
+
+============================================================
+  2) ROUTINE DI OGNI GIORNO
+============================================================
+
+>> QUANDO INIZI a lavorare (prendi le ultime modifiche):
+  git pull
+
+>> QUANDO HAI FINITO (salvi e rimandi su GitHub):
+  git add -A
+  git commit -m "descrizione di cosa ho cambiato"
+  git push
+
+Dopo il push:
+  - Netlify ripubblica il sito da solo in 1-2 minuti.
+  - Firebase (dati aziende) e' gia' uguale ovunque.
+
+
+============================================================
+  3) REGOLA D'ORO  (per non fare confusione)
+============================================================
+
+UN COMPUTER ALLA VOLTA.
+  - Finisci su un PC  -> git push
+  - Passi all'altro   -> git pull PRIMA di iniziare
+
+Se lavori su due PC senza sincronizzare, Git crea dei
+"conflitti" da risolvere a mano. Se succede: NON toccare
+niente e chiedi aiuto a Claude, li' sistema lui.
+
+
+============================================================
+  COMANDI UTILI EXTRA
+============================================================
+
+Vedere cosa e' cambiato / lo stato:
+  git status
+
+Vedere l'elenco dei file nella cartella:
+  ls
+
+Vedere lo storico delle modifiche:
+  git log --oneline
+
+============================================================
