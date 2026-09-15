@@ -91,7 +91,10 @@
     {v:2, t:"2 · Compila date"},
     {v:3, t:"3 · Inserimento pieno"}
   ];
-  var MODULI = [ {key:"adempimenti", nome:"Adempimenti"} ];
+  var MODULI = [
+    {key:"adempimenti", nome:"Adempimenti"},
+    {key:"formazione",  nome:"Formazione"}
+  ];
 
   function nomeAzi(id){
     for(var i=0;i<AZIENDE.length;i++){ if(AZIENDE[i].id===id) return AZIENDE[i].nome; }
