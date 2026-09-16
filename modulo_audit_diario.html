@@ -354,7 +354,8 @@ function aziIdDaNome(nome){
   for(var i=0;i<AZIENDE.length;i++){ if(String(AZIENDE[i].nome||"").trim().toLowerCase()===nome) return AZIENDE[i].id; }
   return null;
 }
-let attivita=[
+let attivita=[];   /* piattaforma pulita: nessuna attività demo */
+let _demoAttivita=[
 {id:1,data:"2025-10-27",azienda:"Valdama S.R.L.",tipo:"Sopralluogo",area:"Area forno, colaggio, spruzzo, magazzino, esterno",note:"Sopralluogo generale stabilimento — relazione del 27/10/2025",rilievi:[
  {idCat:3,note:"Area forno e colaggio — carrelli e materiali in attesa di lavorazione lungo i percorsi segnalati",stato:"Aperto",foto:[]},
  {idCat:8,note:"Reparto colaggio e spruzzo — quadri con tappi e coperture mancanti",stato:"Aperto",foto:[]},

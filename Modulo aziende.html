@@ -255,36 +255,8 @@ const GIORNI_PROVA=30;
 
 let licenzeTotali=5;
 
-let aziende=[
- {id:1,ragione:"Valdama",forma:"S.r.l.",piva:"",cf:"",ateco:"23.42.00",
-  attivita:"Produzione di articoli igienico sanitari in ceramica",
-  slVia:"Via Galileo Galilei, 5",slComune:"01033 Civita Castellana",slProv:"VT",
-  ddl:"Daniele Vitali",ddlEmail:"",ddlTel:"",
-  stato:"Attiva",referente:"",note:"",
-  unita:[
-   {id:1,nome:"Stabilimento di Civita Castellana",via:"Via Galileo Galilei, 5",
-    comune:"01033 Civita Castellana",prov:"VT",addetti:"",superficie:"",turni:"",
-    attvvf:"",catvvf:"",scadvvf:"",rischioinc:"",
-    contatti:[
-     {nome:"Ing. Walter Calamanti",ruolo:"RSPP",email:"",tel:"",notifiche:true,categorie:CATEGORIE.slice(),inizioProva:null}
-    ]}
-  ]},
- {id:2,ragione:"Galassia",forma:"S.r.l.",piva:"",cf:"",ateco:"23.42.00",
-  attivita:"Produzione di articoli igienico sanitari in ceramica",
-  slVia:"Zona Industriale località Pantalone, snc",slComune:"01030 Corchiano",slProv:"VT",
-  ddl:"Dimitri Mei",ddlEmail:"",ddlTel:"",
-  stato:"Attiva",referente:"",note:"",
-  unita:[
-   {id:1,nome:"Stabilimento di Corchiano",via:"Zona Industriale località Pantalone, snc",
-    comune:"01030 Corchiano",prov:"VT",addetti:"",superficie:"",turni:"",
-    attvvf:"",catvvf:"",scadvvf:"",rischioinc:"",
-    contatti:[
-     {nome:"Ing. Walter Calamanti",ruolo:"RSPP",email:"",tel:"",notifiche:false,categorie:[],inizioProva:null},
-     {nome:"Massimo Carpenti",ruolo:"Dirigente delegato",email:"",tel:"",notifiche:false,categorie:[],inizioProva:null}
-    ]}
-  ]}
-];
-let prossimoId=3;
+let aziende=[];   /* piattaforma pulita: le aziende si inseriscono dall'interfaccia */
+let prossimoId=1;
 let unitaTemp=[];
 
 /* ============ UTILITÀ ============ */

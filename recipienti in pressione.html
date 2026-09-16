@@ -245,7 +245,8 @@ var MODKEY="recipienti";          /* chiave del doc per-azienda su Firebase */
 function isCliente(){ return RUOLO==="cliente"; }
 function puoModificare(){ return RUOLO==="studio" || LIVELLO>=2; }
 function puoStruttura(){ return RUOLO==="studio" || LIVELLO>=3; }
-var SEED_RECIPIENTI = [
+var SEED_RECIPIENTI = [];   /* piattaforma pulita: nessun dato demo */
+var _demoRecipienti = [
 {cod:"A1",stato:"In servizio",fabbricante:"O.M.B.",V:100,PS:8,anno:"2006",nf:"7483",matricola:"2017/7/100/VT",descrizione:"Autoclave acqua pozzo 1",utilizzo:"Pozzi prelievo acqua",ubicazione:"Sala osmosi",contenuto:"Acqua",gruppo:"II",cat:"II",vForn:"Nuova GI",vAnno:"2018",vTipo:"D10 OT",vPS:"7,6",vIN:"3/8\"",vSca:"6415",vNum:"18138315",ms:"2019-07-26",ult:null,prox:null,perA:4,intA:10,intS:null},
 {cod:"A3",stato:"In servizio",fabbricante:"SICC",V:500,PS:32,anno:"2009",nf:"0904801011",matricola:"2017/7/101/VT",descrizione:"Serbatoio aria",utilizzo:"Presse Sacmi",ubicazione:"Sala compress. HP",contenuto:"Aria",gruppo:"II",cat:"IV",vForn:"Nuova GI",vAnno:"2024",vTipo:"D14 OT",vPS:"30",vIN:"3/4\"",vSca:"48059",vNum:"24500499",ms:"2018-07-20",ult:"2024-07-12",prox:"2027-07-12",perA:3,intA:10,intS:"2029-11-19"},
 {cod:"A4",stato:"In servizio",fabbricante:"ELBI",V:3000,PS:12,anno:"2004",nf:"11476",matricola:"2017/7/103/VT",descrizione:"Autoclave acqua riciclo",utilizzo:"H2O recupero depur.",ubicazione:"Depurazione",contenuto:"Acqua",gruppo:"II",cat:"IV",vForn:"Nuova GI",vAnno:"2018",vTipo:"G20/S OT",vPS:"8",vIN:"1\"",vSca:"28960",vNum:"18138312",ms:"2019-10-11",ult:"2024-10-04",prox:"2027-07-08",perA:3,intA:10,intS:"2024-10-04"},
