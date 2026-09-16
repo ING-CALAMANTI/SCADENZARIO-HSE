@@ -67,19 +67,36 @@ input,select,textarea{padding:8px;border:1px solid #cbd5e0;border-radius:6px;fon
 </style>
 </head>
 <body>
+<style>
+  /* Accesso cliente: nasconde ciò che è riservato allo studio. */
+  body.ruolo-cliente .only-studio{ display:none !important; }
+  body.ruolo-cliente:not(.liv-pieno) .only-struttura{ display:none !important; }
+  #aziClienteLabel{ display:none; }
+  body.ruolo-cliente #aziClienteLabel{ display:inline-block; font-weight:700; color:#fff;
+    background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.35); border-radius:16px; padding:6px 14px; font-size:14px; }
+  #bannerCliente{ display:none; }
+  body.ruolo-cliente #bannerCliente{ display:block; }
+</style>
+
 <header>
   <div><h1>Scadenzario Sicurezza — Recipienti in Pressione</h1>
   <div class="sub">D.M. 329/2004 · D.Lgs. 81/2008 art. 71 · D.M. 11/04/2011 — Verifiche INAIL/ASL/Soggetti Abilitati</div></div>
-  <div><select id="selAzienda" onchange="cambiaAzienda()"><option>Azienda dimostrativa (dati registro 08/25)</option></select></div>
+  <div>
+    <span id="aziClienteLabel"></span>
+    <select id="selAzienda" class="only-studio" onchange="cambiaAzienda()"><option>Azienda dimostrativa (dati registro 08/25)</option></select>
+  </div>
 </header>
 <div class="container">
+<div id="bannerCliente" style="margin:0 0 12px;padding:10px 16px;background:#e6f0ef;border-left:4px solid #0f5e5a;border-radius:8px;color:#0a4340;font-size:13px">
+  Stai visualizzando i recipienti in pressione della tua azienda. Puoi <b>aggiornare le date delle verifiche</b>; l'elenco delle attrezzature è gestito dallo studio.
+</div>
 <div class="tabs">
   <div class="tab active" onclick="tab('dash',this)">Dashboard</div>
   <div class="tab" onclick="tab('elenco',this)">Recipienti</div>
   <div class="tab" onclick="tab('scad',this)">Scadenzario</div>
-  <div class="tab" onclick="tab('bulk',this)">Registrazione massiva</div>
-  <div class="tab" onclick="tab('email',this)">Email automatiche</div>
-  <div class="tab" onclick="tab('registro',this)">Registro stampabile</div>
+  <div class="tab only-studio" onclick="tab('bulk',this)">Registrazione massiva</div>
+  <div class="tab only-studio" onclick="tab('email',this)">Email automatiche</div>
+  <div class="tab only-studio" onclick="tab('registro',this)">Registro stampabile</div>
 </div>
 
 <!-- DASHBOARD -->
@@ -96,8 +113,8 @@ input,select,textarea{padding:8px;border:1px solid #cbd5e0;border-radius:6px;fon
     <input id="fCerca" placeholder="Cerca cod, matricola, descrizione…" oninput="renderElenco()" style="min-width:240px;">
     <select id="fStato" onchange="renderElenco()"><option value="">Tutti gli stati</option><option>In servizio</option><option>Dismesso</option><option>Da denunciare</option></select>
     <select id="fCat" onchange="renderElenco()"><option value="">Tutte le categorie PED</option><option>I</option><option>II</option><option>III</option><option>IV</option></select>
-    <button class="btn btn-p" onclick="apriRecipiente(null)">+ Nuovo recipiente</button>
-    <button class="btn btn-g" onclick="esportaJSON()">Esporta dati</button>
+    <button class="btn btn-p only-struttura" onclick="apriRecipiente(null)">+ Nuovo recipiente</button>
+    <button class="btn btn-g only-studio" onclick="esportaJSON()">Esporta dati</button>
   </div>
   <div class="box tbl-wrap"><table><thead><tr><th>Cod</th><th>Descrizione</th><th>Ubicazione</th><th>V (l)</th><th>PS (bar)</th><th>P×V</th><th>Assogg.</th><th>Cat</th><th>Matricola INAIL</th><th>Pross. periodica</th><th>Scad. integrità</th><th>Valvola</th><th>Stato</th><th></th></tr></thead><tbody id="tbElenco"></tbody></table></div>
   <div class="nota">Assoggettamento: P×V > 8000 bar·l ⇒ denuncia di messa in servizio e verifiche periodiche (per l'aria/gas gruppo 2 la periodicità di funzionamento è 3 anni per cat. III–IV, 4 anni per cat. I–II; integrità decennale). Verificare sempre il caso specifico su D.M. 329/2004 all. — le soglie variano per fluido e tipologia.</div>
@@ -220,6 +237,14 @@ const SOGLIA_PXV = 8000;
 /* Multi-azienda: AZIENDE dall'anagrafica condivisa; RECIPIENTI[aziId] = lista per azienda;
    "recipienti" resta la VISTA dell'azienda selezionata. SEED_RECIPIENTI = registro iniziale. */
 var AZIENDE=[], aziId=null, RECIPIENTI={}, recipienti=[];
+
+/* --- Accesso: ruolo utente e livello su questo modulo (vedi Adempimenti) ---
+   Livello 2 = il cliente aggiorna le DATE delle verifiche; il resto è dello studio. */
+var RUOLO="studio", LIVELLO=3, MIO_AZIID=null;
+var MODKEY="recipienti";          /* chiave del doc per-azienda su Firebase */
+function isCliente(){ return RUOLO==="cliente"; }
+function puoModificare(){ return RUOLO==="studio" || LIVELLO>=2; }
+function puoStruttura(){ return RUOLO==="studio" || LIVELLO>=3; }
 var SEED_RECIPIENTI = [
 {cod:"A1",stato:"In servizio",fabbricante:"O.M.B.",V:100,PS:8,anno:"2006",nf:"7483",matricola:"2017/7/100/VT",descrizione:"Autoclave acqua pozzo 1",utilizzo:"Pozzi prelievo acqua",ubicazione:"Sala osmosi",contenuto:"Acqua",gruppo:"II",cat:"II",vForn:"Nuova GI",vAnno:"2018",vTipo:"D10 OT",vPS:"7,6",vIN:"3/8\"",vSca:"6415",vNum:"18138315",ms:"2019-07-26",ult:null,prox:null,perA:4,intA:10,intS:null},
 {cod:"A3",stato:"In servizio",fabbricante:"SICC",V:500,PS:32,anno:"2009",nf:"0904801011",matricola:"2017/7/101/VT",descrizione:"Serbatoio aria",utilizzo:"Presse Sacmi",ubicazione:"Sala compress. HP",contenuto:"Aria",gruppo:"II",cat:"IV",vForn:"Nuova GI",vAnno:"2024",vTipo:"D14 OT",vPS:"30",vIN:"3/4\"",vSca:"48059",vNum:"24500499",ms:"2018-07-20",ult:"2024-07-12",prox:"2027-07-12",perA:3,intA:10,intS:"2029-11-19"},
@@ -349,7 +374,7 @@ function renderElenco(){
   <td>${r.stato==="In servizio"&&assogg(r)?badgeScad(r.prox):"—"}</td>
   <td>${r.stato==="In servizio"&&assogg(r)?badgeScad(r.intS):"—"}</td>
   <td style="font-size:.8em;">${r.vTipo?r.vTipo+" n."+r.vNum:"—"}</td>
-  <td>${stB}</td><td><button class="btn btn-g" onclick="apriRecipiente(${i})">Modifica</button></td></tr>`;});
+  <td>${stB}</td><td><button class="btn btn-g" onclick="apriRecipiente(${i})">${puoStruttura()?"Modifica":"Aggiorna date"}</button></td></tr>`;});
  document.getElementById("tbElenco").innerHTML=h;
 }
 
@@ -363,7 +388,7 @@ function renderScad(){
   else if(fin<9999){if(g===null||g>fin)return;}
   righe.push({r,i,s,g:(g===null?99999:g)});}));
  righe.sort((a,b)=>a.g-b.g);
- let h="";righe.forEach(x=>{h+=`<tr><td><b>${x.r.cod}</b></td><td>${x.r.descrizione}</td><td>${x.s.nome}</td><td>${fmt(x.s.ult)}</td><td>${x.s.per}</td><td>${fmt(x.s.scad)}</td><td>${x.s.scad?giorni(x.s.scad):"—"}</td><td>${badgeScad(x.s.scad)}</td><td><button class="btn btn-g" onclick="apriRecipiente(${x.i})">Modifica</button></td></tr>`;});
+ let h="";righe.forEach(x=>{h+=`<tr><td><b>${x.r.cod}</b></td><td>${x.r.descrizione}</td><td>${x.s.nome}</td><td>${fmt(x.s.ult)}</td><td>${x.s.per}</td><td>${fmt(x.s.scad)}</td><td>${x.s.scad?giorni(x.s.scad):"—"}</td><td>${badgeScad(x.s.scad)}</td><td><button class="btn btn-g" onclick="apriRecipiente(${x.i})">${puoStruttura()?"Modifica":"Aggiorna date"}</button></td></tr>`;});
  document.getElementById("tbScad").innerHTML=h||'<tr><td colspan="9">Nessuna scadenza nel filtro selezionato.</td></tr>';
 }
 
@@ -395,7 +420,24 @@ function apriRecipiente(i){mdIdx=i;const r=i===null?{stato:"In servizio",gruppo:
  set("mVForn",r.vForn);set("mVAnno",r.vAnno);set("mVTipo",r.vTipo);set("mVPS",r.vPS);set("mVIN",r.vIN);set("mVSca",r.vSca);set("mVNum",r.vNum);
  set("mMS",r.ms);set("mPerA",r.perA);set("mUlt",r.ult);set("mProx",r.prox);set("mIntA",r.intA);set("mIntS",r.intS);
  document.getElementById("mElimina").style.display=i===null?"none":"inline-block";
+ bloccaCampiRec();
  mPxV();document.getElementById("mdBg").classList.add("show");}
+
+/* Cliente livello 2: nel form recipiente può toccare SOLO le date delle verifiche
+   (messa in servizio, ultima periodica, scadenza integrità). La prossima è calcolata. */
+function bloccaCampiRec(){
+ var strutt=["mCod","mStato","mFabb","mAnno","mNF","mMatr","mDesc","mUtil","mUbic","mCont","mV","mPS","mGruppo","mCat","mVForn","mVAnno","mVTipo","mVPS","mVIN","mVSca","mVNum","mPerA","mIntA","mProx"];
+ var date=["mMS","mUlt","mIntS"];
+ var elimina=document.getElementById("mElimina");
+ if(puoStruttura()){
+  strutt.concat(date).forEach(function(id){var e=document.getElementById(id); if(e) e.disabled=false;});
+  return;
+ }
+ document.getElementById("mdTitolo").textContent="Aggiorna date verifiche";
+ strutt.forEach(function(id){var e=document.getElementById(id); if(e) e.disabled=true;});
+ date.forEach(function(id){var e=document.getElementById(id); if(e) e.disabled=false;});
+ if(elimina) elimina.style.display="none";   /* il cliente non elimina */
+}
 function mPxV(){const v=+document.getElementById("mV").value,p=+document.getElementById("mPS").value;
  const out=document.getElementById("mPxVout");
  if(v&&p){const x=Math.round(v*p);out.value=x+(x>SOGLIA_PXV?"  → ASSOGGETTATO":"  → non assoggettato");}else out.value="";}
@@ -403,6 +445,14 @@ function mCalcScad(){const u=document.getElementById("mUlt").value,a=document.ge
  if(u&&a)document.getElementById("mProx").value=addAnni(u,a);}
 function chiudiMd(){document.getElementById("mdBg").classList.remove("show");}
 function salvaRec(){const g=id=>document.getElementById(id).value||null;
+ /* Cliente livello 2: aggiorna SOLO le date del recipiente esistente. */
+ if(!puoStruttura()){
+  if(mdIdx===null){ alert("Non hai i permessi per aggiungere recipienti. Puoi solo aggiornare le date."); return; }
+  var rr=recipienti[mdIdx];
+  rr.ms=g("mMS"); rr.ult=g("mUlt"); rr.intS=g("mIntS");
+  rr.prox=(rr.ult&&rr.perA)?addAnni(rr.ult,rr.perA):(g("mProx"));
+  salva(); chiudiMd(); renderTutto(); return;
+ }
  const r={cod:g("mCod"),stato:g("mStato"),fabbricante:g("mFabb"),anno:g("mAnno"),nf:g("mNF"),matricola:g("mMatr"),
   descrizione:g("mDesc"),utilizzo:g("mUtil"),ubicazione:g("mUbic"),contenuto:g("mCont"),
   V:g("mV")?+g("mV"):null,PS:g("mPS")?+g("mPS"):null,gruppo:g("mGruppo"),cat:g("mCat"),
@@ -411,7 +461,7 @@ function salvaRec(){const g=id=>document.getElementById(id).value||null;
  if(!r.cod){alert("Inserire il codice.");return;}
  if(mdIdx===null)recipienti.push(r);else recipienti[mdIdx]=r;
  salva();chiudiMd();renderTutto();}
-function eliminaRec(){if(mdIdx!==null&&confirm("Eliminare il recipiente?")){recipienti.splice(mdIdx,1);salva();chiudiMd();renderTutto();}}
+function eliminaRec(){if(!puoStruttura()){alert("Non hai i permessi per eliminare i recipienti.");return;}if(mdIdx!==null&&confirm("Eliminare il recipiente?")){recipienti.splice(mdIdx,1);salva();chiudiMd();renderTutto();}}
 
 function anteprimaEmail(){
  const gg=+document.getElementById("emGiorni").value||60;const az=document.getElementById("emAziendaNome").value;
@@ -439,31 +489,95 @@ function esportaJSON(){const blob=new Blob([JSON.stringify(recipienti,null,1)],{
 /* ============ PERSISTENZA (Firebase; fallback localStorage) ============ */
 /* Prima questo modulo non salvava nulla: le modifiche si perdevano al reload.
    Ora persiste l'array "recipienti" tramite Store (Firebase o localStorage). */
-var LS_KEY="recipienti_dati_v1";
-function salva(){
- Store.save(LS_KEY, {RECIPIENTI:RECIPIENTI, aziId:aziId})
+var LS_KEY="recipienti_dati_v1";   /* vecchio contenitore unico: resta come rete di sicurezza */
+
+/* Salva i dati di UNA azienda nella sua cartella su Firebase. */
+function salvaAzi(id){
+ if(id==null) return;
+ Store.saveAzienda(id, MODKEY, { recipienti: RECIPIENTI[id]||[] })
   .catch(function(e){ console.warn("Salvataggio non riuscito:", e); });
 }
-/* carica() ASINCRONA: anagrafica condivisa + dati per-azienda. Con migrazione dal vecchio formato piatto. */
+/* salva(): salva l'azienda attualmente selezionata. */
+function salva(){ salvaAzi(aziId); }
+
+/* carica() ASINCRONA. Prima capisce CHI sei (studio o cliente), poi carica il giusto. */
 function carica(){
- return Promise.all([ Store.aziende(), Store.load(LS_KEY) ]).then(function(res){
-  AZIENDE = res[0] || [];
-  var d = res[1];
-  var firstId = AZIENDE.length ? AZIENDE[0].id : null;
-  if(d && d.RECIPIENTI){ RECIPIENTI = d.RECIPIENTI; if(d.aziId) aziId = d.aziId; }
-  else if(d && Array.isArray(d.recipienti)){ RECIPIENTI = {}; if(firstId!==null) RECIPIENTI[firstId] = d.recipienti; }   /* vecchio formato piatto → prima azienda */
-  else { RECIPIENTI = {}; if(firstId!==null) RECIPIENTI[firstId] = SEED_RECIPIENTI.slice(); }                             /* primo avvio: registro seed alla prima azienda */
-  if(AZIENDE.length){ var ok=false; for(var i=0;i<AZIENDE.length;i++){ if(AZIENDE[i].id===aziId){ok=true;break;} } if(!ok) aziId = firstId; }
-  else aziId = null;
-  if(aziId!==null){ if(!RECIPIENTI[aziId]) RECIPIENTI[aziId]=[]; recipienti = RECIPIENTI[aziId]; } else recipienti = [];
-  return AZIENDE.length > 0;
+ return Store.profile().then(function(prof){
+  RUOLO   = prof.role || "studio";
+  MIO_AZIID = prof.aziId || null;
+  LIVELLO = (RUOLO==="studio") ? 3 : (((prof.livelli||{}).recipienti)||0);
+  return isCliente() ? caricaCliente(prof) : caricaStudio();
  }).catch(function(e){ console.warn("Caricamento non riuscito:", e); return false; });
 }
 
+/* STUDIO: tutte le aziende; migra dal vecchio contenitore unico se serve. */
+function caricaStudio(){
+ return Promise.all([ Store.aziende(), Store.load(LS_KEY) ]).then(function(res){
+  AZIENDE = res[0] || [];
+  var vecchio = res[1] || null;
+  var firstId = AZIENDE.length ? AZIENDE[0].id : null;
+  if(!AZIENDE.length){ aziId=null; recipienti=[]; return false; }
+  /* dati vecchi per-azienda: mappa RECIPIENTI, oppure vecchio formato piatto (recipienti[]) → prima azienda */
+  var oldMap = (vecchio && vecchio.RECIPIENTI) ? vecchio.RECIPIENTI
+             : (vecchio && Array.isArray(vecchio.recipienti) && firstId!==null) ? (function(){var m={};m[firstId]=vecchio.recipienti;return m;})()
+             : null;
+  var jobs = AZIENDE.map(function(z){
+   return Store.loadAzienda(z.id, MODKEY).then(function(dc){
+    if(dc){ RECIPIENTI[z.id] = dc.recipienti || []; }
+    else if(oldMap && oldMap[z.id]){
+     RECIPIENTI[z.id] = oldMap[z.id] || [];
+     return Store.saveAzienda(z.id, MODKEY, { recipienti: RECIPIENTI[z.id] });
+    } else { if(!RECIPIENTI[z.id]) RECIPIENTI[z.id] = []; }
+   });
+  });
+  return Promise.all(jobs).then(function(){
+   if(vecchio && vecchio.aziId) aziId = vecchio.aziId;
+   var ok=false; for(var i=0;i<AZIENDE.length;i++){ if(AZIENDE[i].id===aziId){ ok=true; break; } }
+   if(!ok) aziId = firstId;
+   if(!RECIPIENTI[aziId]) RECIPIENTI[aziId]=[]; recipienti = RECIPIENTI[aziId];
+   return true;
+  });
+ });
+}
+
+/* CLIENTE: vede SOLO la sua azienda. */
+function caricaCliente(prof){
+ if(!prof.aziId){ AZIENDE=[]; aziId=null; recipienti=[]; return false; }
+ AZIENDE = [{ id:prof.aziId, nome:(prof.aziNome||("Azienda "+prof.aziId)), emailRef:"", ddl:"" }];
+ aziId = prof.aziId; RECIPIENTI={};
+ return Store.loadAzienda(prof.aziId, MODKEY).then(function(dc){
+  RECIPIENTI[prof.aziId] = (dc && dc.recipienti) || [];
+  recipienti = RECIPIENTI[prof.aziId];
+  return true;
+ });
+}
+
 function renderTutto(){renderDash();renderElenco();renderScad();renderBulk();renderRegistro();}
-/* avvio asincrono: prima i dati (anagrafica + per-azienda), poi si disegna */
+
+/* Applica i permessi in base al ruolo/livello (attiva le classi su <body>). */
+function applicaAccesso(){
+ if(isCliente()){
+  document.body.classList.add("ruolo-cliente");
+  if(puoStruttura()) document.body.classList.add("liv-pieno");
+  var lbl=document.getElementById("aziClienteLabel");
+  if(lbl && AZIENDE[0]) lbl.textContent=AZIENDE[0].nome;
+ }
+}
+/* Cliente autenticato ma non ancora abilitato a un'azienda dallo studio. */
+function mostraClienteInAttesa(){
+ var d=document.createElement("div");
+ d.style.cssText="margin:20px;padding:16px 18px;background:#e6f0ef;border:1px solid #9fc4c0;border-radius:10px;color:#0a4340;font-size:14px";
+ d.innerHTML="<b>Accesso in attesa di abilitazione.</b><br>Il tuo account è attivo ma non è ancora collegato a un'azienda. Contatta lo studio per l'abilitazione.";
+ document.body.insertBefore(d, document.body.firstChild);
+}
+
+/* avvio asincrono: prima i dati (ruolo + per-azienda), poi si disegna */
 carica().then(function(){
- if(!AZIENDE.length){ mostraNessunAzienda(); return; }
+ applicaAccesso();
+ if(!AZIENDE.length){
+  if(isCliente()) mostraClienteInAttesa(); else mostraNessunAzienda();
+  return;
+ }
  initSelAzienda();
  var em=document.getElementById("emAziendaNome"); if(em) em.value = nomeAzi();
  renderTutto();
