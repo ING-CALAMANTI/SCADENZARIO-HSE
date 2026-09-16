@@ -73,22 +73,36 @@ label{font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:3px;
 </style>
 </head>
 <body>
+<style>
+  /* Accesso cliente: nasconde ciò che è riservato allo studio (Audit: cliente in sola lettura). */
+  body.ruolo-cliente .only-studio{ display:none !important; }
+  #aziClienteLabel{ display:none; }
+  body.ruolo-cliente #aziClienteLabel{ display:inline-block; font-weight:700; color:var(--verde,#0f5e5a);
+    background:var(--verde-chiaro,#e6f0ef); border-radius:16px; padding:7px 14px; font-size:13px; }
+  #bannerCliente{ display:none; }
+  body.ruolo-cliente #bannerCliente{ display:block; }
+</style>
+
 <header style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
 <div>
 <h1>Audit e Diario Attività</h1>
 <p>Scadenzario Sicurezza — Gestione sopralluoghi, rilievi e relazioni</p>
 </div>
-<div style="display:flex;gap:8px">
-<button class="secondario" onclick="esportaDati()" title="Backup completo diario + catalogo + foto, per trasferire tra PC">Esporta dati</button>
-<button class="secondario" onclick="document.getElementById('imp-dati').click()" title="Ripristina un backup completo">Importa dati</button>
+<div style="display:flex;gap:8px;align-items:center">
+<span id="aziClienteLabel"></span>
+<button class="secondario only-studio" onclick="esportaDati()" title="Backup completo diario + catalogo + foto, per trasferire tra PC">Esporta dati</button>
+<button class="secondario only-studio" onclick="document.getElementById('imp-dati').click()" title="Ripristina un backup completo">Importa dati</button>
 <input type="file" id="imp-dati" accept=".json" style="display:none" onchange="importaDati(this)">
 </div>
 </header>
+<div id="bannerCliente" style="margin:10px 0 0;padding:10px 16px;background:#e6f0ef;border-left:4px solid #0f5e5a;border-radius:8px;color:#0a4340;font-size:13px">
+  Stai consultando il diario degli audit della tua azienda (sola lettura). Le attività e i rilievi sono registrati dallo studio.
+</div>
 <nav>
 <button class="attivo" onclick="vaiTab('dashboard',this)">Dashboard</button>
 <button onclick="vaiTab('diario',this)">Diario Attività</button>
-<button onclick="vaiTab('catalogo',this)">Catalogo Rilievi</button>
-<button onclick="vaiTab('relazione',this)">Relazione</button>
+<button class="only-studio" onclick="vaiTab('catalogo',this)">Catalogo Rilievi</button>
+<button class="only-studio" onclick="vaiTab('relazione',this)">Relazione</button>
 </nav>
 <main>
 
@@ -112,10 +126,10 @@ label{font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:3px;
 <div class="pannello no-print">
 <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
 <h2 style="margin:0">Diario delle attività</h2>
-<button class="azione" onclick="apriModalAttivita()">Nuova attività</button>
+<button class="azione only-studio" onclick="apriModalAttivita()">Nuova attività</button>
 </div>
 <div class="filtri" style="margin-top:12px;">
-<select id="f-azienda" onchange="disegnaDiario()"><option value="">Tutte le aziende</option></select>
+<select id="f-azienda" class="only-studio" onchange="disegnaDiario()"><option value="">Tutte le aziende</option></select>
 <select id="f-tipo" onchange="disegnaDiario()">
 <option value="">Tutti i tipi</option><option>Sopralluogo</option><option>Incontro con responsabili</option><option>Verifica specifica</option><option>Audit completo</option>
 </select>
@@ -327,6 +341,19 @@ let prossimoIdCat=95;
 /* ============ DATI ============ */
 /* Elenco aziende dall'ANAGRAFICA CONDIVISA (per il selettore e il filtro del diario). */
 var AZIENDE=[];
+
+/* --- Accesso: ruolo utente su questo modulo ---
+   Audit è il diario interno dello studio: il cliente lo vede in SOLA LETTURA
+   (solo le attività della sua azienda), lo studio gestisce tutto. */
+var RUOLO="studio", LIVELLO=3, MIO_AZIID=null;
+var MODKEY="audit";
+function isCliente(){ return RUOLO==="cliente"; }
+function puoModificare(){ return RUOLO==="studio"; }   /* i clienti sono sempre in sola lettura */
+function aziIdDaNome(nome){
+  nome=(nome||"").trim().toLowerCase();
+  for(var i=0;i<AZIENDE.length;i++){ if(String(AZIENDE[i].nome||"").trim().toLowerCase()===nome) return AZIENDE[i].id; }
+  return null;
+}
 let attivita=[
 {id:1,data:"2025-10-27",azienda:"Valdama S.R.L.",tipo:"Sopralluogo",area:"Area forno, colaggio, spruzzo, magazzino, esterno",note:"Sopralluogo generale stabilimento — relazione del 27/10/2025",rilievi:[
  {idCat:3,note:"Area forno e colaggio — carrelli e materiali in attesa di lavorazione lungo i percorsi segnalati",stato:"Aperto",foto:[]},
@@ -478,7 +505,7 @@ function disegnaDiario(){
        <p>${c?c.des:''}</p>
        <p>${c?c.nor.map(n=>`<span class="etichetta-norma">${n}</span>`).join(''):''}</p>
        ${r.foto.length?'<div>'+r.foto.map(f=>`<img src="${f}">`).join('')+'</div>':''}
-       <div style="margin-top:6px">
+       <div class="only-studio" style="margin-top:6px">
         <select style="width:auto;display:inline-block;margin:0" onchange="cambiaStato(${a.id},${i},this.value)">
          <option${r.stato==='Aperto'?' selected':''}>Aperto</option>
          <option${r.stato==='In corso'?' selected':''}>In corso</option>
@@ -489,8 +516,8 @@ function disegnaDiario(){
        </div>
       </div>`;
     }).join('')}
-    <button class="azione piccolo" onclick="apriModalRilievo(${a.id})">Aggiungi rilievo</button>
-    <button class="secondario piccolo" onclick="eliminaAttivita(${a.id})">Elimina attività</button>
+    <button class="azione piccolo only-studio" onclick="apriModalRilievo(${a.id})">Aggiungi rilievo</button>
+    <button class="secondario piccolo only-studio" onclick="eliminaAttivita(${a.id})">Elimina attività</button>
    </div>
   </div>`;
  });
@@ -744,13 +771,40 @@ function _senzaFoto(att){
   return att.map(a=>({...a, rilievi:(a.rilievi||[]).map(r=>({...r, foto:[], _nFoto:(r.foto||[]).length}))}));
 }
 function salva(){
+  if(RUOLO!=="studio") return;   /* i clienti sono in sola lettura */
   Store.save(LS_KEY, {
     attivita:_senzaFoto(attivita), catalogo:catalogo,
     prossimoIdAtt:prossimoIdAtt, prossimoIdCat:prossimoIdCat
   }).catch(function(e){ console.warn("Salvataggio non riuscito:", e); });
+  pubblicaSnapshot();
 }
-/* carica() ASINCRONA: anagrafica condivisa (per il selettore azienda) + diario/catalogo. */
+/* Pubblica per ogni azienda una copia in SOLA LETTURA (solo le sue attività + il catalogo),
+   che il cliente legge dalla sua cartella. Le attività senza azienda riconosciuta restano
+   solo nel diario dello studio. */
+function pubblicaSnapshot(){
+  if(RUOLO!=="studio" || Store.mode()!=="firebase") return;
+  var byAzi={};
+  for(var i=0;i<AZIENDE.length;i++) byAzi[AZIENDE[i].id]=[];
+  var pulite=_senzaFoto(attivita);
+  for(var j=0;j<pulite.length;j++){
+    var id=aziIdDaNome(pulite[j].azienda);
+    if(id!=null){ if(!byAzi[id]) byAzi[id]=[]; byAzi[id].push(pulite[j]); }
+  }
+  for(var k in byAzi){ if(byAzi.hasOwnProperty(k)){
+    Store.saveAzienda(Number(k), MODKEY, { attivita: byAzi[k], catalogo: catalogo });
+  }}
+}
+/* carica() ASINCRONA. Prima capisce CHI sei (studio o cliente), poi carica il giusto. */
 function carica(){
+  return Store.profile().then(function(prof){
+    RUOLO   = prof.role || "studio";
+    MIO_AZIID = prof.aziId || null;
+    LIVELLO = (RUOLO==="studio") ? 3 : (((prof.livelli||{}).audit)||0);
+    return isCliente() ? caricaCliente(prof) : caricaStudio();
+  }).catch(function(e){ console.warn("Caricamento non riuscito:", e); return false; });
+}
+/* STUDIO: diario condiviso completo (come prima) + pubblicazione snapshot per i clienti. */
+function caricaStudio(){
   return Promise.all([ Store.aziende(), Store.load(LS_KEY) ]).then(function(res){
     AZIENDE = res[0] || [];
     var d = res[1];
@@ -758,11 +812,22 @@ function carica(){
       attivita=d.attivita; if(Array.isArray(d.catalogo)) catalogo=d.catalogo;
       if(d.prossimoIdAtt) prossimoIdAtt=d.prossimoIdAtt;
       if(d.prossimoIdCat) prossimoIdCat=d.prossimoIdCat;
-      // le foto non sono in locale: garantisco che ogni rilievo abbia comunque l'array foto
       attivita.forEach(a=>(a.rilievi||[]).forEach(r=>{ if(!r.foto) r.foto=[]; }));
     }
+    pubblicaSnapshot();   /* aggiorna le copie per-azienda che leggono i clienti */
     return true;
   }).catch(function(e){ console.warn("Caricamento non riuscito:", e); return false; });
+}
+/* CLIENTE: vede SOLO la copia della sua azienda, in sola lettura. */
+function caricaCliente(prof){
+  if(!prof.aziId){ AZIENDE=[]; attivita=[]; catalogo=[]; return false; }
+  AZIENDE = [{ id:prof.aziId, nome:(prof.aziNome||("Azienda "+prof.aziId)), emailRef:"", ddl:"" }];
+  return Store.loadAzienda(prof.aziId, MODKEY).then(function(dc){
+    attivita = (dc && dc.attivita) || [];
+    catalogo = (dc && dc.catalogo) || [];
+    attivita.forEach(a=>(a.rilievi||[]).forEach(r=>{ if(!r.foto) r.foto=[]; }));
+    return true;
+  });
 }
 /* Export/import JSON: ponte multi-PC finché non c'è Firebase. QUI le foto SONO incluse. */
 function esportaDati(){
@@ -795,8 +860,27 @@ function importaDati(input){
   r.readAsText(file);
 }
 
-/* avvio asincrono: prima i dati (Firebase o localStorage), poi si disegna */
-carica().then(function(){ popolaAziende(); disegnaDashboard(); });
+/* Applica i permessi in base al ruolo (Audit: cliente = sola lettura). */
+function applicaAccesso(){
+  if(isCliente()){
+    document.body.classList.add("ruolo-cliente");
+    var lbl=document.getElementById("aziClienteLabel");
+    if(lbl && AZIENDE[0]) lbl.textContent=AZIENDE[0].nome;
+  }
+}
+function mostraClienteInAttesa(){
+  var d=document.createElement("div");
+  d.style.cssText="margin:20px;padding:16px 18px;background:#e6f0ef;border:1px solid #9fc4c0;border-radius:10px;color:#0a4340;font-size:14px";
+  d.innerHTML="<b>Accesso in attesa di abilitazione.</b><br>Il tuo account è attivo ma non è ancora collegato a un'azienda. Contatta lo studio per l'abilitazione.";
+  document.body.insertBefore(d, document.body.firstChild);
+}
+
+/* avvio asincrono: prima i dati (ruolo + Firebase), poi si disegna */
+carica().then(function(){
+  applicaAccesso();
+  if(isCliente() && !AZIENDE.length){ mostraClienteInAttesa(); return; }
+  popolaAziende(); disegnaDashboard();
+});
 </script>
 </body>
 </html>
