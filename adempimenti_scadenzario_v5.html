@@ -219,6 +219,7 @@ tr:hover td{background:#fafaf8}
       <div class="fld"><label>Adempimento</label><input type="text" id="fAd"></div>
     </div>
     <div class="fld"><label>Riferimento legislativo</label><input type="text" id="fR"></div>
+    <div class="fld"><label>Note</label><textarea id="fNote" rows="2" placeholder="Note manuali su questo adempimento"></textarea></div>
     <div class="g2">
       <div class="fld"><label>Tipo scadenza</label><select id="fTipo" onchange="toggleTipoScad()"><option value="periodica">Periodica (giorni)</option><option value="evento">Ad evento</option></select></div>
       <div class="fld" id="fEventoWrap" style="display:none"><label>Evento scatenante</label><input type="text" id="fEvento" placeholder="Es: Ad ogni modifica"></div>
@@ -781,6 +782,7 @@ function renderScad(){
     h+='<button class="only-studio" onclick="apriEmailAz('+x.aziId+','+r.id+')" style="margin-right:4px;font-size:11px;padding:3px 7px">Email</button>';
     h+='<button class="only-struttura" onclick="eliminaAdempAz('+x.aziId+','+r.id+')" style="color:#c0392b;font-size:11px;padding:3px 7px">Elimina</button>';
     h+='</td></tr>';
+    if(r.note){ h+='<tr><td colspan="'+(mostraAzienda?12:11)+'" style="font-size:11px;color:#555;background:#fbfbf7;padding:2px 10px 8px">📝 <b>Note:</b> '+r.note+'</td></tr>'; }
   }
   var ncol=mostraAzienda?12:11;
   if(!h)h='<tr><td colspan="'+ncol+'" style="text-align:center;padding:2rem;color:#888">Nessun risultato</td></tr>';
@@ -805,7 +807,7 @@ function onDocSelected(){var f=document.getElementById("fDoc").files[0];if(f){pe
 function openFormAdemp(id){
   editAdempId=id;pendingDoc="";
   document.getElementById("mAdempTit").textContent=id?"Modifica adempimento":"Nuovo adempimento";
-  var ids=["fA","fAd","fR","fEF","fTA","fTF","fTAz","fEvento"];
+  var ids=["fA","fAd","fR","fNote","fEF","fTA","fTF","fTAz","fEvento"];
   for(var i=0;i<ids.length;i++)document.getElementById(ids[i]).value="";
   document.getElementById("fTipo").value="periodica";
   document.getElementById("fF").value=365;document.getElementById("fD").value="";
@@ -822,6 +824,7 @@ function openFormAdemp(id){
       document.getElementById("fA").value=r.aspetto;
       document.getElementById("fAd").value=r.adempimento;
       document.getElementById("fR").value=r.riferimento;
+      document.getElementById("fNote").value=r.note||"";
       document.getElementById("fTipo").value=r.tipo;
       document.getElementById("fEvento").value=r.evento||"";
       document.getElementById("fF").value=r.frequenza||365;
@@ -850,12 +853,12 @@ function bloccaCampiStruttura(){
   var titolo=document.getElementById("mAdempTit");
   if(puoStruttura()){
     /* studio o livello pieno: tutto sbloccato (ripristina in caso fosse stato bloccato) */
-    var tutti=["fA","fAd","fR","fTipo","fEvento","fF","fPA","fPF","fEF","fEA2","fTA","fTF","fTAz","fAuto","fHasEmail","fDoc","fD"];
+    var tutti=["fA","fAd","fR","fNote","fTipo","fEvento","fF","fPA","fPF","fEF","fEA2","fTA","fTF","fTAz","fAuto","fHasEmail","fDoc","fD"];
     for(var i=0;i<tutti.length;i++){ var el=document.getElementById(tutti[i]); if(el) el.disabled=false; }
     return;
   }
   if(titolo) titolo.textContent="Aggiorna data di esecuzione";
-  var bloccati=["fA","fAd","fR","fTipo","fEvento","fF","fPA","fPF","fEF","fEA2","fTA","fTF","fTAz","fAuto","fHasEmail","fDoc"];
+  var bloccati=["fA","fAd","fR","fNote","fTipo","fEvento","fF","fPA","fPF","fEF","fEA2","fTA","fTF","fTAz","fAuto","fHasEmail","fDoc"];
   for(var j=0;j<bloccati.length;j++){ var e=document.getElementById(bloccati[j]); if(e) e.disabled=true; }
   var d=document.getElementById("fD"); if(d) d.disabled=false;   /* la data resta modificabile */
 }
@@ -880,6 +883,7 @@ function salvaAdemp(){
     aspetto:document.getElementById("fA").value,
     adempimento:document.getElementById("fAd").value,
     riferimento:document.getElementById("fR").value,
+    note:document.getElementById("fNote").value,
     tipo:tipo,
     evento:tipo==="evento"?document.getElementById("fEvento").value:"",
     frequenza:tipo==="evento"?0:Number(document.getElementById("fF").value),
@@ -926,8 +930,22 @@ function renderAzioni(){
   if(!r)return;if(!r.azioni)r.azioni=[];
   var h="";
   if(!r.azioni.length)h='<p style="color:#888;font-size:13px;font-style:italic">Nessuna azione registrata</p>';
-  else{var s=r.azioni.slice().sort(function(a,b){return new Date(b.data)-new Date(a.data);});for(var i=0;i<s.length;i++){h+='<div class="azione-item"><div class="azione-data">'+fmtDate(s[i].data)+'</div><div>'+s[i].testo+'</div></div>';}}
+  else{var s=r.azioni.slice().sort(function(a,b){return new Date(b.data)-new Date(a.data);});for(var i=0;i<s.length;i++){var oi=r.azioni.indexOf(s[i]);h+='<div class="azione-item" style="display:flex;align-items:center;gap:8px"><div class="azione-data">'+fmtDate(s[i].data)+'</div><div style="flex:1">'+s[i].testo+'</div><button onclick="eliminaAzione('+oi+')" title="Elimina questa azione" style="border:0;background:none;color:#c0392b;cursor:pointer;font-size:12px;padding:2px 6px">Elimina</button></div>';}}
   document.getElementById("azioniList").innerHTML=h;
+}
+/* Elimina una singola azione dall'adempimento aperto nella modale Azioni. */
+function eliminaAzione(idx){
+  var rows=getAdemp();
+  for(var i=0;i<rows.length;i++){
+    if(rows[i].id===azioniId){
+      if(rows[i].azioni && idx>=0 && idx<rows[i].azioni.length){
+        if(!confirm("Eliminare questa azione?")) return;
+        rows[i].azioni.splice(idx,1);
+        salva(); renderAzioni(); renderScad();
+      }
+      break;
+    }
+  }
 }
 function aggiungiAzione(){
   var data=document.getElementById("azData").value;var testo=document.getElementById("azTesto").value.trim();
