@@ -75,6 +75,7 @@ tr:hover td{background:#fafaf8}
     background:var(--verde-chiaro,#e6f0ef); border-radius:16px; padding:6px 14px; font-size:14px; }
   #bannerCliente{ display:none; }
   body.ruolo-cliente #bannerCliente{ display:block; }
+  .badge.bx{ background:#6b7280; color:#fff; }   /* corso escluso dallo scadenzario */
 </style>
 
 <div class="hdr">
@@ -212,6 +213,15 @@ tr:hover td{background:#fafaf8}
       <div class="fld"><label>Data esecuzione</label><input type="date" id="cData" onchange="calcScadenzaCorso()"></div>
       <div class="fld"><label>Validita (giorni)</label><input type="number" id="cValidita" value="1825" onchange="calcScadenzaCorso()"></div>
       <div class="fld"><label>Scadenza (calcolata)</label><input type="date" id="cScadenza"></div>
+    </div>
+    <div style="background:#f5f5f2;border-radius:8px;padding:10px 12px;margin-bottom:12px;border:1px solid #eee">
+      <label style="display:flex;align-items:center;gap:8px;margin:0;font-size:13px;font-weight:600;cursor:pointer">
+        <input type="checkbox" id="cEscluso" onchange="toggleEsclusoCorso()"> Non considerare nello scadenzario
+      </label>
+      <div class="fld" id="cMotivoWrap" style="display:none;margin-top:8px;margin-bottom:0">
+        <label>Motivazione dell'esclusione</label>
+        <textarea id="cMotivoEscl" rows="2" placeholder="Es. dipendente non più soggetto a questo corso, corso non pertinente…"></textarea>
+      </div>
     </div>
     <div class="g2">
       <div class="fld"><label>Ente formatore</label><input type="text" id="cEnte"></div>
@@ -393,11 +403,11 @@ function puoStruttura(){ return RUOLO==="studio" || LIVELLO>=3; }
 
 function addDays(s,d){return Fond.addGiorni(s,d);}
 function fmtDate(d){return Fond.fmtData(d);}
-function scadenzaCorso(c){if(c.validita>=99999)return null;return addDays(c.data,c.validita);}
-function statoCorso(c){var sc=scadenzaCorso(c);if(!sc)return "ok";return Fond.statoScad(sc,60);}
+function scadenzaCorso(c){if(c.escluso)return null;if(c.validita>=99999)return null;return addDays(c.data,c.validita);}
+function statoCorso(c){if(c.escluso)return "escluso";var sc=scadenzaCorso(c);if(!sc)return "ok";return Fond.statoScad(sc,60);}
 function diffCorso(c){var sc=scadenzaCorso(c);if(!sc)return null;return Fond.giorniA(sc);}
-var LBL={scaduta:"Scaduto",in_scadenza:"In scadenza",ok:"Ok"};
-var BCL={scaduta:"bs",in_scadenza:"bi",ok:"bo"};
+var LBL={scaduta:"Scaduto",in_scadenza:"In scadenza",ok:"Ok",escluso:"Escluso"};
+var BCL={scaduta:"bs",in_scadenza:"bi",ok:"bo",escluso:"bx"};
 var pendingCIDoc="";
 function statoCI(p){if(!p.ciScad)return "nd";return Fond.statoScad(p.ciScad,90);}
 function vaiACorso(azId,dipId,idx){if(aziId!==azId){aziId=azId;initSelAzi();renderAll();}openFormCorso(dipId,idx);}
@@ -418,7 +428,7 @@ function tuttiCorsi(){return tuttiCorsiAzi(aziId);}
 
 function renderDash(){
   var all=tuttiCorsi();var sc=0,ins=0,ok=0;
-  for(var i=0;i<all.length;i++){var s=statoCorso(all[i].corso);if(s==="scaduta")sc++;else if(s==="in_scadenza")ins++;else ok++;}
+  for(var i=0;i<all.length;i++){var s=statoCorso(all[i].corso);if(s==="scaduta")sc++;else if(s==="in_scadenza")ins++;else if(s==="ok")ok++;}
   document.getElementById("cS").textContent=sc;document.getElementById("cI").textContent=ins;document.getElementById("cO").textContent=ok;document.getElementById("cD").textContent=getDip().length;
   var nCI=0;var dipAll=getDip();for(var i=0;i<dipAll.length;i++){var sci=statoCI(dipAll[i]);if(sci==="scaduta"||sci==="in_scadenza")nCI++;}
   document.getElementById("cCI").textContent=nCI;
@@ -444,7 +454,7 @@ function renderPerPersona(){
     h+='<div class="persona-body" id="pers'+p.id+'"><div class="tw" style="border:none"><table><thead><tr><th>Corso</th><th>Data</th><th>Scadenza</th><th>Stato</th><th>Att.</th><th></th></tr></thead><tbody>';
     if(!p.corsi.length)h+='<tr><td colspan="6" style="color:#888;font-style:italic">Nessun corso</td></tr>';
     for(var j=0;j<p.corsi.length;j++){var c=p.corsi[j];var s=statoCorso(c);var sc=scadenzaCorso(c);
-      h+='<tr><td style="font-weight:600">'+c.nome+'</td><td>'+fmtDate(c.data)+'</td><td>'+(sc?fmtDate(sc):"Non scade")+'</td><td><span class="badge '+BCL[s]+'">'+LBL[s]+'</span></td><td>'+(c.docNome?'<span class="doc-chip">Doc</span>':'—')+'</td><td style="white-space:nowrap"><button class="only-studio" onclick="apriEmailCorso('+p.id+','+j+')" style="font-size:11px;padding:3px 7px;margin-right:4px" title="Anteprima email ai 3 destinatari">&#9993;</button><button onclick="openFormCorso('+p.id+','+j+')" style="font-size:11px;padding:3px 7px;margin-right:4px">'+(puoStruttura()?"Modifica":"Aggiorna data")+'</button><button class="only-struttura" onclick="eliminaCorso('+p.id+','+j+')" style="font-size:11px;padding:3px 7px;color:#c0392b">Elimina</button></td></tr>';
+      h+='<tr><td style="font-weight:600">'+c.nome+'</td><td>'+fmtDate(c.data)+'</td><td>'+(sc?fmtDate(sc):"Non scade")+'</td><td><span class="badge '+BCL[s]+'"'+(c.escluso&&c.motivoEsclusione?' title="'+String(c.motivoEsclusione).replace(/"/g,"&quot;")+'"':'')+'>'+LBL[s]+'</span>'+(c.escluso&&c.motivoEsclusione?'<div style="font-size:10px;color:#888;margin-top:2px">'+c.motivoEsclusione+'</div>':'')+'</td><td>'+(c.docNome?'<span class="doc-chip">Doc</span>':'—')+'</td><td style="white-space:nowrap"><button class="only-studio" onclick="apriEmailCorso('+p.id+','+j+')" style="font-size:11px;padding:3px 7px;margin-right:4px" title="Anteprima email ai 3 destinatari">&#9993;</button><button onclick="openFormCorso('+p.id+','+j+')" style="font-size:11px;padding:3px 7px;margin-right:4px">'+(puoStruttura()?"Modifica":"Aggiorna data")+'</button><button class="only-struttura" onclick="eliminaCorso('+p.id+','+j+')" style="font-size:11px;padding:3px 7px;color:#c0392b">Elimina</button></td></tr>';
     }
     h+='</tbody></table></div><div style="padding:10px 14px"><button class="bp only-struttura" style="font-size:12px;padding:5px 10px" onclick="openFormCorso('+p.id+',null)">+ Assegna corso</button></div></div></div>';
   }
@@ -536,11 +546,13 @@ function openFormCorso(dipId,idx){
   var dip=getDip();var p=null;for(var i=0;i<dip.length;i++){if(dip[i].id===dipId){p=dip[i];break;}}
   document.getElementById("mCorsoSub").textContent=p?p.nome:"";
   fillCorsoSelect(null);document.getElementById("cData").value="";document.getElementById("cValidita").value=1825;document.getElementById("cScadenza").value="";document.getElementById("cEnte").value="";document.getElementById("cOre").value="";document.getElementById("cDoc").value="";document.getElementById("docCurrent").innerHTML="";
+  document.getElementById("cEscluso").checked=false;document.getElementById("cMotivoEscl").value="";document.getElementById("cMotivoWrap").style.display="none";
   document.getElementById("cHasEmail").checked=false;document.getElementById("emailCorsoFields").style.display="none";
   document.getElementById("cPreavviso").value=60;document.getElementById("cEmailForm").value="";document.getElementById("cEA2").value="";document.getElementById("cTxtAdmin").value="";document.getElementById("cTxtForm").value="";document.getElementById("cTxtAzi").value="";document.getElementById("cAuto").checked=false;
   if(idx!==null&&p){var c=p.corsi[idx];fillCorsoSelect(c.nome);var inCat=false;for(var i=0;i<CATALOGO.length;i++){if(CATALOGO[i].nome===c.nome)inCat=true;}if(!inCat)document.getElementById("cCorso").value="__altro__";document.getElementById("cData").value=c.data;document.getElementById("cValidita").value=c.validita;document.getElementById("cEnte").value=c.ente||"";document.getElementById("cOre").value=c.ore||"";pendingDoc=c.docNome||"";if(c.docNome)document.getElementById("docCurrent").innerHTML='<span class="doc-chip">Doc '+c.docNome+'</span>';
     document.getElementById("cPreavviso").value=c.preavviso||60;document.getElementById("cEmailForm").value=c.emailForm||"";document.getElementById("cEA2").value=c.emailAzienda2||"";document.getElementById("cTxtAdmin").value=c.testoAdmin||"";document.getElementById("cTxtForm").value=c.testoFornitore||"";document.getElementById("cTxtAzi").value=c.testoAzienda||"";document.getElementById("cAuto").checked=!!c.invioAuto;
     if(c.testoAdmin||c.testoFornitore||c.testoAzienda||c.invioAuto){document.getElementById("cHasEmail").checked=true;document.getElementById("emailCorsoFields").style.display="block";}
+    document.getElementById("cEscluso").checked=!!c.escluso;document.getElementById("cMotivoEscl").value=c.motivoEsclusione||"";document.getElementById("cMotivoWrap").style.display=c.escluso?"block":"none";
     calcScadenzaCorso();}
   bloccaCampiCorso();
   document.getElementById("mCorso").classList.add("on");
@@ -549,7 +561,7 @@ function openFormCorso(dipId,idx){
 /* Cliente livello 2: nel form corso può toccare SOLO la data di esecuzione. */
 function bloccaCampiCorso(){
   var titolo=document.getElementById("mCorsoTit");
-  var strutt=["cCorso","cValidita","cEnte","cOre","cDoc","cEmailForm","cEA2","cHasEmail","cPreavviso","cTxtAdmin","cTxtForm","cTxtAzi","cAuto"];
+  var strutt=["cCorso","cValidita","cEnte","cOre","cDoc","cEmailForm","cEA2","cHasEmail","cPreavviso","cTxtAdmin","cTxtForm","cTxtAzi","cAuto","cEscluso","cMotivoEscl"];
   if(puoStruttura()){
     for(var i=0;i<strutt.length;i++){ var el=document.getElementById(strutt[i]); if(el) el.disabled=false; }
     var d0=document.getElementById("cData"); if(d0) d0.disabled=false;
@@ -562,6 +574,7 @@ function bloccaCampiCorso(){
 }
 function onDocSelected(){var f=document.getElementById("cDoc").files[0];if(f){pendingDoc=f.name;document.getElementById("docCurrent").innerHTML='<span class="doc-chip">Doc '+f.name+'</span> <span style="font-size:11px;color:#888">(salvato con Firebase nella versione finale)</span>';}}
 function toggleEmailCorso(){document.getElementById("emailCorsoFields").style.display=document.getElementById("cHasEmail").checked?"block":"none";}
+function toggleEsclusoCorso(){document.getElementById("cMotivoWrap").style.display=document.getElementById("cEscluso").checked?"block":"none";}
 function salvaCorso(){
   /* Cliente livello 2: aggiorna SOLO la data del corso esistente. */
   if(!puoStruttura()){
@@ -572,7 +585,7 @@ function salvaCorso(){
     for(var i=0;i<dipL.length;i++){ if(dipL[i].id===corsoDipId){ dipL[i].corsi[corsoIdx].data=dataNew; break; } }
     chiudiModal("mCorso"); salva(); renderAll(); return;
   }
-  var nome=document.getElementById("cCorso").value;if(nome==="__altro__"){nome=prompt("Nome del corso personalizzato:")||"";if(!nome)return;}var data=document.getElementById("cData").value;if(!data){alert("Inserisci la data");return;}var c={nome:nome,data:data,validita:Number(document.getElementById("cValidita").value),ente:document.getElementById("cEnte").value,ore:document.getElementById("cOre").value,docNome:pendingDoc,preavviso:Number(document.getElementById("cPreavviso").value),emailForm:document.getElementById("cEmailForm").value,emailAzienda2:document.getElementById("cEA2").value,testoAdmin:document.getElementById("cTxtAdmin").value,testoFornitore:document.getElementById("cTxtForm").value,testoAzienda:document.getElementById("cTxtAzi").value,invioAuto:document.getElementById("cAuto").checked};var dip=getDip();for(var i=0;i<dip.length;i++){if(dip[i].id===corsoDipId){if(corsoIdx===null)dip[i].corsi.push(c);else dip[i].corsi[corsoIdx]=c;break;}}chiudiModal("mCorso");salva();renderAll();}
+  var nome=document.getElementById("cCorso").value;if(nome==="__altro__"){nome=prompt("Nome del corso personalizzato:")||"";if(!nome)return;}var data=document.getElementById("cData").value;if(!data){alert("Inserisci la data");return;}var c={nome:nome,data:data,validita:Number(document.getElementById("cValidita").value),ente:document.getElementById("cEnte").value,ore:document.getElementById("cOre").value,docNome:pendingDoc,preavviso:Number(document.getElementById("cPreavviso").value),emailForm:document.getElementById("cEmailForm").value,emailAzienda2:document.getElementById("cEA2").value,testoAdmin:document.getElementById("cTxtAdmin").value,testoFornitore:document.getElementById("cTxtForm").value,testoAzienda:document.getElementById("cTxtAzi").value,invioAuto:document.getElementById("cAuto").checked,escluso:document.getElementById("cEscluso").checked,motivoEsclusione:document.getElementById("cMotivoEscl").value};var dip=getDip();for(var i=0;i<dip.length;i++){if(dip[i].id===corsoDipId){if(corsoIdx===null)dip[i].corsi.push(c);else dip[i].corsi[corsoIdx]=c;break;}}chiudiModal("mCorso");salva();renderAll();}
 
 function apriEmailCorso(dipId,idx){
   var dip=getDip();var p=null;for(var i=0;i<dip.length;i++){if(dip[i].id===dipId){p=dip[i];break;}}
@@ -643,7 +656,7 @@ function renderConsulente(){
   popolaFiltriConsulente();
   /* tabella riepilogo per azienda */
   var h='<div class="tw"><table><thead><tr><th>Azienda</th><th>Scaduti</th><th>In scadenza</th><th>Regolari</th><th>Dipendenti</th></tr></thead><tbody>';
-  for(var a=0;a<AZIENDE.length;a++){var all=tuttiCorsiAzi(AZIENDE[a].id);var sc=0,ins=0,ok=0;for(var i=0;i<all.length;i++){var s=statoCorso(all[i].corso);if(s==="scaduta")sc++;else if(s==="in_scadenza")ins++;else ok++;}
+  for(var a=0;a<AZIENDE.length;a++){var all=tuttiCorsiAzi(AZIENDE[a].id);var sc=0,ins=0,ok=0;for(var i=0;i<all.length;i++){var s=statoCorso(all[i].corso);if(s==="scaduta")sc++;else if(s==="in_scadenza")ins++;else if(s==="ok")ok++;}
     h+='<tr><td style="font-weight:600">'+AZIENDE[a].nome+'</td><td><span class="badge bs">'+sc+'</span></td><td><span class="badge bi">'+ins+'</span></td><td><span class="badge bo">'+ok+'</span></td><td style="font-weight:600">'+(DIP[AZIENDE[a].id]||[]).length+'</td></tr>';
   }
   h+='</tbody></table></div>';

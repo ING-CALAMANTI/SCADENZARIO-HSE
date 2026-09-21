@@ -191,12 +191,55 @@ var Store = (function(){
     });
   }
 
+  /* ================================================================
+     ANNULLA ("torna indietro") — cronologia delle modifiche
+     ----------------------------------------------------------------
+     Prima di ogni salvataggio memorizziamo lo stato PRECEDENTE del
+     documento. "Annulla" riscrive quel valore. La cronologia sta in
+     sessionStorage: sopravvive ai ricaricamenti della stessa scheda
+     (l'annulla ricarica la pagina), così si possono annullare più
+     modifiche di fila. È per-scheda del browser e non condivisa.
+     ================================================================ */
+  var _cache = {};                                  // percorso doc -> ultimo valore noto
+  var UNDO_KEY = "scad_undo_" + WORKSPACE;
+  var UNDO_MAX = 12;                                // profondità massima cronologia
+  function _pathDi(scope, aziId, key){ return scope==="azienda" ? ("azi:"+aziId+":"+key) : ("mod:"+key); }
+  function _cacheSet(scope, aziId, key, payload){ _cache[_pathDi(scope,aziId,key)] = payload; }
+  function _stackGet(){ try{ var r=sessionStorage.getItem(UNDO_KEY); return r?JSON.parse(r):[]; }catch(e){ return []; } }
+  function _stackSet(s){ try{ sessionStorage.setItem(UNDO_KEY, JSON.stringify(s)); }catch(e){ /* quota piena: si degrada senza errori */ } }
+  function _pushUndo(scope, aziId, key, etichetta){
+    var p = _pathDi(scope, aziId, key);
+    if(!(p in _cache)) return;                      // nessun "prima" noto: niente punto di annullo
+    var s = _stackGet();
+    s.push({ scope:scope, aziId:aziId, key:key, payload:_cache[p], t:Date.now(), et:(etichetta||"") });
+    while(s.length > UNDO_MAX) s.shift();
+    _stackSet(s);
+  }
+  /* undo() -> Promise<boolean> : ripristina l'ultimo stato salvato. */
+  function undo(){
+    var s=_stackGet();
+    if(!s.length) return Promise.resolve(false);
+    var e=s.pop(); _stackSet(s);
+    if(!useFirebase){ _localSave(e.scope==="azienda"?("azi_"+e.aziId+"_"+e.key):e.key, e.payload); return Promise.resolve(true); }
+    return _awaitUid().then(function(){
+      var ref = e.scope==="azienda" ? _docAzi(e.aziId, e.key) : _doc(e.key);
+      return ref.set({ payload:e.payload, aggiornato:Date.now() }).then(function(){
+        _cacheSet(e.scope, e.aziId, e.key, e.payload);
+        return true;
+      });
+    }).catch(function(err){ console.warn("[Store] undo fallito:", err); return false; });
+  }
+  function canUndo(){ return _stackGet().length > 0; }
+  function undoCount(){ return _stackGet().length; }
+
   /* loadAzienda(aziId, chiave) -> Promise<oggetto|null> */
   function loadAzienda(aziId, key){
     if(!useFirebase) return Promise.resolve(_localLoad("azi_"+aziId+"_"+key));
     return _awaitUid().then(function(){
       return _docAzi(aziId, key).get().then(function(snap){
-        return (snap.exists && snap.data()) ? snap.data().payload : null;
+        var payload = (snap.exists && snap.data()) ? snap.data().payload : null;
+        _cacheSet("azienda", aziId, key, payload);   // semina la cronologia
+        return payload;
       });
     }).catch(function(e){ console.warn("[Store] loadAzienda fallito:", e); return null; });
   }
@@ -205,6 +248,8 @@ var Store = (function(){
   function saveAzienda(aziId, key, obj){
     if(!useFirebase){ _localSave("azi_"+aziId+"_"+key, obj); return Promise.resolve(); }
     return _awaitUid().then(function(){
+      _pushUndo("azienda", aziId, key);              // salva lo stato precedente per "Annulla"
+      _cacheSet("azienda", aziId, key, obj);
       return _docAzi(aziId, key).set({ payload: obj, aggiornato: Date.now() });
     }).catch(function(e){ console.warn("[Store] saveAzienda fallito:", e); });
   }
@@ -241,7 +286,9 @@ var Store = (function(){
     return _awaitUid().then(function(){
       return _doc(key).get()
         .then(function(snap){
-          return (snap.exists && snap.data()) ? snap.data().payload : null;
+          var payload = (snap.exists && snap.data()) ? snap.data().payload : null;
+          _cacheSet("moduli", null, key, payload);   // semina la cronologia
+          return payload;
         });
     }).catch(function(e){
       console.warn("[Store] load Firebase fallito:", e);
@@ -253,6 +300,8 @@ var Store = (function(){
   function save(key, obj){
     if(!useFirebase){ _localSave(key, obj); return Promise.resolve(); }
     return _awaitUid().then(function(){
+      _pushUndo("moduli", null, key);                // salva lo stato precedente per "Annulla"
+      _cacheSet("moduli", null, key, obj);
       return _doc(key).set({ payload: obj, aggiornato: Date.now() });
     }).catch(function(e){
       console.warn("[Store] save Firebase fallito:", e);
@@ -318,6 +367,10 @@ var Store = (function(){
     loadAzienda: loadAzienda,
     saveAzienda: saveAzienda,
     listUsers: listUsers,
-    setAssegnazione: setAssegnazione
+    setAssegnazione: setAssegnazione,
+    /* --- annulla ("torna indietro") --- */
+    undo: undo,
+    canUndo: canUndo,
+    undoCount: undoCount
   };
 })();

@@ -121,14 +121,51 @@
     userbar.style.display = "flex";
   }
 
+  /* --- Pulsante "Annulla ultima modifica": compare quando c'è qualcosa da
+         annullare (vedi Store.undo in firebase-init.js). Ricarica la pagina
+         dopo l'annullo, così il modulo rilegge i dati ripristinati. --- */
+  var undoBar = null;
+  function creaUndoBar(){
+    if(undoBar || typeof Store === "undefined" || !Store.undo) return;
+    undoBar = document.createElement("button");
+    undoBar.id = "auth-undo"; undoBar.type = "button";
+    undoBar.textContent = "↶ Annulla ultima modifica";
+    undoBar.title = "Riporta i dati allo stato precedente l'ultima modifica salvata";
+    undoBar.style.cssText = "position:fixed;bottom:12px;left:50%;transform:translateX(-50%);z-index:9998;"
+      + "display:none;border:0;border-radius:18px;background:#8a5a1a;color:#fff;cursor:pointer;"
+      + "padding:8px 16px;box-shadow:0 2px 8px rgba(0,0,0,.28);"
+      + "font:600 12px -apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif";
+    undoBar.addEventListener("click", function(){
+      if(!Store.canUndo()) return;
+      if(!confirm("Annullare l'ultima modifica? I dati torneranno allo stato precedente.")) return;
+      undoBar.disabled = true; undoBar.textContent = "Annullo…";
+      Store.undo().then(function(ok){
+        if(ok){ location.reload(); }
+        else { alert("Non è stato possibile annullare."); aggiornaUndo(); }
+      });
+    });
+    document.body.appendChild(undoBar);
+  }
+  function aggiornaUndo(){
+    if(!undoBar) return;
+    if(typeof Store !== "undefined" && Store.canUndo && Store.canUndo()){
+      undoBar.style.display = "block"; undoBar.disabled = false;
+      undoBar.textContent = "↶ Annulla ultima modifica";
+    } else { undoBar.style.display = "none"; }
+  }
+
   function start(){
     buildOverlay();
+    creaUndoBar();
+    setInterval(aggiornaUndo, 1200);   // mostra/nasconde il pulsante quando cambia la cronologia
     firebase.auth().onAuthStateChanged(function(user){
       if(user){
         overlay.style.display = "none";
         mostraUserbar(user);
+        aggiornaUndo();
       }else{
         if(userbar) userbar.style.display = "none";
+        if(undoBar) undoBar.style.display = "none";
         var ld = overlay.querySelector("#auth-loading"); if(ld) ld.style.display = "none";
         var card = overlay.querySelector("#auth-card"); if(card) card.style.display = "";
         overlay.style.display = "flex";
