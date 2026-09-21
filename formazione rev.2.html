@@ -106,10 +106,10 @@ tr:hover td{background:#fafaf8}
 <!-- DASHBOARD -->
 <div class="pg on" id="p0">
   <div class="cards">
-    <div class="card cr"><div class="l">Scaduti</div><div class="n" id="cS">0</div></div>
-    <div class="card co"><div class="l">In scadenza</div><div class="n" id="cI">0</div></div>
-    <div class="card cg"><div class="l">Regolari</div><div class="n" id="cO">0</div></div>
-    <div class="card"><div class="l">Dipendenti</div><div class="n" id="cD">0</div></div>
+    <div class="card cr" style="cursor:pointer" onclick="vaiPersone('scaduta')" title="Vedi i dipendenti con corsi scaduti"><div class="l">Scaduti</div><div class="n" id="cS">0</div></div>
+    <div class="card co" style="cursor:pointer" onclick="vaiPersone('in_scadenza')" title="Vedi i dipendenti con corsi in scadenza"><div class="l">In scadenza</div><div class="n" id="cI">0</div></div>
+    <div class="card cg" style="cursor:pointer" onclick="vaiPersone('tutti')" title="Vedi tutti i dipendenti e i corsi"><div class="l">Regolari</div><div class="n" id="cO">0</div></div>
+    <div class="card" style="cursor:pointer" onclick="vaiPersone('tutti')" title="Vedi l'elenco per persona"><div class="l">Dipendenti</div><div class="n" id="cD">0</div></div>
     <div class="card" style="cursor:pointer" onclick="showTab(3)" title="Vai a Dipendenti"><div class="l">C.I. scadute/in scad.</div><div class="n" id="cCI">0</div></div>
   </div>
   <p style="font-size:13px;font-weight:600;color:#555;margin-bottom:10px;text-transform:uppercase;letter-spacing:.4px">Corsi urgenti</p>
@@ -426,6 +426,12 @@ function showTab(i){for(var j=0;j<6;j++){document.getElementById("p"+j).classLis
 function tuttiCorsiAzi(azId){var dip=DIP[azId]||[];var out=[];for(var i=0;i<dip.length;i++){for(var j=0;j<dip[i].corsi.length;j++){out.push({dip:dip[i],corso:dip[i].corsi[j],idx:j});}}return out;}
 function tuttiCorsi(){return tuttiCorsiAzi(aziId);}
 
+/* Dalla dashboard: vai alla scheda "Per persona" filtrando per stato. */
+function vaiPersone(stato){
+  showTab(1);
+  var f=document.getElementById("filtroStatoP"); if(f) f.value=stato||"tutti";
+  renderPerPersona();
+}
 function renderDash(){
   var all=tuttiCorsi();var sc=0,ins=0,ok=0;
   for(var i=0;i<all.length;i++){var s=statoCorso(all[i].corso);if(s==="scaduta")sc++;else if(s==="in_scadenza")ins++;else if(s==="ok")ok++;}

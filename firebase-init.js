@@ -204,7 +204,10 @@ var Store = (function(){
   var UNDO_KEY = "scad_undo_" + WORKSPACE;
   var UNDO_MAX = 12;                                // profondità massima cronologia
   function _pathDi(scope, aziId, key){ return scope==="azienda" ? ("azi:"+aziId+":"+key) : ("mod:"+key); }
-  function _cacheSet(scope, aziId, key, payload){ _cache[_pathDi(scope,aziId,key)] = payload; }
+  /* Copia PROFONDA: la cronologia deve essere una fotografia indipendente,
+     altrimenti le modifiche "in place" del modulo la altererebbero. */
+  function _clona(x){ try{ return x==null ? x : JSON.parse(JSON.stringify(x)); }catch(e){ return x; } }
+  function _cacheSet(scope, aziId, key, payload){ _cache[_pathDi(scope,aziId,key)] = _clona(payload); }
   function _stackGet(){ try{ var r=sessionStorage.getItem(UNDO_KEY); return r?JSON.parse(r):[]; }catch(e){ return []; } }
   function _stackSet(s){ try{ sessionStorage.setItem(UNDO_KEY, JSON.stringify(s)); }catch(e){ /* quota piena: si degrada senza errori */ } }
   function _pushUndo(scope, aziId, key, etichetta){
