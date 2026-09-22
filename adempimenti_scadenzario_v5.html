@@ -68,6 +68,27 @@ tr:hover td{background:#fafaf8}
     background:var(--verde-chiaro,#e6f0ef); border-radius:16px; padding:6px 14px; font-size:14px; }
   #bannerCliente{ display:none; }
   body.ruolo-cliente #bannerCliente{ display:block; }
+
+  /* ---- Stampa / PDF dello scadenzario ---- */
+  #printHeader{ display:none; }
+  @media print{
+    /* nascondi tutto ciò che non è la tabella dello scadenzario */
+    .hdr, .nav, #bannerCliente, .tb, .info-box,
+    #auth-userbar, #auth-undo, #nav-home, #store-stato,
+    .no-print{ display:none !important; }
+    .pg{ display:none !important; }
+    #p1{ display:block !important; }
+    #printHeader{ display:block !important; margin:0 0 10px; }
+    #printHeader h2{ margin:0 0 2px; font-size:16px; }
+    #printHeader .meta{ font-size:11px; color:#333; }
+    body{ background:#fff !important; margin:0; }
+    .tw{ overflow:visible !important; border:0 !important; }
+    table{ width:100%; border-collapse:collapse; font-size:10.5px; }
+    thead{ display:table-header-group; }          /* ripete l'intestazione a ogni pagina */
+    th, td{ border:1px solid #999; padding:3px 5px; text-align:left; vertical-align:top; }
+    tr{ page-break-inside:avoid; }
+    @page{ margin:12mm; }
+  }
 </style>
 
 <div class="hdr">
@@ -146,12 +167,14 @@ tr:hover td{background:#fafaf8}
       <option value="ok">Regolari</option>
     </select>
     <button class="bp only-struttura" onclick="openFormAdemp(null)">+ Nuovo</button>
+    <button class="bp" onclick="stampaScadenzario()" title="Stampa o salva in PDF lo scadenzario visualizzato">&#128424; Stampa / PDF</button>
   </div>
+  <div id="printHeader"></div>
   <div class="tw">
     <table>
       <thead><tr>
         <th class="colAzienda" style="display:none">Azienda</th><th>Aspetto</th><th>Adempimento</th><th>Rif. Legislativo</th><th>Freq.</th>
-        <th>Ultima esec.</th><th>Scadenza</th><th>Giorni</th><th>Stato</th><th>Doc</th><th>Note</th><th></th>
+        <th>Ultima esec.</th><th>Scadenza</th><th>Giorni</th><th>Stato</th><th>Doc</th><th class="no-print">Azioni</th><th class="no-print"></th>
       </tr></thead>
       <tbody id="tbodyScad"></tbody>
     </table>
@@ -721,6 +744,23 @@ function fillFiltroAspetto(){
   sel.value=ok?cur:"__tutti__";
 }
 
+/* Stampa / PDF: prepara un'intestazione e apre la stampa del browser.
+   Stampa esattamente lo scadenzario visualizzato (rispetta i filtri attivi). */
+function stampaScadenzario(){
+  showTab(1); renderScad();
+  var scope=document.getElementById("scadScope");
+  var tutteAz = scope && scope.value==="tutte";
+  var azi = (typeof getAzi==="function" && getAzi()) ? getAzi().nome : "";
+  var stSel=document.getElementById("filtroStato");
+  var st = stSel ? stSel.options[stSel.selectedIndex].text : "";
+  var oggi = (typeof Fond!=="undefined" && Fond.oggiIT) ? Fond.oggiIT() : new Date().toLocaleDateString("it-IT");
+  var meta = "Azienda: <b>" + (tutteAz ? "Tutte le aziende" : (azi||"—")) + "</b>"
+           + " &nbsp;·&nbsp; Filtro stato: " + (st||"Tutti")
+           + " &nbsp;·&nbsp; Stampato il " + oggi;
+  var ph=document.getElementById("printHeader");
+  if(ph){ ph.innerHTML = '<h2>Scadenzario Adempimenti di Sicurezza</h2><div class="meta">'+meta+'</div>'; }
+  setTimeout(function(){ window.print(); }, 80);
+}
 function renderScad(){
   fillFiltroAspetto();
   var multi=AZIENDE.length>1;
@@ -776,8 +816,8 @@ function renderScad(){
     h+='<td style="'+dCol+';font-weight:600">'+dTxt+'</td>';
     h+='<td><span class="badge '+BCL[s]+'">'+LBL[s]+'</span></td>';
     h+='<td>'+(r.docNome?'<span class="doc-chip" title="'+r.docNome+'">Doc</span>':'—')+'</td>';
-    h+='<td><button class="only-studio" onclick="openAzioniAz('+x.aziId+','+r.id+')" style="font-size:11px;padding:3px 8px">Azioni ('+nAz+')</button></td>';
-    h+='<td style="white-space:nowrap">';
+    h+='<td class="no-print"><button class="only-studio" onclick="openAzioniAz('+x.aziId+','+r.id+')" style="font-size:11px;padding:3px 8px">Azioni ('+nAz+')</button></td>';
+    h+='<td class="no-print" style="white-space:nowrap">';
     h+='<button onclick="openFormAdempAz('+x.aziId+','+r.id+')" style="margin-right:4px;font-size:11px;padding:3px 7px">'+(puoStruttura()?"Modifica":"Aggiorna data")+'</button>';
     h+='<button class="only-studio" onclick="apriEmailAz('+x.aziId+','+r.id+')" style="margin-right:4px;font-size:11px;padding:3px 7px">Email</button>';
     h+='<button class="only-struttura" onclick="eliminaAdempAz('+x.aziId+','+r.id+')" style="color:#c0392b;font-size:11px;padding:3px 7px">Elimina</button>';
