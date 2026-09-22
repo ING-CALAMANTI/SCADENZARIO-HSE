@@ -131,7 +131,7 @@ label{font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:3px;
 <div class="filtri" style="margin-top:12px;">
 <select id="f-azienda" class="only-studio" onchange="disegnaDiario()"><option value="">Tutte le aziende</option></select>
 <select id="f-tipo" onchange="disegnaDiario()">
-<option value="">Tutti i tipi</option><option>Sopralluogo</option><option>Incontro con responsabili</option><option>Verifica specifica</option><option>Audit completo</option>
+<option value="">Tutti i tipi</option><option>Sopralluogo</option><option>Incontro con responsabili</option><option>Verifica specifica</option><option>Audit completo</option><option>Attività varie</option>
 </select>
 </div>
 </div>
@@ -175,11 +175,11 @@ label{font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:3px;
 
 <!-- MODAL ATTIVITÀ -->
 <div class="modal-bg" id="m-attivita"><div class="modal">
-<h3>Nuova attività</h3>
+<h3 id="m-attivita-tit">Nuova attività</h3>
 <div class="riga3">
 <div><label>Data</label><input type="date" id="a-data"></div>
 <div><label>Azienda</label><select id="a-azienda"><option value="">— seleziona azienda —</option></select></div>
-<div><label>Tipo</label><select id="a-tipo"><option>Sopralluogo</option><option>Incontro con responsabili</option><option>Verifica specifica</option><option>Audit completo</option></select></div>
+<div><label>Tipo</label><select id="a-tipo"><option>Sopralluogo</option><option>Incontro con responsabili</option><option>Verifica specifica</option><option>Audit completo</option><option>Attività varie</option></select></div>
 </div>
 <label>Area / Reparto</label><input id="a-area" placeholder="Es. Area colaggio e spruzzo">
 <label>Note <button type="button" class="secondario piccolo" onclick="detta('a-note',this)">Detta</button></label><textarea id="a-note" placeholder="Argomenti trattati, presenti, osservazioni"></textarea>
@@ -518,22 +518,47 @@ function disegnaDiario(){
       </div>`;
     }).join('')}
     <button class="azione piccolo only-studio" onclick="apriModalRilievo(${a.id})">Aggiungi rilievo</button>
+    <button class="secondario piccolo only-studio" onclick="apriModalAttivita(${a.id})">Modifica attività</button>
     <button class="secondario piccolo only-studio" onclick="eliminaAttivita(${a.id})">Elimina attività</button>
    </div>
   </div>`;
  });
  document.getElementById('lista-attivita').innerHTML=html||'<div class="pannello">Nessuna attività registrata.</div>';
 }
-function apriModalAttivita(){
- document.getElementById('a-data').value=new Date().toISOString().slice(0,10);
- document.getElementById('a-azienda').value='';document.getElementById('a-area').value='';document.getElementById('a-note').value='';
+var editAttId=null;   /* id dell'attività in modifica (null = nuova) */
+function apriModalAttivita(id){
+ editAttId = id || null;
+ var tit=document.getElementById('m-attivita-tit');
+ if(editAttId){
+   var a=attivita.find(function(x){return x.id===editAttId;});
+   if(a){
+     if(tit) tit.textContent='Modifica attività';
+     document.getElementById('a-data').value=a.data||'';
+     document.getElementById('a-azienda').value=a.azienda||'';
+     document.getElementById('a-tipo').value=a.tipo||'Sopralluogo';
+     document.getElementById('a-area').value=a.area||'';
+     document.getElementById('a-note').value=a.note||'';
+   }
+ } else {
+   if(tit) tit.textContent='Nuova attività';
+   document.getElementById('a-data').value=new Date().toISOString().slice(0,10);
+   document.getElementById('a-azienda').value='';document.getElementById('a-tipo').value='Sopralluogo';
+   document.getElementById('a-area').value='';document.getElementById('a-note').value='';
+ }
  document.getElementById('m-attivita').style.display='block';
 }
 function salvaAttivita(){
  const az=document.getElementById('a-azienda').value.trim();
  if(!az){alert('Inserire l\'azienda.');return;}
- attivita.push({id:prossimoIdAtt++,data:document.getElementById('a-data').value,azienda:az,tipo:document.getElementById('a-tipo').value,area:document.getElementById('a-area').value.trim(),note:document.getElementById('a-note').value.trim(),rilievi:[]});
+ var dati={data:document.getElementById('a-data').value,azienda:az,tipo:document.getElementById('a-tipo').value,area:document.getElementById('a-area').value.trim(),note:document.getElementById('a-note').value.trim()};
+ if(editAttId){
+   var a=attivita.find(function(x){return x.id===editAttId;});
+   if(a){ a.data=dati.data; a.azienda=dati.azienda; a.tipo=dati.tipo; a.area=dati.area; a.note=dati.note; }
+ } else {
+   attivita.push({id:prossimoIdAtt++,data:dati.data,azienda:dati.azienda,tipo:dati.tipo,area:dati.area,note:dati.note,rilievi:[]});
+ }
  salva();
+ editAttId=null;
  chiudi('m-attivita');disegnaDiario();
 }
 function eliminaAttivita(id){if(confirm('Eliminare l\'attività e tutti i suoi rilievi?')){attivita=attivita.filter(a=>a.id!==id);salva();disegnaDiario();}}
