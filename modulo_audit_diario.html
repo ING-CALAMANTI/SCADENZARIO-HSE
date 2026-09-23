@@ -81,6 +81,9 @@ label{font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:3px;
     background:var(--verde-chiaro,#e6f0ef); border-radius:16px; padding:7px 14px; font-size:13px; }
   #bannerCliente{ display:none; }
   body.ruolo-cliente #bannerCliente{ display:block; }
+  /* Funzioni IA nascoste (non attive sul sito pubblico). Per riattivarle: togliere
+     questa regola. Servono comunque una chiave Anthropic + un piccolo proxy server. */
+  .ia-feature{ display:none !important; }
 </style>
 
 <header style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px">
@@ -193,6 +196,9 @@ label{font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:3px;
 <input id="ril-cerca" placeholder="Digita per cercare nel catalogo" oninput="suggerisci()" autocomplete="off">
 <div id="ril-suggerimenti" style="max-height:160px;overflow:auto;border:1px solid var(--bordo);border-radius:4px;display:none;margin-bottom:10px;"></div>
 <div id="ril-scelto" style="display:none;background:var(--verde-chiaro);padding:10px;border-radius:4px;margin-bottom:10px;font-size:12px;"></div>
+<div style="text-align:center;color:#999;font-size:12px;margin:2px 0 8px">— oppure —</div>
+<label>Appunto / rilievo libero (fuori catalogo) <button type="button" class="secondario piccolo" onclick="detta('ril-libero',this)">Detta</button></label>
+<input id="ril-libero" placeholder="Es. Da verificare con il responsabile alla prossima visita" autocomplete="off">
 <label>Note specifiche del rilievo (ubicazione, dettagli) <button type="button" class="secondario piccolo" onclick="detta('ril-note',this)">Detta</button></label>
 <textarea id="ril-note" placeholder="Es. Estintore n. 7, parete lato forno"></textarea>
 <label>Foto (scatta o carica dalla galleria)</label>
@@ -200,11 +206,11 @@ label{font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:3px;
 <input type="file" id="ril-foto" accept="image/*" multiple onchange="anteprimaFoto()" style="margin:0">
 </div>
 <div class="foto-anteprima" id="ril-anteprima"></div>
-<div style="margin:0 0 10px">
+<div class="ia-feature" style="margin:0 0 10px">
 <button class="secondario piccolo" id="ril-ia-btn" onclick="analizzaFotoIA()">Analizza foto con IA</button>
 <span id="ril-ia-stato" style="font-size:12px;color:#666;margin-left:8px"></span>
 </div>
-<div id="ril-ia-risultato" style="display:none;background:var(--verde-chiaro);padding:10px;border-radius:4px;margin-bottom:10px;font-size:12px;"></div>
+<div id="ril-ia-risultato" class="ia-feature" style="display:none;background:var(--verde-chiaro);padding:10px;border-radius:4px;margin-bottom:10px;font-size:12px;"></div>
 <label>Stato</label>
 <select id="ril-stato"><option>Aperto</option><option>In corso</option><option>Risolto</option></select>
 <div style="text-align:right"><button class="secondario" onclick="chiudi('m-rilievo')">Annulla</button> <button class="azione" onclick="salvaRilievo()">Salva rilievo</button></div>
@@ -213,7 +219,7 @@ label{font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:3px;
 <!-- MODAL CATALOGO -->
 <div class="modal-bg" id="m-catalogo"><div class="modal">
 <h3 id="mc-titolo">Nuovo rilievo a catalogo</h3>
-<div style="background:var(--verde-chiaro);padding:12px;border-radius:5px;margin-bottom:14px;">
+<div class="ia-feature" style="background:var(--verde-chiaro);padding:12px;border-radius:5px;margin-bottom:14px;">
 <label>Genera la scheda con l'IA — descrivi la criticità in poche parole <button type="button" class="secondario piccolo" onclick="detta('mc-ia-testo',this)">Detta</button></label>
 <textarea id="mc-ia-testo" style="min-height:50px" placeholder="Es. Bombole di ossigeno stoccate in officina senza catene di fissaggio"></textarea>
 <button class="azione piccolo" id="mc-ia-btn" onclick="generaSchedaIA()">Genera con IA</button>
@@ -396,7 +402,7 @@ function disegnaDashboard(){
   a.rilievi.forEach((r,i)=>{
    if(r.stato==='Risolto')return;
    const c=catalogo.find(x=>x.id===r.idCat);
-   righe+=`<tr style="cursor:pointer" onclick="apriDaDashboard(${a.id},${i})"><td>${dataIt(a.data)}</td><td>${a.azienda}</td><td>${a.area||''}</td><td><strong>${c?c.tit:'—'}</strong><br><span style="color:#666">${r.note||''}</span></td><td>${badgeStato(r.stato)}</td></tr>`;
+   righe+=`<tr style="cursor:pointer" onclick="apriDaDashboard(${a.id},${i})"><td>${dataIt(a.data)}</td><td>${a.azienda}</td><td>${a.area||''}</td><td><strong>${c?c.tit:(r.titoloLibero||'Appunto libero')}</strong><br><span style="color:#666">${r.note||''}</span></td><td>${badgeStato(r.stato)}</td></tr>`;
   });
  });
  document.getElementById('tbl-aperti').innerHTML=righe||'<tr><td colspan="5">Nessun rilievo aperto.</td></tr>';
@@ -501,7 +507,7 @@ function disegnaDiario(){
     ${a.rilievi.map((r,i)=>{
       const c=catalogo.find(x=>x.id===r.idCat);
       return `<div class="rilievo" id="ril-${a.id}-${i}">
-       <h4>${c?c.tit:'Rilievo'} ${badgeStato(r.stato)}</h4>
+       <h4>${c?c.tit:(r.titoloLibero||'Appunto libero')}${c?'':' <span style="font-size:11px;color:#888;font-weight:400">(fuori catalogo)</span>'} ${badgeStato(r.stato)}</h4>
        ${r.note?`<p><strong>Note:</strong> ${r.note}</p>`:''}
        <p>${c?c.des:''}</p>
        <p>${c?c.nor.map(n=>`<span class="etichetta-norma">${n}</span>`).join(''):''}</p>
@@ -581,7 +587,7 @@ function aggiungiFotoRilievo(idAtt,idx){
 /* ============ NUOVO RILIEVO ============ */
 function apriModalRilievo(idAtt){
  attivitaCorrente=idAtt;catScelto=null;fotoTemp=[];
- document.getElementById('ril-cerca').value='';document.getElementById('ril-note').value='';
+ document.getElementById('ril-cerca').value='';document.getElementById('ril-note').value='';document.getElementById('ril-libero').value='';
  document.getElementById('ril-scelto').style.display='none';
  document.getElementById('ril-suggerimenti').style.display='none';
  document.getElementById('ril-foto').value='';document.getElementById('ril-anteprima').innerHTML='';
@@ -613,8 +619,11 @@ function anteprimaFoto(){
  });
 }
 function salvaRilievo(){
- if(!catScelto){alert('Selezionare un rilievo dal catalogo.');return;}
- attivita.find(a=>a.id===attivitaCorrente).rilievi.push({idCat:catScelto,note:document.getElementById('ril-note').value.trim(),stato:document.getElementById('ril-stato').value,foto:fotoTemp.slice()});
+ const libero=document.getElementById('ril-libero').value.trim();
+ if(!catScelto && !libero){alert('Seleziona un rilievo dal catalogo oppure scrivi un appunto/rilievo libero.');return;}
+ const ril={idCat:catScelto||null,note:document.getElementById('ril-note').value.trim(),stato:document.getElementById('ril-stato').value,foto:fotoTemp.slice()};
+ if(!catScelto && libero){ ril.titoloLibero=libero; }   /* rilievo fuori catalogo */
+ attivita.find(a=>a.id===attivitaCorrente).rilievi.push(ril);
  salva();
  chiudi('m-rilievo');disegnaDiario();
 }
