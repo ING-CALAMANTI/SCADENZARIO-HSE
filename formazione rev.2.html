@@ -76,6 +76,25 @@ tr:hover td{background:#fafaf8}
   #bannerCliente{ display:none; }
   body.ruolo-cliente #bannerCliente{ display:block; }
   .badge.bx{ background:#6b7280; color:#fff; }   /* corso escluso dallo scadenzario */
+
+  /* ---- Stampa / PDF della situazione formazione ---- */
+  #formazionePrint{ display:none; }
+  @media print{
+    .hdr, .nav, #bannerCliente, .tb, .info-box,
+    #auth-userbar, #auth-undo, #nav-home, #store-stato{ display:none !important; }
+    .pg{ display:none !important; }
+    #p1{ display:block !important; }
+    #perPersonaList{ display:none !important; }
+    #formazionePrint{ display:block !important; }
+    #formazionePrint h2{ margin:0 0 2px; font-size:16px; }
+    #formazionePrint .pmeta{ font-size:11px; color:#333; margin-bottom:3px; }
+    body{ background:#fff !important; margin:0; }
+    #formazionePrint table{ width:100%; border-collapse:collapse; font-size:10.5px; margin-top:8px; }
+    #formazionePrint thead{ display:table-header-group; }
+    #formazionePrint th, #formazionePrint td{ border:1px solid #999; padding:3px 5px; text-align:left; }
+    #formazionePrint tr{ page-break-inside:avoid; }
+    @page{ margin:12mm; }
+  }
 </style>
 
 <div class="hdr">
@@ -125,8 +144,10 @@ tr:hover td{background:#fafaf8}
       <option value="scaduta">Con corsi scaduti</option>
       <option value="in_scadenza">Con corsi in scadenza</option>
     </select>
+    <button class="bp" onclick="stampaFormazione()" title="Stampa o salva in PDF la situazione formazione (rispetta il filtro stato)">&#128424; Stampa / PDF</button>
   </div>
   <div id="perPersonaList"></div>
+  <div id="formazionePrint"></div>
 </div>
 
 <!-- PER CORSO -->
@@ -431,6 +452,38 @@ function vaiPersone(stato){
   showTab(1);
   var f=document.getElementById("filtroStatoP"); if(f) f.value=stato||"tutti";
   renderPerPersona();
+}
+/* Stampa / PDF della situazione formazione dell'azienda corrente.
+   Tabella piatta Dipendente/Corso/Data/Scadenza/Stato, ordinata (scaduti prima),
+   rispetta il filtro stato della scheda "Per persona". */
+function stampaFormazione(){
+  var dip=getDip();
+  var fS=document.getElementById('filtroStatoP');
+  var fStato=fS?fS.value:'tutti';
+  var righe=[]; var cnt={scaduta:0,in_scadenza:0,ok:0,escluso:0};
+  for(var i=0;i<dip.length;i++){ var p=dip[i];
+    var corsi=p.corsi||[];
+    for(var j=0;j<corsi.length;j++){ var c=corsi[j]; var s=statoCorso(c);
+      if(cnt[s]!==undefined) cnt[s]++;
+      if(fStato!=='tutti' && s!==fStato) continue;
+      righe.push({dip:p.nome, mans:p.mansione||'', corso:c.nome, data:c.data, scad:scadenzaCorso(c), stato:s});
+    }
+  }
+  var ord={scaduta:0,in_scadenza:1,ok:2,escluso:3};
+  righe.sort(function(a,b){ var d=(ord[a.stato]!=null?ord[a.stato]:9)-(ord[b.stato]!=null?ord[b.stato]:9); if(d)return d; return a.dip<b.dip?-1:1; });
+  var oggi=(typeof Fond!=='undefined'&&Fond.oggiIT)?Fond.oggiIT():new Date().toLocaleDateString('it-IT');
+  var filtroTxt = fStato==='tutti'?'Tutti gli stati':(fStato==='scaduta'?'Solo corsi scaduti':(fStato==='in_scadenza'?'Solo corsi in scadenza':fStato));
+  var h='<h2>Situazione formazione</h2>'
+   +'<div class="pmeta">Azienda: <b>'+((getAzi()&&getAzi().nome)||'—')+'</b> &nbsp;·&nbsp; Filtro: '+filtroTxt+' &nbsp;·&nbsp; Stampato il '+oggi+'</div>'
+   +'<div class="pmeta">Scaduti: '+cnt.scaduta+' &nbsp;·&nbsp; In scadenza: '+cnt.in_scadenza+' &nbsp;·&nbsp; Regolari: '+cnt.ok+(cnt.escluso?(' &nbsp;·&nbsp; Esclusi: '+cnt.escluso):'')+'</div>'
+   +'<table><thead><tr><th>Dipendente</th><th>Mansione</th><th>Corso</th><th>Data</th><th>Scadenza</th><th>Stato</th></tr></thead><tbody>';
+  if(!righe.length){ h+='<tr><td colspan="6" style="text-align:center;padding:12px">Nessun corso da mostrare con il filtro attuale.</td></tr>'; }
+  for(var r=0;r<righe.length;r++){ var x=righe[r];
+    h+='<tr><td>'+x.dip+'</td><td>'+x.mans+'</td><td>'+x.corso+'</td><td>'+fmtDate(x.data)+'</td><td>'+(x.scad?fmtDate(x.scad):'Non scade')+'</td><td>'+(LBL[x.stato]||x.stato)+'</td></tr>';
+  }
+  h+='</tbody></table>';
+  document.getElementById('formazionePrint').innerHTML=h;
+  setTimeout(function(){ window.print(); }, 80);
 }
 function renderDash(){
   var all=tuttiCorsi();var sc=0,ins=0,ok=0;

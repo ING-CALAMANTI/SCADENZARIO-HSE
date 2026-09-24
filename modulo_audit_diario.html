@@ -190,8 +190,17 @@ label{font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:3px;
 </div></div>
 
 <!-- MODAL RILIEVO -->
+<div class="modal-bg" id="m-azione"><div class="modal">
+<h3>Nuova azione da fare</h3>
+<label>Azione da fare <button type="button" class="secondario piccolo" onclick="detta('az-testo',this)">Detta</button></label>
+<textarea id="az-testo" placeholder="Es. Richiedere preventivo per la nuova scala di sicurezza"></textarea>
+<label>Scadenza (facoltativa)</label>
+<input type="date" id="az-scadenza">
+<div style="text-align:right"><button class="secondario" onclick="chiudi('m-azione')">Annulla</button> <button class="azione" onclick="salvaAzioneRilievo()">Salva azione</button></div>
+</div></div>
+
 <div class="modal-bg" id="m-rilievo"><div class="modal">
-<h3>Nuovo rilievo</h3>
+<h3 id="m-rilievo-tit">Nuovo rilievo</h3>
 <label>Rilievo da catalogo <button type="button" class="secondario piccolo" onclick="detta('ril-cerca',this)">Detta</button></label>
 <input id="ril-cerca" placeholder="Digita per cercare nel catalogo" oninput="suggerisci()" autocomplete="off">
 <div id="ril-suggerimenti" style="max-height:160px;overflow:auto;border:1px solid var(--bordo);border-radius:4px;display:none;margin-bottom:10px;"></div>
@@ -512,12 +521,15 @@ function disegnaDiario(){
        <p>${c?c.des:''}</p>
        <p>${c?c.nor.map(n=>`<span class="etichetta-norma">${n}</span>`).join(''):''}</p>
        ${r.foto.length?'<div>'+r.foto.map(f=>`<img src="${f}">`).join('')+'</div>':''}
+       ${renderAzioniRilievo(a.id,i,r)}
        <div class="only-studio" style="margin-top:6px">
         <select style="width:auto;display:inline-block;margin:0" onchange="cambiaStato(${a.id},${i},this.value)">
          <option${r.stato==='Aperto'?' selected':''}>Aperto</option>
          <option${r.stato==='In corso'?' selected':''}>In corso</option>
          <option${r.stato==='Risolto'?' selected':''}>Risolto</option>
         </select>
+        <button class="secondario piccolo" onclick="event.stopPropagation();apriAzioneRilievo(${a.id},${i})">+ Azione</button>
+        <button class="secondario piccolo" onclick="event.stopPropagation();apriModalRilievo(${a.id},${i})">Modifica</button>
         <button class="secondario piccolo" onclick="event.stopPropagation();aggiungiFotoRilievo(${a.id},${i})">Aggiungi foto</button>
         <button class="secondario piccolo" onclick="eliminaRilievo(${a.id},${i})">Elimina</button>
        </div>
@@ -585,13 +597,27 @@ function aggiungiFotoRilievo(idAtt,idx){
 }
 
 /* ============ NUOVO RILIEVO ============ */
-function apriModalRilievo(idAtt){
+var rilievoIdxEdit=null;
+function apriModalRilievo(idAtt, idx){
  attivitaCorrente=idAtt;catScelto=null;fotoTemp=[];
+ rilievoIdxEdit=(idx==null)?null:idx;
+ var tit=document.getElementById('m-rilievo-tit'); if(tit) tit.textContent = rilievoIdxEdit==null?'Nuovo rilievo':'Modifica rilievo';
  document.getElementById('ril-cerca').value='';document.getElementById('ril-note').value='';document.getElementById('ril-libero').value='';
  document.getElementById('ril-scelto').style.display='none';
  document.getElementById('ril-suggerimenti').style.display='none';
  document.getElementById('ril-foto').value='';document.getElementById('ril-anteprima').innerHTML='';
  document.getElementById('ril-stato').value='Aperto';
+ if(rilievoIdxEdit!=null){
+   var r=attivita.find(a=>a.id===idAtt).rilievi[rilievoIdxEdit];
+   if(r){
+     if(r.idCat){ scegliCat(r.idCat); }
+     else if(r.titoloLibero){ document.getElementById('ril-libero').value=r.titoloLibero; }
+     document.getElementById('ril-note').value=r.note||'';
+     document.getElementById('ril-stato').value=r.stato||'Aperto';
+     fotoTemp=(r.foto||[]).slice();
+     document.getElementById('ril-anteprima').innerHTML=fotoTemp.map(f=>`<img src="${f}">`).join('');
+   }
+ }
  document.getElementById('m-rilievo').style.display='block';
 }
 function suggerisci(){
@@ -623,9 +649,59 @@ function salvaRilievo(){
  if(!catScelto && !libero){alert('Seleziona un rilievo dal catalogo oppure scrivi un appunto/rilievo libero.');return;}
  const ril={idCat:catScelto||null,note:document.getElementById('ril-note').value.trim(),stato:document.getElementById('ril-stato').value,foto:fotoTemp.slice()};
  if(!catScelto && libero){ ril.titoloLibero=libero; }   /* rilievo fuori catalogo */
- attivita.find(a=>a.id===attivitaCorrente).rilievi.push(ril);
+ const att=attivita.find(a=>a.id===attivitaCorrente);
+ if(rilievoIdxEdit!=null){
+   ril.azioni = att.rilievi[rilievoIdxEdit].azioni || [];   /* conserva le azioni esistenti */
+   att.rilievi[rilievoIdxEdit]=ril;
+ } else {
+   ril.azioni=[];
+   att.rilievi.push(ril);
+ }
  salva();
+ rilievoIdxEdit=null;
  chiudi('m-rilievo');disegnaDiario();
+}
+
+/* ---- Azioni da fare su un rilievo (con scadenza) ---- */
+function renderAzioniRilievo(idAtt, idx, r){
+ if(!r.azioni || !r.azioni.length) return '';
+ var oggi=new Date(new Date().toDateString());
+ var h='<div style="margin-top:8px;padding:6px 8px;background:#f7f7f4;border-radius:5px"><strong style="font-size:12px">Azioni da fare</strong>';
+ for(var k=0;k<r.azioni.length;k++){
+  var az=r.azioni[k];
+  var scad=az.scadenza?new Date(az.scadenza):null;
+  var inRitardo=scad&&!az.fatto&&scad<oggi;
+  var badge=az.scadenza?(' <span class="badge '+(az.fatto?'b-ok':(inRitardo?'b-rosso':'b-verde'))+'">entro '+dataIt(az.scadenza)+'</span>'):'';
+  h+='<div style="display:flex;align-items:flex-start;gap:6px;font-size:12px;margin-top:4px">'
+    +'<input type="checkbox" class="only-studio" '+(az.fatto?'checked':'')+' onchange="toggleAzioneRilievo('+idAtt+','+idx+','+k+')">'
+    +'<span style="flex:1;'+(az.fatto?'text-decoration:line-through;color:#999':'')+'">'+az.testo+badge+'</span>'
+    +'<button class="secondario piccolo only-studio" onclick="eliminaAzioneRilievo('+idAtt+','+idx+','+k+')" title="Elimina azione" style="padding:0 7px">&times;</button>'
+    +'</div>';
+ }
+ return h+'</div>';
+}
+var azTargetAtt=null, azTargetIdx=null;
+function apriAzioneRilievo(idAtt, idx){
+ azTargetAtt=idAtt; azTargetIdx=idx;
+ document.getElementById('az-testo').value='';
+ document.getElementById('az-scadenza').value='';
+ document.getElementById('m-azione').style.display='block';
+}
+function salvaAzioneRilievo(){
+ var t=document.getElementById('az-testo').value.trim();
+ if(!t){alert('Descrivi l\'azione da fare.');return;}
+ var r=attivita.find(a=>a.id===azTargetAtt).rilievi[azTargetIdx];
+ if(!r.azioni) r.azioni=[];
+ r.azioni.push({testo:t, scadenza:document.getElementById('az-scadenza').value||'', fatto:false});
+ salva(); chiudi('m-azione'); disegnaDiario();
+}
+function toggleAzioneRilievo(idAtt, idx, k){
+ var r=attivita.find(a=>a.id===idAtt).rilievi[idx];
+ if(r.azioni&&r.azioni[k]){ r.azioni[k].fatto=!r.azioni[k].fatto; salva(); disegnaDiario(); }
+}
+function eliminaAzioneRilievo(idAtt, idx, k){
+ var r=attivita.find(a=>a.id===idAtt).rilievi[idx];
+ if(r.azioni&&r.azioni[k]!==undefined){ if(!confirm('Eliminare questa azione?'))return; r.azioni.splice(k,1); salva(); disegnaDiario(); }
 }
 
 /* ============ CATALOGO ============ */
